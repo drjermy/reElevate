@@ -6,41 +6,73 @@ function init() {
     wrapperPaddingBottom = wrapper.css('padding-bottom');
     largeImageMarginLeft = $('#largeImage').css('margin-left');
 
-    if ($('.slide').length > 0) {
-        isSlide = true;
-        maximise.hide();
-    }
+    initVisibility();
+
     wrapper.css('opacity', 1);
 }
 
-function calculateImageWrapperSize() {
-    let wrapper = $('.offline-workflow-outer-wrapper');
-    let wrapperHeight = wrapper.height();
-    let wrapperWidth = wrapper.width();
-    let imageDimension, top;
-    if (wrapperHeight < wrapperWidth) {
-        imageDimension = wrapperHeight;
-        top = 0;
-    } else {
-        imageDimension = wrapperWidth;
-        top = (wrapperHeight - imageDimension)/2;
+
+function initVisibility()
+{
+    header.setVisibility();
+    sidebar.setVisibility();
+    footer.setVisibility();
+
+    if ($('.slide').length > 0) {
+        isSlide = true;
+        maximise.slideHide();
     }
+}
+
+
+function calculateImageWrapperSize()
+{
+    let imageWrapper = $('.offline-workflow-image-wrapper');
+    let imageAspectRatio = imageWrapper.height()/imageWrapper.width();
+
+    let wrapper = $('.offline-workflow-outer-wrapper');
+    let wrapperWidth = wrapper.width();
+    let wrapperHeight = wrapper.height();
+    let wrapperAspectRatio = wrapperHeight/wrapperWidth;
+
+    let imageHeight, imageWidth, imageOffsetTop;
+
+    if (imageAspectRatio > wrapperAspectRatio) {
+        imageHeight = wrapperHeight;
+        imageWidth = wrapperHeight / imageAspectRatio;
+        imageOffsetTop = 0;
+    } else {
+        imageWidth = wrapperWidth;
+        imageHeight = wrapperWidth * imageAspectRatio;
+        imageOffsetTop = (wrapperHeight - imageHeight)/2;
+    }
+
     return {
-        height: imageDimension + 'px',
-        width: imageDimension + 'px',
-        top: top + 'px',
+        height: imageHeight + 'px',
+        width: imageWidth + 'px',
+        top: imageOffsetTop + 'px',
         left: 0
     }
 }
 
-function setImageWrapperSize() {
+
+function setImageWrapperSize()
+{
     let imageWrapperSize = calculateImageWrapperSize();
     $('.offline-workflow-image-wrapper').css(imageWrapperSize);
     $('#offline-workflow-study-large-image').css({width: imageWrapperSize.width, height: imageWrapperSize.height});
 }
 
+
 let header = {
     visible: true,
+    setVisibility: function () {
+        chrome.storage.local.get(['headerVisible'], function (result) {
+            if (result.headerVisible === false) {
+                header.hide();
+            }
+        });
+    },
     toggle: function () {
         if (header.visible === true) header.hide();
         else header.show();
@@ -50,17 +82,32 @@ let header = {
         $('#headerWrapper').show();
         setImageWrapperSize();
         header.visible = true;
+        chrome.storage.local.set({headerVisible: true}, function () {});
     },
     hide: function () {
         $('#headerWrapper').hide();
         $('#wrapper').css('padding-top', '16px');
         setImageWrapperSize();
+        chrome.storage.local.set({headerVisible: false}, function () {});
         header.visible = false;
+    },
+    slideHide: function () {
+        $('#headerWrapper').hide();
+        $('#wrapper').css('padding-top', '16px');
+        setImageWrapperSize();
     }
 };
 
+
 let sidebar = {
     visible: true,
+    setVisibility: function () {
+        chrome.storage.local.get(['sidebarVisible'], function (result) {
+            if (result.sidebarVisible === false) {
+                sidebar.hide();
+            }
+        });
+    },
     toggle: function () {
         if (sidebar.visible === true) sidebar.hide();
         else sidebar.show();
@@ -69,17 +116,32 @@ let sidebar = {
         $('#largeImage').css('margin-left', largeImageMarginLeft);
         $('#navTab').show();
         setImageWrapperSize();
+        chrome.storage.local.set({sidebarVisible: true}, function () {});
         sidebar.visible = true;
     },
     hide: function () {
         $('#navTab').hide();
         $('#largeImage').css('margin-left', 0);
         setImageWrapperSize();
+        chrome.storage.local.set({sidebarVisible: false}, function () {});
         sidebar.visible = false;
+    },
+    slideHide: function () {
+        $('#navTab').hide();
+        $('#largeImage').css('margin-left', 0);
+        setImageWrapperSize();
     }
 };
 
+
 let footer = {
+    setVisibility: function () {
+        chrome.storage.local.get(['footerVisible'], function (result) {
+            if (result.footerVisible === false) {
+                footer.hide();
+            }
+        });
+    },
     visible: true,
     toggle: function () {
         if (footer.visible === true) footer.hide();
@@ -89,15 +151,23 @@ let footer = {
         $('#footer').show();
         $('#wrapper').css('padding-bottom', wrapperPaddingBottom);
         setImageWrapperSize();
+        chrome.storage.local.set({footerVisible: true}, function () {});
         footer.visible = true;
     },
     hide: function () {
         $('#footer').hide();
         $('#wrapper').css('padding-bottom', 0);
         setImageWrapperSize();
+        chrome.storage.local.set({footerVisible: false}, function () {});
         footer.visible = false;
+    },
+    slideHide: function () {
+        $('#footer').hide();
+        $('#wrapper').css('padding-bottom', 0);
+        setImageWrapperSize();
     }
 };
+
 
 let maximise = {
     visble: true,
@@ -123,8 +193,14 @@ let maximise = {
         header.hide();
         sidebar.hide();
         footer.hide();
+    },
+    slideHide: function () {
+        header.slideHide();
+        sidebar.slideHide();
+        footer.slideHide();
     }
 };
+
 
 let navigate = {
     previous: function () {
@@ -164,7 +240,6 @@ let navigate = {
         }
     }
 };
-
 
 
 init();

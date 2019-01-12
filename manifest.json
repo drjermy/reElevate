@@ -4,7 +4,9 @@
   "name": "reElevate",
   "version": "0.1.2",
   "description": "Elevate Radiopaedia playlists",
-
+  "permissions": [
+    "storage"
+  ],
   "content_scripts": [{
     "css": ["styles.css"],
     "js": [
