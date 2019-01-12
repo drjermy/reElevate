@@ -1,14 +1,16 @@
 {
 	"manifest_version": 2,
 
-	"name": "Elevate Playlists",
+	"name": "reElevate",
 	"version": "0.1.2",
 	"description": "Elevate Radiopaedia playlists",
 		
 	"content_scripts": [{
 		"css": ["styles.css"],
 		"js": ["thirdParty/jquery-3.3.1.slim.min.js", "content.js"],
-		"matches": ["https://radiopaedia.org/*"]
+		"matches": [
+			"https://radiopaedia.org/play/*",
+            "file://*pages/*"
+		]
 	}]
- 
 }
