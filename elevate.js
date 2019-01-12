@@ -35,7 +35,6 @@ function calculateImageWrapperSize() {
 
 function setImageWrapperSize() {
     let imageWrapperSize = calculateImageWrapperSize();
-    console.log(imageWrapperSize);
     $('.offline-workflow-image-wrapper').css(imageWrapperSize);
     $('#offline-workflow-study-large-image').css({width: imageWrapperSize.width, height: imageWrapperSize.height});
 }
