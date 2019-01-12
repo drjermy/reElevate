@@ -17,3 +17,21 @@ $(document).bind('keydown', 'm', function () {
 $(document).bind('keydown', 'shift+m', function () {
     maximise.show();
 });
+
+$(document).bind('keydown', ',', function () {
+    navigate.previous();
+});
+
+$(document).bind('keydown', '.', function () {
+    navigate.next();
+});
+
+$(document).bind('keydown', 'left', function () {
+    navigate.back();
+});
+
+$(document).bind('keydown', 'right', function () {
+    navigate.orange();
+});
+
+$()
