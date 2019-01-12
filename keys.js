@@ -1,37 +1,53 @@
-$(document).bind('keydown', 'h', function () {
-    header.toggle();
-});
+$(document).ready(function() {
 
-$(document).bind('keydown', 's', function () {
-    sidebar.toggle();
-});
+    $(document).bind('keyup', 'h', function () {
+        header.toggle();
+    });
 
-$(document).bind('keydown', 'f', function () {
-    footer.toggle();
-});
+    $(document).bind('keyup', 's', function () {
+        sidebar.toggle();
+    });
 
-$(document).bind('keydown', 'm', function () {
-    maximise.toggle();
-});
+    $(document).bind('keyup', 'f', function () {
+        footer.toggle();
+    });
 
-$(document).bind('keydown', 'shift+m', function () {
-    maximise.show();
-});
+    $(document).bind('keyup', 'm', function () {
+        maximise.toggle();
+    });
 
-$(document).bind('keydown', ',', function () {
-    navigate.previous();
-});
+    $(document).bind('keyup', 'shift+m', function () {
+        maximise.show();
+    });
 
-$(document).bind('keydown', '.', function () {
-    navigate.next();
-});
+    $(document).bind('keyup', 'shift+left', function () {
+        navigate.previous();
+    });
 
-$(document).bind('keydown', 'left', function () {
-    navigate.back();
-});
+    $(document).bind('keyup', 'shift+right', function () {
+        navigate.next();
+    });
 
-$(document).bind('keydown', 'right', function () {
-    navigate.orange();
-});
+    $(document).bind('keyup', 'left', function () {
+        navigate.back();
+    });
 
-$()
+    $(document).bind('keyup', 'right', function () {
+        navigate.orange();
+    });
+
+    $('#offline-workflow-page-links li').each(function (n, value) {
+        let key = n+1;
+        $(document).bind('keyup', key.toString(), function () {
+            navigate.study(key);
+        });
+    });
+
+    $('.thumb').each(function (n, value) {
+        let key = n+1;
+        $(document).bind('keyup', 'shift+' + key.toString(), function () {
+            navigate.series(n);
+        });
+    });
+
+});

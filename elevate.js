@@ -148,8 +148,20 @@ let navigate = {
     back: function () {
         window.history.back();
     },
-    orange: function() {
+    orange: function () {
         $('a.orange')[0].click();
+    },
+    series: function (n) {
+        let button = $('#offline-workflow-thumb-' + n + ' a');
+        if (button.length > 0) {
+            button[0].click();
+        }
+    },
+    study: function (n) {
+        let button = $('#offline-workflow-page-' + n + ' a');
+        if (button.length > 0) {
+            button[0].click();
+        }
     }
 };
 
