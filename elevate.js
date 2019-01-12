@@ -5,6 +5,11 @@ function init() {
     wrapperPaddingTop = wrapper.css('padding-top');
     wrapperPaddingBottom = wrapper.css('padding-bottom');
     largeImageMarginLeft = $('#largeImage').css('margin-left');
+
+    if ($('.slide').length > 0) {
+        maximise.hide();
+    }
+    wrapper.css('opacity', 1);
 }
 
 
