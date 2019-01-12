@@ -10,9 +10,9 @@
     "js": [
       "vendor/jquery-3.3.1.slim.min.js",
       "vendor/jquery.hotkeys-0.2.0.js",
+      "elevate/toggle.js",
       "keys.js",
-      "elevate.js",
-      "content.js"
+      "elevate.js"
     ],
     "matches": [
       "https://radiopaedia.org/play/*",
