@@ -2,6 +2,9 @@
     opacity: 0;
 }
 
+div.modality {
+    display:none;
+}
 
 
 
