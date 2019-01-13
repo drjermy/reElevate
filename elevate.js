@@ -6,6 +6,7 @@ function init() {
     wrapperPaddingBottom = wrapper.css('padding-bottom');
     largeImageMarginLeft = $('#largeImage').css('margin-left');
 
+    saveHistory();
     initVisibility();
 
     wrapper.css('opacity', 1);
@@ -22,6 +23,39 @@ function initVisibility()
         isSlide = true;
         maximise.slideHide();
     }
+}
+
+
+function saveHistory() {
+    chrome.storage.local.get(['backAction'], function (result) {
+        console.log(result.backAction);
+        if (result.backAction === true) {
+            chrome.storage.local.set({backAction: false}, function () {});
+            chrome.storage.local.get(['history'], function (result) {
+                result.history.pop();
+                console.log(result.history);
+                chrome.storage.local.set({history: result.history}, function () {});
+            });
+        } else {
+            let currentURL = window.location.href;
+            chrome.storage.local.get(['history'], function (result) {
+                let history = result.history;
+                if (Array.isArray(history)) {
+                    if (history.slice(-1)[0] !== currentURL) {
+                        // Only add the URL if it's not the same as the last one.
+                        history.push(currentURL);
+                    }
+                } else {
+                    history = [currentURL];
+                }
+                if (history.length > 20) {
+                    history.splice(0, history.length - 20);
+                }
+                console.log(history)
+                chrome.storage.local.set({history: history}, function () {});
+            });
+        }
+    });
 }
 
 
@@ -222,7 +256,15 @@ let navigate = {
         nextButton.click();
     },
     back: function () {
-        window.history.back();
+        chrome.storage.local.set({backAction: true}, function () {});
+        chrome.storage.local.get(['history'], function (result) {
+            let history = result.history;
+            if (Array.isArray(history) && history.slice(-2)[0]) {
+                window.location.href = history.slice(-2)[0];
+            } else {
+                navigate.previous();
+            }
+        });
     },
     orange: function () {
         $('a.orange')[0].click();
