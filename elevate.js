@@ -64,6 +64,7 @@ function getPageVariables()
     stackedImages = pageVariables['stackedImages'];
 }
 
+
 // https://stackoverflow.com/questions/3955803/page-variables-in-content-script
 function retrieveWindowVariables(variables) {
     var ret = {};
@@ -89,6 +90,18 @@ function retrieveWindowVariables(variables) {
 
     return ret;
 }
+
+
+var findIndex = function (key, val, arr) {
+    for (var i = 0, j = arr.length; i < j; i++) {
+        if (arr[i].hasOwnProperty(key)) {
+            if (arr[i][key] == val) {
+                return i;
+            }
+        }
+    }
+    return -1;
+};
 
 
 function calculateImageWrapperSize()
@@ -322,22 +335,18 @@ let navigate = {
         navigate.down(n);
     },
     previous: function () {
-        let prevButton;
         if (isSlide) {
-            prevButton = $('a.goback')[0];
+            $('a.goback')[0].click();
         } else {
-            prevButton = $('#offline-workflow-prev-case')[0];
+            $('#offline-workflow-prev-case')[0].click();
         }
-        prevButton.click();
     },
     next: function () {
-        let nextButton;
         if (isSlide) {
-            nextButton = $('a.orange')[0];
+            $('a.orange')[0].click();
         } else {
-            nextButton = $('#offline-workflow-next-slide')[0];
+            $('#offline-workflow-next-slide')[0].click();
         }
-        nextButton.click();
     },
     back: function () {
         chrome.storage.local.set({backAction: true}, function () {});
@@ -374,19 +383,6 @@ let navigate = {
     findingsTab: function () {
         $('#offline-workflow-link-findings')[0].click();
     },
-};
-
-
-var findIndex = function (key, val, arr) {
-
-    for (var i = 0, j = arr.length; i < j; i++) {
-        if (arr[i].hasOwnProperty(key)) {
-            if (arr[i][key] == val) {
-                return i;
-            }
-        }
-    }
-    return -1;
 };
 
 init();
