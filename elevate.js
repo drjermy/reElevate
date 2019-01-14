@@ -1,39 +1,38 @@
-let wrapperPaddingTop, wrapperPaddingBottom, largeImageMarginLeft, isSlide;
+let wrapper, wrapperPaddingTop, wrapperPaddingBottom, largeImageMarginLeft, isSlide, stackedImages;
 
 function init() {
-    let wrapper = $('#wrapper');
+    wrapper = $('#wrapper');
     wrapperPaddingTop = wrapper.css('padding-top');
     wrapperPaddingBottom = wrapper.css('padding-bottom');
     largeImageMarginLeft = $('#largeImage').css('margin-left');
+    if ($('.slide').length > 0) isSlide = true;
 
     saveHistory();
     initVisibility();
-
-    wrapper.css('opacity', 1);
+    getPageVariables();
 }
 
 
 function initVisibility()
 {
-    header.setVisibility();
-    sidebar.setVisibility();
-    footer.setVisibility();
-
-    if ($('.slide').length > 0) {
-        isSlide = true;
+    if (isSlide === true) {
         maximise.slideHide();
+    } else {
+        header.setVisibility();
+        sidebar.setVisibility();
+        footer.setVisibility();
     }
+    wrapper.css({'opacity': 1, 'transition': 'opacity .2s ease-out'});
+    $('#largeImage img').trigger('mouseover');
 }
 
 
 function saveHistory() {
     chrome.storage.local.get(['backAction'], function (result) {
-        console.log(result.backAction);
         if (result.backAction === true) {
             chrome.storage.local.set({backAction: false}, function () {});
             chrome.storage.local.get(['history'], function (result) {
                 result.history.pop();
-                console.log(result.history);
                 chrome.storage.local.set({history: result.history}, function () {});
             });
         } else {
