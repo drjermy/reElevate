@@ -10,6 +10,7 @@ function init() {
     saveHistory();
     initVisibility();
     getPageVariables();
+    setFirstSlice();
 }
 
 
@@ -65,6 +66,19 @@ function getPageVariables()
 }
 
 
+/**
+ * Determine which is the first slice that should be shown and select it.
+ */
+function setFirstSlice()
+{
+    chrome.storage.sync.get(['defaultToTopImage'], function (result) {
+        if (result.defaultToTopImage === true) {
+            navigate.top();
+        }
+    });
+}
+
+
 // https://stackoverflow.com/questions/3955803/page-variables-in-content-script
 function retrieveWindowVariables(variables) {
     var ret = {};
@@ -104,6 +118,10 @@ var findIndex = function (key, val, arr) {
 };
 
 
+/**
+ * Breaks on mobile/iPad.
+ * @returns {{height: string, width: string, top: string, left: number}}
+ */
 function calculateImageWrapperSize()
 {
     let imageWrapper = $('.offline-workflow-image-wrapper');
@@ -386,3 +404,11 @@ let navigate = {
 };
 
 init();
+
+
+/**
+ * When we click a thumb (with the mouse or triggered via js, select the first slice.
+ */
+$('.thumb a').click(function() {
+    setFirstSlice();
+});
