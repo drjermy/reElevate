@@ -35,7 +35,15 @@ $(document).ready(function() {
     $(document).bind('keyup', 'right', function () {
         navigate.orange();
     });
-    
+
+    $(document).bind('keyup', 'pageup', function () {
+        navigate.up(5);
+    });
+
+    $(document).bind('keyup', 'pagedown', function () {
+        navigate.down(5);
+    });
+
     $('#offline-workflow-page-links li').each(function (n, value) {
         let key = n+1;
         $(document).bind('keyup', 'shift+' + key.toString(), function () {

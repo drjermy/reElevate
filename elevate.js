@@ -24,6 +24,7 @@ function initVisibility()
     }
     wrapper.css({'opacity': 1, 'transition': 'opacity .2s ease-out'});
     $('#largeImage img').trigger('mouseover');
+
 }
 
 
@@ -268,6 +269,17 @@ let maximise = {
 
 
 let navigate = {
+    up: function (n) {
+        for (let i = 0; i < n; i++) {
+            $('#largeImage .scrollbar .up')[0].click();
+        }
+    },
+    down: function (n) {
+        for (let i = 0; i < n; i++) {
+            console.log('a');
+            $('#largeImage .scrollbar .down')[0].click();
+        }
+    },
     previous: function () {
         let prevButton;
         if (isSlide) {
