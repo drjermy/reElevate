@@ -56,6 +56,18 @@ $(document).ready(function() {
         navigate.to(12);
     });
 
+    $(document).bind('keyup', 'q', function () {
+        navigate.imagesTab();
+    });
+
+    $(document).bind('keyup', 'w', function () {
+        navigate.questionsTab();
+    });
+
+    $(document).bind('keyup', 'e', function () {
+        navigate.findingsTab();
+    });
+
 
     $('#offline-workflow-page-links li').each(function (n, value) {
         let key = n+1;

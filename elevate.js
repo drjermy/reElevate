@@ -364,7 +364,16 @@ let navigate = {
         if (button.length > 0) {
             button[0].click();
         }
-    }
+    },
+    imagesTab: function () {
+        $('#offline-workflow-link-images')[0].click();
+    },
+    questionsTab: function () {
+        $('#offline-workflow-link-questions')[0].click();
+    },
+    findingsTab: function () {
+        $('#offline-workflow-link-findings')[0].click();
+    },
 };
 
 
