@@ -44,6 +44,19 @@ $(document).ready(function() {
         navigate.down(5);
     });
 
+    $(document).bind('keyup', 'home', function () {
+        navigate.top();
+    });
+
+    $(document).bind('keyup', 'end', function () {
+        navigate.bottom();
+    });
+
+    $(document).bind('keyup', 't', function () {
+        navigate.to(12);
+    });
+
+
     $('#offline-workflow-page-links li').each(function (n, value) {
         let key = n+1;
         $(document).bind('keyup', 'shift+' + key.toString(), function () {

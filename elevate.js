@@ -130,6 +130,30 @@ function setImageWrapperSize()
 }
 
 
+function currentStudyImages()
+{
+    let currentTab = $('#navTab .thumbnails .active').parent('.thumb').attr('id');
+    let currentSeries = Number(currentTab.replace('offline-workflow-thumb-', ''));
+    return stackedImages[currentSeries]['images'];
+}
+
+
+function firstStudyImage()
+{
+    let images = currentStudyImages();
+    let firstImageIndex = findIndex('position', 1, images);
+    return images[firstImageIndex]['public_filename'];
+}
+
+
+function lastStudyImage()
+{
+    let images = currentStudyImages();
+    let lastImageIndex = findIndex('position', images.length, images);
+    return images[lastImageIndex]['public_filename'];
+}
+
+
 let header = {
     visible: true,
     setVisibility: function () {
@@ -276,9 +300,26 @@ let navigate = {
     },
     down: function (n) {
         for (let i = 0; i < n; i++) {
-            console.log('a');
             $('#largeImage .scrollbar .down')[0].click();
         }
+    },
+    top: function () {
+        let firstImage = firstStudyImage();
+        do {
+            $('#largeImage .scrollbar .up')[0].click();
+        }
+        while (firstImage !== $('#largeImage img').attr('src'));
+    },
+    bottom: function () {
+        let lastImage = lastStudyImage();
+        do {
+            $('#largeImage .scrollbar .down')[0].click();
+        }
+        while (lastImage !== $('#largeImage img').attr('src'));
+    },
+    to: function (n) {
+        navigate.top();
+        navigate.down(n);
     },
     previous: function () {
         let prevButton;
