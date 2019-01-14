@@ -35,17 +35,17 @@ $(document).ready(function() {
     $(document).bind('keyup', 'right', function () {
         navigate.orange();
     });
-
+    
     $('#offline-workflow-page-links li').each(function (n, value) {
         let key = n+1;
-        $(document).bind('keyup', key.toString(), function () {
+        $(document).bind('keyup', 'shift+' + key.toString(), function () {
             navigate.study(key);
         });
     });
 
     $('.thumb').each(function (n, value) {
         let key = n+1;
-        $(document).bind('keyup', 'shift+' + key.toString(), function () {
+        $(document).bind('keyup', key.toString(), function () {
             navigate.series(n);
         });
     });
