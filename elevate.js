@@ -50,7 +50,6 @@ function saveHistory() {
                 if (history.length > 20) {
                     history.splice(0, history.length - 20);
                 }
-                console.log(history)
                 chrome.storage.local.set({history: history}, function () {});
             });
         }
