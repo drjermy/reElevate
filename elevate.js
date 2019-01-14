@@ -57,6 +57,39 @@ function saveHistory() {
 }
 
 
+function getPageVariables()
+{
+    let pageVariables = retrieveWindowVariables(["stackedImages", "caseIDs", "currentCaseID", "studies", "components"])
+    stackedImages = pageVariables['stackedImages'];
+}
+
+// https://stackoverflow.com/questions/3955803/page-variables-in-content-script
+function retrieveWindowVariables(variables) {
+    var ret = {};
+
+    var scriptContent = "";
+    for (var i = 0; i < variables.length; i++) {
+        var currVariable = variables[i];
+        scriptContent += "if (typeof " + currVariable + " !== 'undefined') $('body').attr('tmp_" + currVariable + "', JSON.stringify(" + currVariable + "));\n"
+    }
+
+    var script = document.createElement('script');
+    script.id = 'tmpScript';
+    script.appendChild(document.createTextNode(scriptContent));
+    (document.body || document.head || document.documentElement).appendChild(script);
+
+    for (var i = 0; i < variables.length; i++) {
+        var currVariable = variables[i];
+        ret[currVariable] = $.parseJSON($("body").attr("tmp_" + currVariable));
+        $("body").removeAttr("tmp_" + currVariable);
+    }
+
+    $("#tmpScript").remove();
+
+    return ret;
+}
+
+
 function calculateImageWrapperSize()
 {
     let imageWrapper = $('.offline-workflow-image-wrapper');
@@ -281,5 +314,17 @@ let navigate = {
     }
 };
 
+
+var findIndex = function (key, val, arr) {
+
+    for (var i = 0, j = arr.length; i < j; i++) {
+        if (arr[i].hasOwnProperty(key)) {
+            if (arr[i][key] == val) {
+                return i;
+            }
+        }
+    }
+    return -1;
+};
 
 init();
