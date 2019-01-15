@@ -336,15 +336,20 @@ let navigate = {
     },
     top: function () {
         let firstImage = firstStudyImage();
+        console.log(firstImage);
+        let i = 0;
         do {
             $('#largeImage .scrollbar .up')[0].click();
+            if (i++ > 100) break;
         }
         while (firstImage !== $('#largeImage img').attr('src'));
     },
     bottom: function () {
         let lastImage = lastStudyImage();
+        let i = 0;
         do {
             $('#largeImage .scrollbar .down')[0].click();
+            if (i++ > 100) break;
         }
         while (lastImage !== $('#largeImage img').attr('src'));
     },
