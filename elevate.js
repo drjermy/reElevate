@@ -32,10 +32,10 @@ function initVisibility()
 function saveHistory() {
     chrome.storage.local.get(['backAction'], function (result) {
         if (result.backAction === true) {
-            chrome.storage.local.set({backAction: false}, function () {});
+            store.set('backAction', false);
             chrome.storage.local.get(['history'], function (result) {
                 result.history.pop();
-                chrome.storage.local.set({history: result.history}, function () {});
+                store.set('history', result.history);
             });
         } else {
             let currentURL = window.location.href;
@@ -52,7 +52,7 @@ function saveHistory() {
                 if (history.length > 20) {
                     history.splice(0, history.length - 20);
                 }
-                chrome.storage.local.set({history: history}, function () {});
+                store.set('history', history);
             });
         }
     });
@@ -184,6 +184,14 @@ function lastStudyImage()
     return images[lastImageIndex]['public_filename'];
 }
 
+let store = {
+    set: function (name, value) {
+        let setter = {};
+        setter[name] = value;
+        chrome.storage.local.set(setter, function () {});
+    }
+};
+
 
 let header = {
     visible: true,
@@ -203,13 +211,13 @@ let header = {
         $('#headerWrapper').show();
         setImageWrapperSize();
         header.visible = true;
-        chrome.storage.local.set({headerVisible: true}, function () {});
+        store.set('headerVisible', true);
     },
     hide: function () {
         $('#headerWrapper').hide();
         $('#wrapper').css('padding-top', '16px');
         setImageWrapperSize();
-        chrome.storage.local.set({headerVisible: false}, function () {});
+        store.set('headerVisible', false);
         header.visible = false;
     },
     slideHide: function () {
@@ -237,14 +245,14 @@ let sidebar = {
         $('#largeImage').css('margin-left', largeImageMarginLeft);
         $('#navTab').show();
         setImageWrapperSize();
-        chrome.storage.local.set({sidebarVisible: true}, function () {});
+        store.set('sidebarVisible', true);
         sidebar.visible = true;
     },
     hide: function () {
         $('#navTab').hide();
         $('#largeImage').css('margin-left', 0);
         setImageWrapperSize();
-        chrome.storage.local.set({sidebarVisible: false}, function () {});
+        store.set('sidebarVisible', false);
         sidebar.visible = false;
     },
     slideHide: function () {
@@ -272,14 +280,14 @@ let footer = {
         $('#footer').show();
         $('#wrapper').css('padding-bottom', wrapperPaddingBottom);
         setImageWrapperSize();
-        chrome.storage.local.set({footerVisible: true}, function () {});
+        store.set('footerVisible', true);
         footer.visible = true;
     },
     hide: function () {
         $('#footer').hide();
         $('#wrapper').css('padding-bottom', 0);
         setImageWrapperSize();
-        chrome.storage.local.set({footerVisible: false}, function () {});
+        store.set('footerVisible', false);
         footer.visible = false;
     },
     slideHide: function () {
@@ -336,7 +344,6 @@ let navigate = {
     },
     top: function () {
         let firstImage = firstStudyImage();
-        console.log(firstImage);
         let i = 0;
         do {
             $('#largeImage .scrollbar .up')[0].click();
@@ -372,7 +379,7 @@ let navigate = {
         }
     },
     back: function () {
-        chrome.storage.local.set({backAction: true}, function () {});
+        store.set('backAction', true);
         chrome.storage.local.get(['history'], function (result) {
             let history = result.history;
             if (Array.isArray(history) && history.slice(-2)[0]) {
