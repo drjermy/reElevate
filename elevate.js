@@ -462,12 +462,20 @@ let navigate = {
     },
 };
 
-init();
+$(document).ready(function() {
+    init();
+
+    /**
+     * When we click a thumb (with the mouse or triggered via js, select the first slice.
+     */
+    $('.thumb a').click(function() {
+        setFirstSlice();
+    });
 
 
-/**
- * When we click a thumb (with the mouse or triggered via js, select the first slice.
- */
-$('.thumb a').click(function() {
-    setFirstSlice();
+    chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+        console.log(request);
+        sendResponse({ name: store.name() });
+    });
+
 });
