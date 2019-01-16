@@ -110,22 +110,25 @@ function setFirstSlice()
 
 // https://stackoverflow.com/questions/3955803/page-variables-in-content-script
 function retrieveWindowVariables(variables) {
-    var ret = {};
+    let ret = {};
 
-    var scriptContent = "";
-    for (var i = 0; i < variables.length; i++) {
-        var currVariable = variables[i];
+    let scriptContent = "";
+    for (let i = 0; i < variables.length; i++) {
+        let currVariable = variables[i];
         scriptContent += "if (typeof " + currVariable + " !== 'undefined') $('body').attr('tmp_" + currVariable + "', JSON.stringify(" + currVariable + "));\n"
     }
 
-    var script = document.createElement('script');
+    let script = document.createElement('script');
     script.id = 'tmpScript';
     script.appendChild(document.createTextNode(scriptContent));
     (document.body || document.head || document.documentElement).appendChild(script);
 
-    for (var i = 0; i < variables.length; i++) {
-        var currVariable = variables[i];
-        ret[currVariable] = $.parseJSON($("body").attr("tmp_" + currVariable));
+    for (let i = 0; i < variables.length; i++) {
+        let currVariable = variables[i];
+        let current = $("body").attr("tmp_" + currVariable);
+        if (current) {
+            ret[currVariable] = $.parseJSON(current);
+        }
         $("body").removeAttr("tmp_" + currVariable);
     }
 
@@ -214,16 +217,25 @@ function lastStudyImage()
 }
 
 let store = {
-    name: function (variableName) {
-        return 'radiopaedia' + '-' + playlistVars.playlistId + '-' + playlistVars.entryId + '-' + playlistVars.caseId + '-' + playlistVars.studyId + '-' + variableName;
+    name: function () {
+        return 'radiopaedia' + '-' + playlistVars.playlistId + '-' + playlistVars.entryId + '-' + playlistVars.caseId + '-' + playlistVars.studyId;
     },
     set: function (name, value) {
-        let setter = {};
-        setter[name] = value;
-        chrome.storage.local.set(setter, function () {});
+        chrome.storage.local.get([store.name()], function(result) {
+            if (!result[store.name()]) {
+                result[store.name()] = {};
+            }
+            result[store.name()][name] = value;
+            chrome.storage.local.set(result, function () {});
+        });
     },
     get: function (name, callback) {
-        chrome.storage.local.get([name], callback);
+        chrome.storage.local.get([store.name()], function(result) {
+            result = result[store.name()];
+            if (result) {
+                callback(result)
+            }
+        });
     }
 };
 
