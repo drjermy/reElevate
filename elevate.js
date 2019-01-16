@@ -11,6 +11,7 @@ function init() {
     getPlaylistVarsFromURL();
     saveHistory();
     setFirstSlice();
+    elementVisibility();
     initVisibility();
     fadeIn();
 }
@@ -19,6 +20,16 @@ function init() {
 function fadeIn()
 {
     wrapper.css({'opacity': 1, 'transition': 'opacity .2s ease-out'});
+}
+
+
+function elementVisibility()
+{
+    store.get('hideFindings', function (result) {
+        if (result.hideFindings === true) {
+            $('#offline-workflow-link-findings').parent('li').addClass('inactive').removeClass('active');
+        }
+    });
 }
 
 
@@ -31,7 +42,7 @@ function initVisibility()
         sidebar.setVisibility();
         footer.setVisibility();
     }
-    $('#largeImage img').trigger('mouseover');
+    $('#largeImage img').trigger('mouseover').click();
 }
 
 
@@ -433,11 +444,10 @@ let navigate = {
     back: function () {
         store.set('backAction', true);
         store.get('history', function (result) {
+            console.log(result);
             let history = result.history;
             if (Array.isArray(history) && history.slice(-2)[0]) {
                 window.location.href = history.slice(-2)[0];
-            } else {
-                navigate.previous();
             }
         });
     },
