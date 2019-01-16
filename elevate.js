@@ -214,6 +214,9 @@ function lastStudyImage()
 }
 
 let store = {
+    name: function (variableName) {
+        return 'radiopaedia' + '-' + playlistVars.playlistId + '-' + playlistVars.entryId + '-' + playlistVars.caseId + '-' + playlistVars.studyId + '-' + variableName;
+    },
     set: function (name, value) {
         let setter = {};
         setter[name] = value;
