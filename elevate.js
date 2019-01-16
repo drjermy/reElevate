@@ -30,16 +30,16 @@ function initVisibility()
 
 
 function saveHistory() {
-    chrome.storage.local.get(['backAction'], function (result) {
+    store.get('backAction', function (result) {
         if (result.backAction === true) {
             store.set('backAction', false);
-            chrome.storage.local.get(['history'], function (result) {
+            store.get('history', function (result) {
                 result.history.pop();
                 store.set('history', result.history);
             });
         } else {
             let currentURL = window.location.href;
-            chrome.storage.local.get(['history'], function (result) {
+            store.get('history', function (result) {
                 let history = result.history;
                 if (Array.isArray(history)) {
                     if (history.slice(-1)[0] !== currentURL) {
@@ -189,6 +189,9 @@ let store = {
         let setter = {};
         setter[name] = value;
         chrome.storage.local.set(setter, function () {});
+    },
+    get: function (name, callback) {
+        chrome.storage.local.get([name], callback);
     }
 };
 
@@ -196,7 +199,7 @@ let store = {
 let header = {
     visible: true,
     setVisibility: function () {
-        chrome.storage.local.get(['headerVisible'], function (result) {
+        store.get('headerVisible', function (result) {
             if (result.headerVisible === false) {
                 header.hide();
             }
@@ -231,7 +234,7 @@ let header = {
 let sidebar = {
     visible: true,
     setVisibility: function () {
-        chrome.storage.local.get(['sidebarVisible'], function (result) {
+        store.get('sidebarVisible', function (result) {
             if (result.sidebarVisible === false) {
                 sidebar.hide();
             }
@@ -265,7 +268,7 @@ let sidebar = {
 
 let footer = {
     setVisibility: function () {
-        chrome.storage.local.get(['footerVisible'], function (result) {
+        store.get('footerVisible', function (result) {
             if (result.footerVisible === false) {
                 footer.hide();
             }
@@ -380,7 +383,7 @@ let navigate = {
     },
     back: function () {
         store.set('backAction', true);
-        chrome.storage.local.get(['history'], function (result) {
+        store.get('history', function (result) {
             let history = result.history;
             if (Array.isArray(history) && history.slice(-2)[0]) {
                 window.location.href = history.slice(-2)[0];
