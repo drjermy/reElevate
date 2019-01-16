@@ -1,4 +1,4 @@
-let wrapper, wrapperPaddingTop, wrapperPaddingBottom, largeImageMarginLeft, isSlide, stackedImages;
+let wrapper, wrapperPaddingTop, wrapperPaddingBottom, largeImageMarginLeft, isSlide, stackedImages, offlineMode, playlistVars;
 
 function init() {
     wrapper = $('#wrapper');
@@ -10,6 +10,7 @@ function init() {
     saveHistory();
     initVisibility();
     getPageVariables();
+    getPlaylistVarsFromURL();
     setFirstSlice();
 }
 
@@ -61,8 +62,36 @@ function saveHistory() {
 
 function getPageVariables()
 {
-    let pageVariables = retrieveWindowVariables(["stackedImages", "caseIDs", "currentCaseID", "studies", "components"])
+    let pageVariables = retrieveWindowVariables(["stackedImages", "caseIDs", "currentCaseID", "studies", "components", "offlineMode"]);
+
     stackedImages = pageVariables['stackedImages'];
+    offlineMode = pageVariables['offlineMode'];
+}
+
+
+function getPlaylistVarsFromURL()
+{
+    let playlistIds = {};
+
+    let pathArray = window.location.pathname.split('/');
+    if (offlineMode === true) {
+        let partsArray = pathArray[6].split('.html')[0].split('_');
+        playlistIds = {
+            playlistId: partsArray[1],
+            entryId: partsArray[3],
+            caseId: partsArray[5],
+            studyId: partsArray[7]
+        };
+    } else {
+        playlistIds = {
+            playlistId: pathArray[2],
+            entryId: pathArray[4],
+            caseId: pathArray[6],
+            studyId: pathArray[8]
+        };
+    }
+
+    playlistVars = playlistIds;
 }
 
 
