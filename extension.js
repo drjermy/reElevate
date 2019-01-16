@@ -1,9 +1,16 @@
 $(document).ready(function() {
-    chrome.storage.sync.get(['defaultToTopImage'], function (result) {
-        console.log('Retrieved (defaultToTopImage): ' + result.defaultToTopImage);
-        $('#defaultToTopImage').prop("checked", result.defaultToTopImage);
-    });
 
+    let init = function () {
+        loadForm();
+        $('#wrapper').css({'opacity': 1, 'transition': 'opacity .2s ease-out'});
+    };
+
+    let loadForm = function () {
+        chrome.storage.sync.get(['defaultToTopImage'], function (result) {
+            console.log('Retrieved (defaultToTopImage): ' + result.defaultToTopImage);
+            $('#defaultToTopImage').prop("checked", result.defaultToTopImage);
+        });
+    };
 
     $('#defaultToTopImage').change(function() {
         let value = $(this).prop("checked");
@@ -12,4 +19,5 @@ $(document).ready(function() {
         });
     });
 
+    init();
 });
