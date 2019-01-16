@@ -7,10 +7,10 @@ function init() {
     largeImageMarginLeft = $('#largeImage').css('margin-left');
     if ($('.slide').length > 0) isSlide = true;
 
-    saveHistory();
-    initVisibility();
     getPageVariables();
     getPlaylistVarsFromURL();
+    saveHistory();
+    initVisibility();
     setFirstSlice();
 }
 
