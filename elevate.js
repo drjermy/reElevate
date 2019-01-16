@@ -100,7 +100,7 @@ function getPlaylistVarsFromURL()
  */
 function setFirstSlice()
 {
-    chrome.storage.sync.get(['defaultToTopImage'], function (result) {
+    store.get('defaultToTopImage', function (result) {
         if (result.defaultToTopImage === true) {
             navigate.top();
         }
