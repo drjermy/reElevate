@@ -10,8 +10,15 @@ function init() {
     getPageVariables();
     getPlaylistVarsFromURL();
     saveHistory();
-    initVisibility();
     setFirstSlice();
+    initVisibility();
+    fadeIn();
+}
+
+
+function fadeIn()
+{
+    wrapper.css({'opacity': 1, 'transition': 'opacity .2s ease-out'});
 }
 
 
@@ -24,9 +31,7 @@ function initVisibility()
         sidebar.setVisibility();
         footer.setVisibility();
     }
-    wrapper.css({'opacity': 1, 'transition': 'opacity .2s ease-out'});
     $('#largeImage img').trigger('mouseover');
-
 }
 
 
