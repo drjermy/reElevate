@@ -10,10 +10,9 @@ function init() {
     getPageVariables();
     getPlaylistVarsFromURL();
     saveHistory();
-    setFirstSlice();
     elementVisibility();
     initVisibility();
-    fadeIn();
+    setFirstSlice();
 }
 
 
@@ -142,6 +141,8 @@ function setFirstSlice()
                     navigate.to(result[studySliceName]);
                 }
             }
+
+            fadeIn();
         });
     });
 }
