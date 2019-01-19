@@ -24,6 +24,8 @@ function fadeIn()
 
 
 function elementVisibility() {
+    $('#offline-workflow-footer-courtesy .supporter-ornament').attr('style', 'display: none !important');
+    $('#offline-workflow-footer-courtesy .diagnostic-certainty').hide();
     global.get('hideFindings', function (result) {
         let globalHideFindings = result.hideFindings;
         store.get('hideFindings', function (result) {
@@ -31,6 +33,7 @@ function elementVisibility() {
             let pageShowFindings = result.showFindings;
             if ((globalHideFindings === true && pageShowFindings !== true) || (globalHideFindings !== true && pageHideFindings === true)) {
                 $('#offline-workflow-link-findings').parent('li').addClass('inactive').removeClass('active');
+                $('#offline-workflow-footer-courtesy .caseNumber').text('xxxx');
             }
         });
     });
