@@ -444,7 +444,6 @@ let navigate = {
     back: function () {
         store.set('backAction', true);
         store.get('history', function (result) {
-            console.log(result);
             let history = result.history;
             if (Array.isArray(history) && history.slice(-2)[0]) {
                 window.location.href = history.slice(-2)[0];
@@ -489,7 +488,6 @@ $(document).ready(function() {
 
 
     chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-        console.log(request);
         sendResponse({ name: store.name() });
     });
 
