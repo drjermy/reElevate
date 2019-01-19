@@ -392,14 +392,14 @@ let footer = {
     },
     hide: function () {
         $('#footer').hide();
-        $('#wrapper').css('padding-bottom', 0);
+        $('#wrapper').css('padding-bottom', '16px');
         setImageWrapperSize();
         global.set('footerVisible', false);
         footer.visible = false;
     },
     slideHide: function () {
         $('#footer').hide();
-        $('#wrapper').css('padding-bottom', 0);
+        $('#wrapper').css('padding-bottom', '16px');
         setImageWrapperSize();
     }
 };
