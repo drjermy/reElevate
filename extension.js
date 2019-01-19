@@ -80,15 +80,15 @@ let loadForm = function () {
             chrome.storage.local.get([response.global], function(result) {
                 if (result[response.global][response.name]) {
                     pagePopup.settings = result[response.global][response.name];
-                    pagePopup.toggleHTML('defaultToTopImage', 'Start on first slice');
-                    pagePopup.toggleHTML('defaultSlice', 'Start on selected slice');
-                    pagePopup.toggleHTML('hideFindings', 'Hide findings');
-                    pagePopup.toggleHTML('showFindings', 'Show findings');
+                }
+                pagePopup.toggleHTML('defaultToTopImage', 'Start on first slice');
+                pagePopup.toggleHTML('defaultSlice', 'Start on selected slice');
+                pagePopup.toggleHTML('hideFindings', 'Hide findings');
+                pagePopup.toggleHTML('showFindings', 'Show findings');
 
-                    if (response.series) {
-                        for (let n in response.series) {
-                            $('#startingSlice' + n).val(pagePopup.settings['startingSlice' + n]);
-                        }
+                if (response.series) {
+                    for (let n in response.series) {
+                        $('#startingSlice' + n).val(pagePopup.settings['startingSlice' + n]);
                     }
                 }
 
