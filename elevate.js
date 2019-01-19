@@ -294,16 +294,10 @@ let global = {
 };
 
 
-let logger = function (variable, variableName, functionName) {
-    console.log('FUNCTION: '+ functionName + '; VARIABLE: ' + variableName);
-    console.log(variable);
-}
-
-
 let header = {
     visible: true,
     setVisibility: function () {
-        store.get('headerVisible', function (result) {
+        global.get('headerVisible', function (result) {
             if (result.headerVisible === false) {
                 header.hide();
             }
@@ -318,13 +312,13 @@ let header = {
         $('#headerWrapper').show();
         setImageWrapperSize();
         header.visible = true;
-        store.set('headerVisible', true);
+        global.set('headerVisible', true);
     },
     hide: function () {
         $('#headerWrapper').hide();
         $('#wrapper').css('padding-top', '16px');
         setImageWrapperSize();
-        store.set('headerVisible', false);
+        global.set('headerVisible', false);
         header.visible = false;
     },
     slideHide: function () {
@@ -338,7 +332,7 @@ let header = {
 let sidebar = {
     visible: true,
     setVisibility: function () {
-        store.get('sidebarVisible', function (result) {
+        global.get('sidebarVisible', function (result) {
             if (result.sidebarVisible === false) {
                 sidebar.hide();
             }
@@ -352,14 +346,14 @@ let sidebar = {
         $('#largeImage').css('margin-left', largeImageMarginLeft);
         $('#navTab').show();
         setImageWrapperSize();
-        store.set('sidebarVisible', true);
+        global.set('sidebarVisible', true);
         sidebar.visible = true;
     },
     hide: function () {
         $('#navTab').hide();
         $('#largeImage').css('margin-left', 0);
         setImageWrapperSize();
-        store.set('sidebarVisible', false);
+        global.set('sidebarVisible', false);
         sidebar.visible = false;
     },
     slideHide: function () {
@@ -372,7 +366,7 @@ let sidebar = {
 
 let footer = {
     setVisibility: function () {
-        store.get('footerVisible', function (result) {
+        global.get('footerVisible', function (result) {
             if (result.footerVisible === false) {
                 footer.hide();
             }
@@ -387,14 +381,14 @@ let footer = {
         $('#footer').show();
         $('#wrapper').css('padding-bottom', wrapperPaddingBottom);
         setImageWrapperSize();
-        store.set('footerVisible', true);
+        global.set('footerVisible', true);
         footer.visible = true;
     },
     hide: function () {
         $('#footer').hide();
         $('#wrapper').css('padding-bottom', 0);
         setImageWrapperSize();
-        store.set('footerVisible', false);
+        global.set('footerVisible', false);
         footer.visible = false;
     },
     slideHide: function () {

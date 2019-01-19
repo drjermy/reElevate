@@ -116,6 +116,7 @@ $('#pageHideFindings').change(function() {
     storage.set('hideFindings', $(this).prop("checked"));
 });
 
+
 $('#pageShowFindings').change(function() {
     storage.set('showFindings', $(this).prop("checked"));
 });
