@@ -110,7 +110,7 @@ function getPlaylistVarsFromURL()
         };
     }
 
-    playlistVars = playlistIds;
+     playlistVars = playlistIds;
 }
 
 
@@ -522,7 +522,10 @@ $(document).ready(function() {
 
 
     chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-        sendResponse({ name: store.name() });
+        sendResponse({
+            name: store.name(),
+            global: global.name()
+        });
     });
 
 });

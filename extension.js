@@ -3,49 +3,84 @@ let init = function () {
     $('#wrapper').css({'opacity': 1, 'transition': 'opacity .2s ease-out'});
 };
 
+let outputVar = (selector, variable, value) => {
+    if (typeof value !== "undefined") {
+        $(selector).append('<nobr><div>' + variable + ' <code>' + value) + '</code></div></nobr>';
+    }
+};
+
+let outputPageVar = (varName, pageSettings) => {
+    outputVar('#pageStorage', varName, pageSettings[varName]);
+};
+
+let outputGlobalVar = (varName, globalSettings) => {
+    outputVar('#globalStorage', varName, globalSettings[varName]);
+};
+
+let checkToggle = (selector, value) => {
+    $(selector).prop("checked", value);
+};
+
 
 let loadForm = function () {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {}, function(response) {
-            chrome.storage.local.get([response.name], function(result) {
-                if (result[response.name]) {
-                    response = result[response.name];
-                    $('#defaultToTopImage').prop("checked", response.defaultToTopImage);
-                    $('#hideFindings').prop("checked", response.hideFindings);
+
+            chrome.storage.local.get([response.global], function(result) {
+                if (result[response.global]) {
+                    globalSettings = result[response.global];
+                    outputGlobalVar('backAction', globalSettings);
                 }
             });
+
+            chrome.storage.local.get([response.name], function(result) {
+                if (result[response.name]) {
+                    pageSettings = result[response.name];
+                    checkToggle('#pageDefaultToTopImage', pageSettings.defaultToTopImage)
+                    checkToggle('#pageHideFindings', pageSettings.hideFindings)
+
+                    outputPageVar('defaultToTopImage', pageSettings);
+                    outputPageVar('hideFindings', pageSettings);
+                    outputPageVar('backAction', pageSettings);
+                }
+            });
+
         });
     });
 };
 
 
-$('#defaultToTopImage').change(function() {
-    let defaultToTopImageBool = $(this).prop("checked");
+let storage = {
 
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {}, function(response) {
-            chrome.storage.local.get([response.name], function(result) {
-                if (!result[response.name]) result[response.name] = {};
-                result[response.name]['defaultToTopImage'] = defaultToTopImageBool;
-                chrome.storage.local.set(result, function () {});
+    set:(variableName, variableValue, global) => {
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {}, function(response) {
+
+                let context = response.name;
+                if (context === true) {
+                    context = response.global;
+                }
+
+                chrome.storage.local.get([context], function(result) {
+                    if (!result[context]) result[context] = {};
+                    result[context][variableName] = variableValue;
+                    chrome.storage.local.set(result, function () {});
+                });
+
             });
         });
-    });
+    }
+
+};
+
+
+$('#pageDefaultToTopImage').change(function() {
+    storage.set('defaultToTopImage', $(this).prop("checked"));
 });
 
 
-$('#hideFindings').change(function() {
-    let hideFindings = $(this).prop("checked");
-
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {}, function(response) {
-            chrome.storage.local.get([response.name], function(result) {
-                if (!result[response.name]) result[response.name] = {};
-                result[response.name]['hideFindings'] = hideFindings;
-                chrome.storage.local.set(result, function () {});
-            });
-        });
-    });
+$('#pageHideFindings').change(function() {
+    storage.set('hideFindings', $(this).prop("checked"));
 });
 
 
