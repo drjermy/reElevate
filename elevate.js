@@ -49,12 +49,15 @@ function initVisibility()
 function saveHistory() {
     store.get('backAction', function (result) {
         if (result.backAction === true) {
-            store.set('backAction', false);
+            logger(result.backAction, 'backAction', 'saveHistory');
             store.get('history', function (result) {
-                result.history.pop();
-                store.set('history', result.history);
+                if (result.history) {
+                    result.history.pop();
+                    store.set('history', result.history);
+                }
             });
         } else {
+            if (result.backAction) logger(result.backAction, 'backAction', 'saveHistory');
             let currentURL = window.location.href;
             store.get('history', function (result) {
                 let history = result.history;
@@ -72,6 +75,7 @@ function saveHistory() {
                 store.set('history', history);
             });
         }
+        store.set('backAction', false);
     });
 }
 
@@ -238,23 +242,36 @@ let store = {
         return 'radiopaedia' + '-' + playlistVars.playlistId + '-' + playlistVars.entryId + '-' + playlistVars.caseId + '-' + playlistVars.studyId;
     },
     set: function (name, value) {
-        chrome.storage.local.get([store.name()], function(result) {
-            if (!result[store.name()]) {
-                result[store.name()] = {};
-            }
-            result[store.name()][name] = value;
+        let context = store.name();
+        chrome.storage.local.get([context], function(result) {
+            if (!result[context]) result[context] = {};
+            result[context][name] = value;
             chrome.storage.local.set(result, function () {});
         });
     },
     get: function (name, callback) {
-        chrome.storage.local.get([store.name()], function(result) {
-            result = result[store.name()];
-            if (result) {
-                callback(result)
+        let context = store.name();
+        logger(context, 'context', 'store.get');
+
+        chrome.storage.local.get([context], function(result) {
+            if (typeof result !== "undefined") {
+                if (typeof result[context] !== "undefined") {
+                    logger(result[context], 'result.context', 'store.get');
+                    callback(result[context]);
+                } else {
+                    logger(result, 'result', 'store.get');
+                    callback(result);
+                }
             }
         });
     }
 };
+
+
+let logger = function (variable, variableName, functionName) {
+    console.log('FUNCTION: '+ functionName + '; VARIABLE: ' + variableName);
+    console.log(variable);
+}
 
 
 let header = {
