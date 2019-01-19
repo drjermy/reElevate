@@ -91,7 +91,8 @@ function getPlaylistVarsFromURL()
 
     let pathArray = window.location.pathname.split('/');
     if (offlineMode === true) {
-        let partsArray = pathArray[6].split('.html')[0].split('_');
+        let lastPart = pathArray.pop();
+        let partsArray = lastPart.split('.html')[0].split('_');
         playlistIds = {
             playlistId: partsArray[1],
             entryId: partsArray[3],
