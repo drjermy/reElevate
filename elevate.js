@@ -253,26 +253,23 @@ function lastStudyImage()
 }
 
 let store = {
-    name: function () {
+    playlist_id: () => {
+        return 'radiopaedia' + '-' + playlistVars.playlistId;
+    },
+    name: () => {
         return 'radiopaedia' + '-' + playlistVars.playlistId + '-' + playlistVars.entryId + '-' + playlistVars.caseId + '-' + playlistVars.studyId;
     },
-    set: function (name, value) {
-        let pContext = store.name();
-        chrome.storage.local.get([pContext], function(result) {
-            if (typeof result[pContext] === "undefined") {
-                result[pContext] = {};
+    get: (name, callback) => {
+        let playlist_id = store.playlist_id();
+        let study_id = store.name();
+        chrome.storage.local.get([playlist_id], function(result) {
+            if (typeof result[playlist_id] === "undefined") {
+                result[playlist_id] = {};
             }
-            result[pContext][name] = value;
-            chrome.storage.local.set(result, function () {});
-        });
-    },
-    get: function (name, callback) {
-        let pContext = store.name();
-        chrome.storage.local.get([pContext], function(result) {
-            if (typeof result[pContext] === "undefined") {
-                result[pContext] = {};
+            if (typeof result[playlist_id][study_id] === "undefined") {
+                result[playlist_id][study_id] = {};
             }
-            callback(result[pContext]);
+            callback(result[playlist_id][study_id]);
         });
     }
 };
@@ -281,7 +278,7 @@ let global = {
     name: () => {
         return 'radiopaedia' + '-' + playlistVars.playlistId;
     },
-    set: function (name, value) {
+    set: (name, value) => {
         let gContext = global.name();
         chrome.storage.local.get([gContext], function(result) {
             if (typeof result[gContext] === "undefined") {
@@ -291,7 +288,7 @@ let global = {
             chrome.storage.local.set(result, function () {});
         });
     },
-    get: function (name, callback) {
+    get: (name, callback) => {
         let gContext = global.name();
         chrome.storage.local.get([gContext], function(result) {
             if (typeof result[gContext] === "undefined") {

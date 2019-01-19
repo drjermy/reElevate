@@ -77,9 +77,9 @@ let loadForm = function () {
                 }
             }
 
-            chrome.storage.local.get([response.name], function(result) {
-                if (result[response.name]) {
-                    pagePopup.settings = result[response.name];
+            chrome.storage.local.get([response.global], function(result) {
+                if (result[response.global][response.name]) {
+                    pagePopup.settings = result[response.global][response.name];
                     pagePopup.toggleHTML('defaultToTopImage', 'Start on first slice');
                     pagePopup.toggleHTML('defaultSlice', 'Start on selected slice');
                     pagePopup.toggleHTML('hideFindings', 'Hide findings');
@@ -91,9 +91,7 @@ let loadForm = function () {
                         }
                     }
                 }
-            });
 
-            chrome.storage.local.get([response.global], function(result) {
                 if (result[response.global]) {
                     globalPopup.settings = result[response.global];
                     globalPopup.toggleHTML('defaultToTopImage', 'Start on first slice', 'defaultSlice');
@@ -111,17 +109,21 @@ let storage = {
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
             chrome.tabs.sendMessage(tabs[0].id, {}, function(response) {
 
-                let context = response.name;
-                if (global === true) {
-                    context = response.global;
-                }
+                let playlist_id = response.global;
+                let study_id = response.name;
 
-                chrome.storage.local.get([context], function(result) {
-                    if (!result[context]) result[context] = {};
-                    result[context][variableName] = variableValue;
+                chrome.storage.local.get([playlist_id], function (result) {
+                    if (!result[playlist_id]) result[playlist_id] = {};
+                    if (global) {
+                        if (!result[playlist_id]) result[playlist_id] = {};
+                        result[playlist_id][variableName] = variableValue;
+                    } else {
+                        if (!result[playlist_id][study_id]) result[playlist_id][study_id] = {};
+                        result[playlist_id][study_id][variableName] = variableValue;
+                    }
+                    console.log(result);
                     chrome.storage.local.set(result, function () {});
                 });
-
             });
         });
     }
