@@ -23,12 +23,15 @@ function fadeIn()
 }
 
 
-function elementVisibility()
-{
-    store.get('hideFindings', function (result) {
-        if (result.hideFindings === true) {
-            $('#offline-workflow-link-findings').parent('li').addClass('inactive').removeClass('active');
-        }
+function elementVisibility() {
+    global.get('hideFindings', function (result) {
+        let globalHideFindings = result.hideFindings;
+        store.get('hideFindings', function (result) {
+            let pageHideFindings = result.hideFindings;
+            if (globalHideFindings === true || pageHideFindings === true) {
+                $('#offline-workflow-link-findings').parent('li').addClass('inactive').removeClass('active');
+            }
+        });
     });
 }
 
@@ -47,7 +50,7 @@ function initVisibility()
 
 function saveHistory() {
     global.get('backAction', function (result) {
-        if (result.backAction) logger(result.backAction, 'backAction', 'saveHistory');
+        //if (result.backAction) logger(result.backAction, 'backAction', 'saveHistory');
         if (result.backAction === true) {
             global.get('history', function (result) {
                 if (result.history) {
@@ -119,10 +122,14 @@ function getPlaylistVarsFromURL()
  */
 function setFirstSlice()
 {
-    store.get('defaultToTopImage', function (result) {
-        if (result.defaultToTopImage === true) {
-            navigate.top();
-        }
+    global.get('defaultToTopImage', function (result) {
+        let globalDefaultToTopImage = result.defaultToTopImage;
+        store.get('defaultToTopImage', function (result) {
+            let pageDefaultToTopImage = result.defaultToTopImage;
+            if (globalDefaultToTopImage === true || pageDefaultToTopImage === true) {
+                navigate.top();
+            }
+        });
     });
 }
 
@@ -240,20 +247,20 @@ let store = {
         return 'radiopaedia' + '-' + playlistVars.playlistId + '-' + playlistVars.entryId + '-' + playlistVars.caseId + '-' + playlistVars.studyId;
     },
     set: function (name, value) {
-        context = store.name();
-        chrome.storage.local.get([context], function(result) {
-            if (typeof result[context] === "undefined") {
-                result[context] = {};
+        let pContext = store.name();
+        chrome.storage.local.get([pContext], function(result) {
+            if (typeof result[pContext] === "undefined") {
+                result[pContext] = {};
             }
-            result[context][name] = value;
+            result[pContext][name] = value;
             chrome.storage.local.set(result, function () {});
         });
     },
     get: function (name, callback) {
-        context = store.name();
-        chrome.storage.local.get([context], function(result) {
-            if (typeof result !== "undefined" && typeof result[context] !== "undefined") {
-                callback(result[context]);
+        let pContext = store.name();
+        chrome.storage.local.get([pContext], function(result) {
+            if (typeof result !== "undefined" && typeof result[pContext] !== "undefined") {
+                callback(result[pContext]);
             }
         });
     }
@@ -264,20 +271,20 @@ let global = {
         return 'radiopaedia' + '-' + playlistVars.playlistId;
     },
     set: function (name, value) {
-        context = store.name();
-        chrome.storage.local.get([context], function(result) {
-            if (typeof result[context] === "undefined") {
-                result[context] = {};
+        let gContext = store.name();
+        chrome.storage.local.get([gContext], function(result) {
+            if (typeof result[gContext] === "undefined") {
+                result[gContext] = {};
             }
-            result[context][name] = value;
+            result[gContext][name] = value;
             chrome.storage.local.set(result, function () {});
         });
     },
     get: function (name, callback) {
-        context = store.name();
-        chrome.storage.local.get([context], function(result) {
-            if (typeof result !== "undefined" && typeof result[context] !== "undefined") {
-                callback(result[context]);
+        let gContext = global.name();
+        chrome.storage.local.get([gContext], function(result) {
+            if (typeof result !== "undefined" && typeof result[gContext] !== "undefined") {
+                callback(result[gContext]);
             }
         });
     }

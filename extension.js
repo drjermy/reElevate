@@ -29,6 +29,10 @@ let loadForm = function () {
             chrome.storage.local.get([response.global], function(result) {
                 if (result[response.global]) {
                     globalSettings = result[response.global];
+                    checkToggle('#globalDefaultToTopImage', globalSettings.defaultToTopImage)
+                    checkToggle('#globalHideFindings', globalSettings.hideFindings)
+
+                    outputGlobalVar('defaultToTopImage', globalSettings);
                     outputGlobalVar('backAction', globalSettings);
                 }
             });
@@ -39,8 +43,6 @@ let loadForm = function () {
                     checkToggle('#pageDefaultToTopImage', pageSettings.defaultToTopImage)
                     checkToggle('#pageHideFindings', pageSettings.hideFindings)
 
-                    outputPageVar('defaultToTopImage', pageSettings);
-                    outputPageVar('hideFindings', pageSettings);
                     outputPageVar('backAction', pageSettings);
                 }
             });
@@ -57,7 +59,7 @@ let storage = {
             chrome.tabs.sendMessage(tabs[0].id, {}, function(response) {
 
                 let context = response.name;
-                if (context === true) {
+                if (global === true) {
                     context = response.global;
                 }
 
@@ -72,6 +74,15 @@ let storage = {
     }
 
 };
+
+$('#globalDefaultToTopImage').change(function() {
+    storage.set('defaultToTopImage', $(this).prop("checked"), true);
+});
+
+
+$('#globalHideFindings').change(function() {
+    storage.set('hideFindings', $(this).prop("checked"), true);
+});
 
 
 $('#pageDefaultToTopImage').change(function() {
