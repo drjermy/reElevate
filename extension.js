@@ -11,9 +11,6 @@ let init = function () {
 
 let globalPopup = {
     settings: {},
-    outputVar: (varName, globalSettings) => {
-        outputVar('#globalStorage', varName, globalSettings[varName]);
-    },
     toggleHTML: (varName, text, related) => {
         createToggle('#globalInput', 'global', varName, text, globalPopup.settings[varName]);
         if (related) {
@@ -61,17 +58,6 @@ let createToggle = (selector, scope, varName, text, value) => {
     );
     $('#' + id).prop("checked", value);
 };
-
-
-let checkToggle = (selector, value) => {
-    $(selector).prop("checked", value);
-};
-
-
-let outputPageVar = (varName, pageSettings) => {
-    outputVar('#pageStorage', varName, pageSettings[varName]);
-};
-
 
 
 let loadForm = function () {
