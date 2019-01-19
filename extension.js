@@ -78,13 +78,32 @@ let loadForm = function () {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {}, function(response) {
 
+            if (response.series) {
+                for (let n in response.series) {
+                    let series = response.series[n];
+                    let value = series.default;
+                    $('#seriesInput').append(
+                        '<div class="form-group">\n' +
+                        '<label for="startingSlice">Starting slice (' + n + ')</label>\n' +
+                        '<input type="range" min="1" max="' + series.count + '" value="' + value + '" class="form-control-range slider" id="startingSlice' + n + '" data-studyNumber="' + n + '">\n' +
+                        '</div>'
+                    );
+                }
+            }
+
             chrome.storage.local.get([response.name], function(result) {
                 if (result[response.name]) {
                     pagePopup.settings = result[response.name];
                     pagePopup.toggleHTML('defaultToTopImage', 'Start on first slice');
-                    pagePopup.toggleHTML('defaultSlice', 'Start on default slice');
+                    pagePopup.toggleHTML('defaultSlice', 'Start on selected slice');
                     pagePopup.toggleHTML('hideFindings', 'Hide findings');
                     pagePopup.toggleHTML('showFindings', 'Show findings');
+
+                    if (response.series) {
+                        for (let n in response.series) {
+                            $('#startingSlice' + n).val(pagePopup.settings['startingSlice' + n]);
+                        }
+                    }
                 }
             });
 
@@ -102,7 +121,6 @@ let loadForm = function () {
 
 
 let storage = {
-
     set:(variableName, variableValue, global) => {
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
             chrome.tabs.sendMessage(tabs[0].id, {}, function(response) {
@@ -121,8 +139,21 @@ let storage = {
             });
         });
     }
-
 };
+
+
+function changeSlice(sliceNumber) {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {slice: sliceNumber}, function(response) {});
+    });
+}
+
+function changeSeries(seriesNumber) {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {series: seriesNumber}, function(response) {});
+    });
+}
+
 
 
 $(document).on('change', '.toggle', function() {
@@ -142,7 +173,26 @@ $(document).on('change', '#globalHideFindings', function() {
     $('#pageShowFindings').parent('div').toggle();
 });
 
+$(document).on('change', '#pageDefaultToTopImage', function () {
+    if ($(this).prop('checked') === true) {
+        $('#startingSlice').parent('div').hide();
+    } else {
+        $('#startingSlice').parent('div').show();
+    }
+});
 
+$(document).on('mousedown', '.slider', function () {
+    changeSeries($(this).attr('data-studyNumber'));
+});
+
+$(document).on('input', '.slider', function () {
+    changeSlice($(this).val());
+});
+
+$(document).on('change', '.slider', function () {
+    let seriesN = $(this).attr('data-studyNumber');
+    storage.set('startingSlice' + seriesN, $(this).val());
+});
 
 
 $(document).ready(function() {

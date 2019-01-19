@@ -127,8 +127,17 @@ function setFirstSlice()
         store.get('defaultToTopImage', function (result) {
             let pageDefaultToTopImage = result.defaultToTopImage;
             let pageDefaultSlice = result.defaultSlice;
+
+            let currentTab = $('#navTab .thumbnails .active').parent('.thumb').attr('id');
+            let currentSeries = Number(currentTab.replace('offline-workflow-thumb-', ''));
+            let studySliceName = 'startingSlice' + currentSeries;
+
             if ((globalDefaultToTopImage === true && pageDefaultSlice !== true) || (globalDefaultToTopImage !== true && pageDefaultToTopImage === true)) {
                 navigate.top();
+            } else {
+                if (result[studySliceName]) {
+                    navigate.to(result[studySliceName]);
+                }
             }
         });
     });
@@ -528,10 +537,33 @@ $(document).ready(function() {
 
 
     chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-        sendResponse({
-            name: store.name(),
-            global: global.name()
-        });
+        do {
+
+            if (typeof request.series !== "undefined") {
+                navigate.series(request.series);
+                break;
+            }
+
+            if (typeof request.slice !== "undefined") {
+                navigate.to(request.slice);
+                break;
+            }
+
+            let series = {};
+            for (let n in stackedImages) {
+                series[n] = {};
+                series[n].count = stackedImages[n].images.length;
+                series[n].default = stackedImages[n].images[0].position;
+            }
+
+            sendResponse({
+                name: store.name(),
+                global: global.name(),
+                series: series
+            });
+
+        } while(false);
+
     });
 
 });
