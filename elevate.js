@@ -28,7 +28,8 @@ function elementVisibility() {
         let globalHideFindings = result.hideFindings;
         store.get('hideFindings', function (result) {
             let pageHideFindings = result.hideFindings;
-            if (globalHideFindings === true || pageHideFindings === true) {
+            let pageShowFindings = result.showFindings;
+            if ((globalHideFindings === true && pageShowFindings !== true) || (globalHideFindings !== true && pageHideFindings === true)) {
                 $('#offline-workflow-link-findings').parent('li').addClass('inactive').removeClass('active');
             }
         });
@@ -50,7 +51,6 @@ function initVisibility()
 
 function saveHistory() {
     global.get('backAction', function (result) {
-        //if (result.backAction) logger(result.backAction, 'backAction', 'saveHistory');
         if (result.backAction === true) {
             global.get('history', function (result) {
                 if (result.history) {
@@ -76,8 +76,8 @@ function saveHistory() {
                 global.set('history', history);
             });
         }
-        global.set('backAction', false);
     });
+    global.set('backAction', false);
 }
 
 
@@ -126,7 +126,8 @@ function setFirstSlice()
         let globalDefaultToTopImage = result.defaultToTopImage;
         store.get('defaultToTopImage', function (result) {
             let pageDefaultToTopImage = result.defaultToTopImage;
-            if (globalDefaultToTopImage === true || pageDefaultToTopImage === true) {
+            let pageDefaultSlice = result.defaultSlice;
+            if ((globalDefaultToTopImage === true && pageDefaultSlice !== true) || (globalDefaultToTopImage !== true && pageDefaultToTopImage === true)) {
                 navigate.top();
             }
         });
@@ -259,9 +260,10 @@ let store = {
     get: function (name, callback) {
         let pContext = store.name();
         chrome.storage.local.get([pContext], function(result) {
-            if (typeof result !== "undefined" && typeof result[pContext] !== "undefined") {
-                callback(result[pContext]);
+            if (typeof result[pContext] === "undefined") {
+                result[pContext] = {};
             }
+            callback(result[pContext]);
         });
     }
 };
@@ -271,7 +273,7 @@ let global = {
         return 'radiopaedia' + '-' + playlistVars.playlistId;
     },
     set: function (name, value) {
-        let gContext = store.name();
+        let gContext = global.name();
         chrome.storage.local.get([gContext], function(result) {
             if (typeof result[gContext] === "undefined") {
                 result[gContext] = {};
@@ -283,9 +285,10 @@ let global = {
     get: function (name, callback) {
         let gContext = global.name();
         chrome.storage.local.get([gContext], function(result) {
-            if (typeof result !== "undefined" && typeof result[gContext] !== "undefined") {
-                callback(result[gContext]);
+            if (typeof result[gContext] === "undefined") {
+                result[gContext] = {};
             }
+            callback(result[gContext]);
         });
     }
 };
@@ -488,6 +491,8 @@ let navigate = {
             let history = result.history;
             if (Array.isArray(history) && history.slice(-2)[0]) {
                 window.location.href = history.slice(-2)[0];
+            } else {
+                navigate.previous();
             }
         });
     },

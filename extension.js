@@ -29,21 +29,34 @@ let loadForm = function () {
             chrome.storage.local.get([response.global], function(result) {
                 if (result[response.global]) {
                     globalSettings = result[response.global];
-                    checkToggle('#globalDefaultToTopImage', globalSettings.defaultToTopImage)
-                    checkToggle('#globalHideFindings', globalSettings.hideFindings)
+                    checkToggle('#globalDefaultToTopImage', globalSettings.defaultToTopImage);
+                    checkToggle('#globalHideFindings', globalSettings.hideFindings);
 
-                    outputGlobalVar('defaultToTopImage', globalSettings);
-                    outputGlobalVar('backAction', globalSettings);
+                    if ($('#globalDefaultToTopImage').prop("checked") === true) {
+                        $('#pageDefaultToTopImage').parent('div').hide();
+                    } else {
+                        $('#pageDefaultSlice').parent('div').hide()
+                    }
+
+                    if ($('#globalHideFindings').prop("checked") === true) {
+                        $('#pageHideFindings').parent('div').hide();
+                    } else {
+                        $('#pageShowFindings').parent('div').hide()
+                    }
+
+                    //outputGlobalVar('backAction', globalSettings);
                 }
             });
 
             chrome.storage.local.get([response.name], function(result) {
                 if (result[response.name]) {
                     pageSettings = result[response.name];
-                    checkToggle('#pageDefaultToTopImage', pageSettings.defaultToTopImage)
-                    checkToggle('#pageHideFindings', pageSettings.hideFindings)
+                    checkToggle('#pageDefaultToTopImage', pageSettings.defaultToTopImage);
+                    checkToggle('#pageDefaultSlice', pageSettings.defaultSlice);
+                    checkToggle('#pageHideFindings', pageSettings.hideFindings);
+                    checkToggle('#pageShowFindings', pageSettings.showFindings);
 
-                    outputPageVar('backAction', pageSettings);
+                    //outputPageVar('defaultToTopImage', pageSettings);
                 }
             });
 
@@ -77,11 +90,15 @@ let storage = {
 
 $('#globalDefaultToTopImage').change(function() {
     storage.set('defaultToTopImage', $(this).prop("checked"), true);
+    $('#pageDefaultToTopImage').parent('div').toggle();
+    $('#pageDefaultSlice').parent('div').toggle();
 });
 
 
 $('#globalHideFindings').change(function() {
     storage.set('hideFindings', $(this).prop("checked"), true);
+    $('#pageHideFindings').parent('div').toggle();
+    $('#pageShowFindings').parent('div').toggle();
 });
 
 
@@ -90,8 +107,17 @@ $('#pageDefaultToTopImage').change(function() {
 });
 
 
+$('#pageDefaultSlice').change(function() {
+    storage.set('defaultSlice', $(this).prop("checked"));
+});
+
+
 $('#pageHideFindings').change(function() {
     storage.set('hideFindings', $(this).prop("checked"));
+});
+
+$('#pageShowFindings').change(function() {
+    storage.set('showFindings', $(this).prop("checked"));
 });
 
 
