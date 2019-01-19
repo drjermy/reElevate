@@ -42,24 +42,22 @@ function initVisibility()
         sidebar.setVisibility();
         footer.setVisibility();
     }
-    $('#largeImage img').trigger('mouseover').click();
 }
 
 
 function saveHistory() {
-    store.get('backAction', function (result) {
+    global.get('backAction', function (result) {
+        if (result.backAction) logger(result.backAction, 'backAction', 'saveHistory');
         if (result.backAction === true) {
-            logger(result.backAction, 'backAction', 'saveHistory');
-            store.get('history', function (result) {
+            global.get('history', function (result) {
                 if (result.history) {
                     result.history.pop();
-                    store.set('history', result.history);
+                    global.set('history', result.history);
                 }
             });
         } else {
-            if (result.backAction) logger(result.backAction, 'backAction', 'saveHistory');
             let currentURL = window.location.href;
-            store.get('history', function (result) {
+            global.get('history', function (result) {
                 let history = result.history;
                 if (Array.isArray(history)) {
                     if (history.slice(-1)[0] !== currentURL) {
@@ -72,10 +70,10 @@ function saveHistory() {
                 if (history.length > 20) {
                     history.splice(0, history.length - 20);
                 }
-                store.set('history', history);
+                global.set('history', history);
             });
         }
-        store.set('backAction', false);
+        global.set('backAction', false);
     });
 }
 
@@ -159,8 +157,8 @@ function retrieveWindowVariables(variables) {
 }
 
 
-var findIndex = function (key, val, arr) {
-    for (var i = 0, j = arr.length; i < j; i++) {
+let findIndex = function (key, val, arr) {
+    for (let i = 0, j = arr.length; i < j; i++) {
         if (arr[i].hasOwnProperty(key)) {
             if (arr[i][key] == val) {
                 return i;
@@ -242,26 +240,44 @@ let store = {
         return 'radiopaedia' + '-' + playlistVars.playlistId + '-' + playlistVars.entryId + '-' + playlistVars.caseId + '-' + playlistVars.studyId;
     },
     set: function (name, value) {
-        let context = store.name();
+        context = store.name();
         chrome.storage.local.get([context], function(result) {
-            if (!result[context]) result[context] = {};
+            if (typeof result[context] === "undefined") {
+                result[context] = {};
+            }
             result[context][name] = value;
             chrome.storage.local.set(result, function () {});
         });
     },
     get: function (name, callback) {
-        let context = store.name();
-        logger(context, 'context', 'store.get');
-
+        context = store.name();
         chrome.storage.local.get([context], function(result) {
-            if (typeof result !== "undefined") {
-                if (typeof result[context] !== "undefined") {
-                    logger(result[context], 'result.context', 'store.get');
-                    callback(result[context]);
-                } else {
-                    logger(result, 'result', 'store.get');
-                    callback(result);
-                }
+            if (typeof result !== "undefined" && typeof result[context] !== "undefined") {
+                callback(result[context]);
+            }
+        });
+    }
+};
+
+let global = {
+    name: () => {
+        return 'radiopaedia' + '-' + playlistVars.playlistId;
+    },
+    set: function (name, value) {
+        context = store.name();
+        chrome.storage.local.get([context], function(result) {
+            if (typeof result[context] === "undefined") {
+                result[context] = {};
+            }
+            result[context][name] = value;
+            chrome.storage.local.set(result, function () {});
+        });
+    },
+    get: function (name, callback) {
+        context = store.name();
+        chrome.storage.local.get([context], function(result) {
+            if (typeof result !== "undefined" && typeof result[context] !== "undefined") {
+                callback(result[context]);
             }
         });
     }
@@ -460,8 +476,8 @@ let navigate = {
         }
     },
     back: function () {
-        store.set('backAction', true);
-        store.get('history', function (result) {
+        global.set('backAction', true);
+        global.get('history', function (result) {
             let history = result.history;
             if (Array.isArray(history) && history.slice(-2)[0]) {
                 window.location.href = history.slice(-2)[0];
