@@ -350,7 +350,7 @@ let header = {
     },
     slideHide: function () {
         $('#headerWrapper').hide();
-        $('#wrapper').css('padding-top', '16px');
+        $('#wrapper').css('padding-top', '32px');
         setImageWrapperSize();
     }
 };
@@ -420,7 +420,7 @@ let footer = {
     },
     slideHide: function () {
         $('#footer').hide();
-        $('#wrapper').css('padding-bottom', '16px');
+        $('#wrapper').css('padding-bottom', '32px');
         setImageWrapperSize();
     }
 };
@@ -550,6 +550,7 @@ $(document).ready(function() {
      * When we click a thumb (with the mouse or triggered via js, select the first slice.
      */
     $('.thumb a').click(function() {
+        $('#largeImage').css({'opacity': 0});
         setFirstSlice();
     });
 
