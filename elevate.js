@@ -22,17 +22,50 @@ function fadeIn()
 }
 
 
+elements = {
+    headerTab: {
+        disable: () => {
+            $('#offline-workflow-link-findings').parent('li').addClass('inactive').removeClass('active');
+        }
+    },
+    supporterOrnament: {
+        hide: () => {
+            $('#offline-workflow-footer-courtesy .supporter-ornament').attr('style', 'display: none !important');
+        }
+    },
+    diagnosticCertainty: {
+        hide: () => {
+            $('#offline-workflow-footer-courtesy .diagnostic-certainty').hide();
+        }
+    },
+    footerCourtesy: {
+        disableLinks: () => {
+            $('#offline-workflow-footer-courtesy a').addClass('disabled');
+        }
+    },
+    rid: {
+        hide: () => {
+            $('#offline-workflow-footer-courtesy .caseNumber').hide();
+        }
+    },
+    presentingDefaults: () => {
+        elements.supporterOrnament.hide();
+        elements.diagnosticCertainty.hide();
+        elements.footerCourtesy.disableLinks();
+    },
+};
+
+
 function elementVisibility() {
-    $('#offline-workflow-footer-courtesy .supporter-ornament').attr('style', 'display: none !important');
-    $('#offline-workflow-footer-courtesy .diagnostic-certainty').hide();
+    elements.presentingDefaults();
     global.get('hideFindings', function (result) {
         let globalHideFindings = result.hideFindings;
         store.get('hideFindings', function (result) {
             let pageHideFindings = result.hideFindings;
             let pageShowFindings = result.showFindings;
             if ((globalHideFindings === true && pageShowFindings !== true) || (globalHideFindings !== true && pageHideFindings === true)) {
-                $('#offline-workflow-link-findings').parent('li').addClass('inactive').removeClass('active');
-                $('#offline-workflow-footer-courtesy .caseNumber').text('xxxx');
+                elements.headerTab.disable();
+                elements.rid.hide();
             }
         });
     });
