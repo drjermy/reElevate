@@ -119,32 +119,42 @@ function getPlaylistVarsFromURL()
 }
 
 
+var getCurrentSeriesNumber = () => {
+    if (isSlide) return false;
+    let currentTab = $('#navTab .thumbnails .active').parent('.thumb').attr('id');
+    if (typeof currentTab !== "undefined") {
+        return Number(currentTab.replace('offline-workflow-thumb-', ''));
+    }
+}
+
+
 /**
  * Determine which is the first slice that should be shown and select it.
  */
 function setFirstSlice()
 {
-    global.get('defaultToTopImage', function (result) {
-        let globalDefaultToTopImage = result.defaultToTopImage;
-        store.get('defaultToTopImage', function (result) {
-            let pageDefaultToTopImage = result.defaultToTopImage;
-            let pageDefaultSlice = result.defaultSlice;
+    if (!isSlide) {
+        global.get('defaultToTopImage', function (result) {
+            let globalDefaultToTopImage = result.defaultToTopImage;
+            store.get('defaultToTopImage', function (result) {
+                let pageDefaultToTopImage = result.defaultToTopImage;
+                let pageDefaultSlice = result.defaultSlice;
+                let studySliceName = 'startingSlice' + getCurrentSeriesNumber();
 
-            let currentTab = $('#navTab .thumbnails .active').parent('.thumb').attr('id');
-            let currentSeries = Number(currentTab.replace('offline-workflow-thumb-', ''));
-            let studySliceName = 'startingSlice' + currentSeries;
-
-            if ((globalDefaultToTopImage === true && pageDefaultSlice !== true) || (globalDefaultToTopImage !== true && pageDefaultToTopImage === true)) {
-                navigate.top();
-            } else {
-                if (result[studySliceName]) {
-                    navigate.to(result[studySliceName]);
+                if ((globalDefaultToTopImage === true && pageDefaultSlice !== true) || (globalDefaultToTopImage !== true && pageDefaultToTopImage === true)) {
+                    navigate.top();
+                } else {
+                    if (result[studySliceName]) {
+                        navigate.to(result[studySliceName]);
+                    }
                 }
-            }
 
-            fadeIn();
+                fadeIn();
+                $('#largeImage').css({'opacity': 1, 'transition': 'opacity .2s ease-out'});
+            });
         });
-    });
+    }
+    fadeIn();
 }
 
 
@@ -179,10 +189,12 @@ function retrieveWindowVariables(variables) {
 
 
 let findIndex = function (key, val, arr) {
-    for (let i = 0, j = arr.length; i < j; i++) {
-        if (arr[i].hasOwnProperty(key)) {
-            if (arr[i][key] == val) {
-                return i;
+    if (Array.isArray(arr)) {
+        for (let i = 0, j = arr.length; i < j; i++) {
+            if (arr[i].hasOwnProperty(key)) {
+                if (arr[i][key] == val) {
+                    return i;
+                }
             }
         }
     }
@@ -235,9 +247,10 @@ function setImageWrapperSize()
 
 function currentStudyImages()
 {
-    let currentTab = $('#navTab .thumbnails .active').parent('.thumb').attr('id');
-    let currentSeries = Number(currentTab.replace('offline-workflow-thumb-', ''));
-    return stackedImages[currentSeries]['images'];
+    let currentSeriesNumber = getCurrentSeriesNumber();
+    if (currentSeriesNumber) {
+        return stackedImages[currentSeriesNumber]['images'];
+    }
 }
 
 
@@ -245,7 +258,9 @@ function firstStudyImage()
 {
     let images = currentStudyImages();
     let firstImageIndex = findIndex('position', 1, images);
-    return images[firstImageIndex]['public_filename'];
+    if (firstImageIndex >= 0) {
+        return images[firstImageIndex]['public_filename'];
+    }
 }
 
 
@@ -253,7 +268,9 @@ function lastStudyImage()
 {
     let images = currentStudyImages();
     let lastImageIndex = findIndex('position', images.length, images);
-    return images[lastImageIndex]['public_filename'];
+    if (firstImageIndex >= 0) {
+        return images[lastImageIndex]['public_filename'];
+    }
 }
 
 let store = {
