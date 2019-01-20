@@ -186,8 +186,9 @@ function setFirstSlice()
                 $('#largeImage').css({'opacity': 1, 'transition': 'opacity .2s ease-out'});
             });
         });
+    } else {
+        fadeIn();
     }
-    fadeIn();
 }
 
 
