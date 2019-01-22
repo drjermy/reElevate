@@ -554,7 +554,11 @@ let navigate = {
         });
     },
     orange: function () {
-        $('a.orange')[0].click();
+        if (isSlide) {
+            $('a.orange')[0].click();
+        } else {
+            $('#offline-workflow-next-slide')[0].click();
+        }
     },
     series: function (n) {
         let button = $('#offline-workflow-thumb-' + n + ' a');
