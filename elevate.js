@@ -45,7 +45,9 @@ elements = {
     },
     rid: {
         hide: () => {
-            $('#offline-workflow-footer-courtesy .caseNumber').hide();
+            let courtesy = $('#offline-workflow-footer-courtesy');
+            let courtesyHTML = courtesy.html();
+            courtesy.html(courtesyHTML.split(' rID:')[0]);
         }
     },
     presentingDefaults: () => {
@@ -152,13 +154,13 @@ function getPlaylistVarsFromURL()
 }
 
 
-var getCurrentSeriesNumber = () => {
+let getCurrentSeriesNumber = () => {
     if (isSlide) return false;
     let currentTab = $('#navTab .thumbnails .active').parent('.thumb').attr('id');
     if (typeof currentTab !== "undefined") {
         return Number(currentTab.replace('offline-workflow-thumb-', ''));
     }
-}
+};
 
 
 /**

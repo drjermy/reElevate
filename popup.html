@@ -6,9 +6,16 @@
         #wrapper {
             opacity: 0;
         }
+        #jsonPane {
+            display: none;
+        }
+        #jsonContent {
+            font-size: 0.8rem;
+            white-space: nowrap;  overflow: auto;
+        }
     </style>
 </head>
-<body>
+<body style="width:300px">
     <div id="wrapper" class="container py-2">
 
         <div><strong>Playlist</strong></div>
@@ -24,7 +31,24 @@
         <div><strong>Series</strong></div>
         <div id="seriesInput"></div>
 
+        <hr/>
+        <nobr>
+            <button id="viewJson" class="btn-sm btn-warning">JSON</button>
+        </nobr>
     </div>
+
+    <div id="jsonPane" class="container py-2">
+        <p>
+            Make edits, or change completely and then hit "Save".
+        </p>
+        <textarea id="jsonContent" rows="20" class="form-control"></textarea>
+        <div class="py-2">
+            <button id="saveJsonSubmit" class="btn-sm btn-primary">Save</button>
+            <button id="downloadJson" class="btn-sm btn-warning">Download</button>
+            <button id="saveJsonCancel" class="btn-sm btn-link">Cancel</button>
+        </div>
+    </div>
+
     <script src="/vendor/jquery-3.3.1.slim.min.js" type="text/javascript"></script>
     <script src="/extension.js" type="text/javascript"></script>
 </body>

@@ -34,7 +34,7 @@ let pagePopup = {
     toggleHTML: (varName, text) => {
         createToggle('#pageInput', 'page', varName, text, pagePopup.settings[varName]);
     }
-}
+};
 
 
 
@@ -64,7 +64,7 @@ let loadForm = function () {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {}, function(response) {
 
-            if (response.series) {
+            if (typeof response.series !== "undefined") {
                 for (let n in response.series) {
                     let series = response.series[n];
                     let value = series.default;
@@ -144,6 +144,73 @@ function changeSeries(seriesNumber) {
 
 
 
+function downloadJson() {
+    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {}, function (response) {
+
+            chrome.storage.local.get([response.global], function (result) {
+                let json = result[response.global];
+                if (json.backAction) delete json.backAction;
+                if (json.history) delete json.history;
+                let jsonOutput = JSON.stringify(json, null, 4);
+                saveText('playlist-' + response.global + '.json', jsonOutput);
+            });
+        });
+    });
+}
+
+
+function saveText(filename, text) {
+    let tempElem = document.createElement('a');
+    tempElem.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    tempElem.setAttribute('download', filename);
+    tempElem.click();
+}
+
+
+function viewJson(jsonDOM) {
+    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {}, function (response) {
+
+            chrome.storage.local.get([response.global], function (result) {
+                let json = result[response.global];
+                if (json.backAction) delete json.backAction;
+                if (json.history) delete json.history;
+                let jsonOutput = JSON.stringify(json, null, 2);
+                jsonDOM.val(jsonOutput);
+            });
+        });
+    });
+}
+
+
+function loadJson() {
+    let jsonDOM = $('#jsonContent');
+    let jsonString = jsonDOM.val();
+    let jsonObj;
+    try {
+        jsonObj = JSON.parse(jsonString);
+    } catch (e) {
+        alert('Failure parsing JSON. Make sure it is valid!');
+        jsonDOM.val();
+        return
+    }
+    $('#wrapper').show();
+    $('#jsonPane').hide();
+
+    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {}, function (response) {
+            let store = {};
+            let playlist_id = response.global;
+            store[playlist_id] = jsonObj;
+            chrome.storage.local.set(store, function () {
+                location.reload();
+            });
+        });
+    });
+}
+
+
 $(document).on('change', '.toggle', function() {
     let varName = $(this).attr('data-varName');
     let scope = $(this).attr('data-scope');
@@ -180,6 +247,25 @@ $(document).on('input', '.slider', function () {
 $(document).on('change', '.slider', function () {
     let seriesN = $(this).attr('data-studyNumber');
     storage.set('startingSlice' + seriesN, $(this).val());
+});
+
+$(document).on('click', '#downloadJson', () => {
+    downloadJson();
+});
+
+$(document).on('click', '#viewJson', () => {
+    $('#wrapper').hide();
+    $('#jsonPane').show();
+    viewJson($('#jsonContent'));
+});
+
+$(document).on('click', '#saveJsonSubmit', () => {
+    loadJson();
+});
+
+$(document).on('click', '#saveJsonCancel', () => {
+    $('#wrapper').show();
+    $('#jsonPane').hide();
 });
 
 
