@@ -68,9 +68,10 @@ let loadForm = function () {
                 for (let n in response.series) {
                     let series = response.series[n];
                     let value = series.default;
+                    let int = Number(n) + 1;
                     $('#seriesInput').append(
                         '<div class="form-group">\n' +
-                        '<label for="startingSlice">Starting slice (' + n + ')</label>\n' +
+                        '<label for="startingSlice">Starting slice (' + int + ')</label>\n' +
                         '<input type="range" min="1" max="' + series.count + '" value="' + value + '" class="form-control-range slider" id="startingSlice' + n + '" data-studyNumber="' + n + '">\n' +
                         '</div>'
                     );
