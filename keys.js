@@ -52,10 +52,6 @@ $(document).ready(function() {
         navigate.bottom();
     });
 
-    $(document).bind('keyup', 't', function () {
-        navigate.to(12);
-    });
-
     $(document).bind('keyup', 'q', function () {
         navigate.imagesTab();
     });

@@ -254,18 +254,29 @@ $(document).on('click', '#downloadJson', () => {
 });
 
 $(document).on('click', '#viewJson', () => {
-    $('#wrapper').hide();
+    $('.pane').hide();
     $('#jsonPane').show();
     viewJson($('#jsonContent'));
 });
+
+$(document).on('click', '#viewHelp', () => {
+    $('.pane').hide();
+    $('#helpPane').show();
+});
+
 
 $(document).on('click', '#saveJsonSubmit', () => {
     loadJson();
 });
 
 $(document).on('click', '#saveJsonCancel', () => {
+    $('.pane').hide();
     $('#wrapper').show();
-    $('#jsonPane').hide();
+});
+
+$(document).on('click', '#helpCancel', () => {
+    $('.pane').hide();
+    $('#wrapper').show();
 });
 
 
