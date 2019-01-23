@@ -69,14 +69,16 @@ let loadForm = function () {
                 // Create sliders for selecting starting slices.
                 for (let n in response.series) {
                     let series = response.series[n];
-                    let value = series.default;
-                    let int = Number(n) + 1;
-                    $('#seriesInput').append(
-                        '<div class="form-group">\n' +
-                        '<label for="startingSlice">Starting slice (' + int + ')</label>\n' +
-                        '<input type="range" min="1" max="' + series.count + '" value="' + value + '" class="form-control-range slider" id="startingSlice' + n + '" data-studyNumber="' + n + '">\n' +
-                        '</div>'
-                    );
+                    if (series.count > 1) {
+                        let value = series.default;
+                        let int = Number(n) + 1;
+                        $('#seriesInput').append(
+                            '<div class="form-group">\n' +
+                            '<label for="startingSlice">Starting slice (' + int + ')</label>\n' +
+                            '<input type="range" min="1" max="' + series.count + '" value="' + value + '" class="form-control-range slider" id="startingSlice' + n + '" data-studyNumber="' + n + '">\n' +
+                            '</div>'
+                        );
+                    }
                 }
 
                 // Create a dropdown to select starting series.
@@ -239,6 +241,13 @@ function loadJson() {
 }
 
 
+function tabRequest(request) {
+    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, request, function (response) {});
+    });
+}
+
+
 $(document).on('change', '.toggle', function() {
     let varName = $(this).attr('data-varName');
     let scope = $(this).attr('data-scope');
@@ -287,16 +296,19 @@ $(document).on('change', '#startingSeries', function () {
 $(document).on('click', '#viewPlaylist', () => {
     $('.pane').hide();
     $('#playlistPane').show();
+    $('#reloadPane').show();
 });
 
 $(document).on('click', '#viewStudy', () => {
     $('.pane').hide();
     $('#studyPane').show();
+    $('#reloadPane').show();
 });
 
 $(document).on('click', '#viewSeries', () => {
     $('.pane').hide();
     $('#seriesPane').show();
+    $('#reloadPane').show();
 });
 
 $(document).on('click', '#viewJson', () => {
@@ -318,10 +330,11 @@ $(document).on('click', '#saveJsonSubmit', () => {
     loadJson();
 });
 
-
+$(document).on('click', '#reloadButton', () => {
+    tabRequest({ reload: true });
+});
 
 
 $(document).ready(function() {
     loadForm();
-    $('#viewPlaylist').click();
 });

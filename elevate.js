@@ -664,6 +664,10 @@ $(document).ready(function() {
     chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         do {
 
+            if (typeof request.reload !== "undefined" && request.reload === true) {
+                location.reload();
+            }
+
             if (typeof request.series !== "undefined") {
                 navigate.series(request.series);
                 break;
