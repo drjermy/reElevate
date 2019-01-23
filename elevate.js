@@ -23,7 +23,50 @@ function fadeIn()
 
 
 elements = {
-    headerTab: {
+    header: {
+        hide: () => {
+            $('#headerWrapper').hide();
+            $('#wrapper').css('padding-top', '32px');
+            setImageWrapperSize();
+        },
+        show: () => {
+            $('#headerWrapper').show();
+            $('#wrapper').css('padding-top', wrapperPaddingTop);
+            setImageWrapperSize();
+        }
+    },
+    sidebar: {
+        hide: () => {
+            $('#navTab').hide();
+            $('#largeImage').css('margin-left', 0);
+            setImageWrapperSize();
+        },
+        show: () => {
+            $('#largeImage').css('margin-left', largeImageMarginLeft);
+            $('#navTab').show();
+            setImageWrapperSize();
+        }
+    },
+    footer: {
+        hide: () => {
+            $('#footer').hide();
+            $('#wrapper').css('padding-bottom', '32px');
+            setImageWrapperSize();
+        },
+        show: () => {
+            $('#footer').show();
+            $('#wrapper').css('padding-bottom', wrapperPaddingBottom);
+            setImageWrapperSize();
+        }
+    },
+    maximise: {
+        hide: () => {
+            elements.header.hide();
+            elements.sidebar.hide();
+            elements.footer.hide();
+        }
+    },
+    findingsTab: {
         disable: () => {
             $('#offline-workflow-link-findings').parent('li').addClass('inactive').removeClass('active');
         }
@@ -371,23 +414,17 @@ let header = {
         else header.show();
     },
     show: function () {
-        $('#wrapper').css('padding-top', wrapperPaddingTop);
-        $('#headerWrapper').show();
-        setImageWrapperSize();
+        elements.header.show();
         header.visible = true;
         global.set('headerVisible', true);
     },
     hide: function () {
-        $('#headerWrapper').hide();
-        $('#wrapper').css('padding-top', '16px');
-        setImageWrapperSize();
+        elements.header.hide();
         global.set('headerVisible', false);
         header.visible = false;
     },
     slideHide: function () {
-        $('#headerWrapper').hide();
-        $('#wrapper').css('padding-top', '32px');
-        setImageWrapperSize();
+        elements.header.hide();
     }
 };
 
@@ -406,28 +443,23 @@ let sidebar = {
         else sidebar.show();
     },
     show: function () {
-        $('#largeImage').css('margin-left', largeImageMarginLeft);
-        $('#navTab').show();
-        setImageWrapperSize();
+        elements.sidebar.show();
         global.set('sidebarVisible', true);
         sidebar.visible = true;
     },
     hide: function () {
-        $('#navTab').hide();
-        $('#largeImage').css('margin-left', 0);
-        setImageWrapperSize();
+        elements.sidebar.hide();
         global.set('sidebarVisible', false);
         sidebar.visible = false;
     },
     slideHide: function () {
-        $('#navTab').hide();
-        $('#largeImage').css('margin-left', 0);
-        setImageWrapperSize();
+        elements.sidebar.hide();
     }
 };
 
 
 let footer = {
+    visible: true,
     setVisibility: function () {
         global.get('footerVisible', function (result) {
             if (result.footerVisible === false) {
@@ -435,39 +467,37 @@ let footer = {
             }
         });
     },
-    visible: true,
     toggle: function () {
         if (footer.visible === true) footer.hide();
         else footer.show();
     },
     show: function () {
-        $('#footer').show();
-        $('#wrapper').css('padding-bottom', wrapperPaddingBottom);
-        setImageWrapperSize();
+        elements.footer.show();
         global.set('footerVisible', true);
         footer.visible = true;
     },
     hide: function () {
-        $('#footer').hide();
-        $('#wrapper').css('padding-bottom', '16px');
-        setImageWrapperSize();
+        elements.footer.hide();
         global.set('footerVisible', false);
         footer.visible = false;
     },
     slideHide: function () {
-        $('#footer').hide();
-        $('#wrapper').css('padding-bottom', '32px');
-        setImageWrapperSize();
+        elements.footer.hide();
     }
 };
 
 
 let maximise = {
-    visble: true,
+    visible: true,
     state: {header, sidebar, footer},
     toggle: function () {
-        if (header.visible || sidebar.visible || footer.visible) maximise.hide();
-        else maximise.reShow();
+        if (header.visible || sidebar.visible || footer.visible) {
+            maximise.hide();
+            alert()
+        }
+        else {
+            maximise.reShow();
+        }
     },
     reShow: function () {
         if (maximise.state.header === true) header.show();
@@ -478,6 +508,7 @@ let maximise = {
         header.show();
         sidebar.show();
         footer.show();
+        // TODO because of async, we can't saving all the state data - only the last one
     },
     hide: function () {
         maximise.state.header = header.visible;
@@ -486,6 +517,7 @@ let maximise = {
         header.hide();
         sidebar.hide();
         footer.hide();
+        // TODO because of async, we can't saving all the state data - only the last one
     },
     slideHide: function () {
         header.slideHide();
