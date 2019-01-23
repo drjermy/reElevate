@@ -373,6 +373,7 @@ function lastStudyImage()
     }
 }
 
+
 let store = {
     playlist_id: () => {
         return 'radiopaedia' + '-' + playlistVars.playlistId;
@@ -394,6 +395,7 @@ let store = {
         });
     }
 };
+
 
 let global = {
     name: () => {
@@ -621,6 +623,7 @@ let navigate = {
         $('#offline-workflow-link-findings')[0].click();
     },
 };
+
 
 $(document).ready(function() {
     init();
