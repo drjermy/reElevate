@@ -125,7 +125,7 @@ function elementVisibility() {
             if (global.hideTabs === true) {
                 elements.sidebar.tabs.hide();
             }
-            console.log(result.startingSeries);
+
             if (typeof result.startingSeries !== "undefined") {
 
                 // We save the starting Series as if they started from 1, but the thumbs are 0-indexed.
