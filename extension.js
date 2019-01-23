@@ -98,6 +98,7 @@ let loadForm = function () {
                     globalPopup.settings = result[response.global];
                     globalPopup.toggleHTML('defaultToTopImage', 'Start on first slice', 'defaultSlice');
                     globalPopup.toggleHTML('hideFindings', 'Hide findings', 'showFindings');
+                    globalPopup.toggleHTML('hideTabs', 'Hide tabs');
                 }
             });
 

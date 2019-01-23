@@ -45,6 +45,12 @@ elements = {
             $('#largeImage').css('margin-left', largeImageMarginLeft);
             $('#navTab').show();
             setImageWrapperSize();
+        },
+        tabs: {
+            hide: () => {
+                $('.offline-workflow-tabs').hide();
+                $('.offline-workflow-tabs-content-container').css('top', '0');
+            }
         }
     },
     footer: {
@@ -116,6 +122,10 @@ function elementVisibility() {
             if (result.maximiseCase === true) {
                 elements.maximise.hide();
             }
+            if (global.hideTabs === true) {
+                elements.sidebar.tabs.hide();
+            }
+
         });
 
     });
