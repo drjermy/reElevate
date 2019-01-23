@@ -65,6 +65,8 @@ let loadForm = function () {
         chrome.tabs.sendMessage(tabs[0].id, {}, function(response) {
 
             if (typeof response.series !== "undefined") {
+
+                // Create sliders for selecting starting slices.
                 for (let n in response.series) {
                     let series = response.series[n];
                     let value = series.default;
@@ -74,6 +76,22 @@ let loadForm = function () {
                         '<label for="startingSlice">Starting slice (' + int + ')</label>\n' +
                         '<input type="range" min="1" max="' + series.count + '" value="' + value + '" class="form-control-range slider" id="startingSlice' + n + '" data-studyNumber="' + n + '">\n' +
                         '</div>'
+                    );
+                }
+
+                // Create a dropdown to select starting series.
+                if (Object.keys(response.series).length > 1) {
+                    let options = '<option disabled>Select default</option>';
+                    for (let n in response.series) {
+                        // We are saving them as if they started from 1 even though the thumbs are 0-indexed.
+                        let int = Number(n) + 1;
+                        options += '<option value="' + int + '">Series ' + int + '</option>';
+                    }
+
+                    $('#seriesInput').append(
+                        '<select id="startingSeries" placeholder="Starting series">' +
+                        options +
+                        '</select>'
                     );
                 }
             }
@@ -92,6 +110,7 @@ let loadForm = function () {
                     for (let n in response.series) {
                         $('#startingSlice' + n).val(pagePopup.settings['startingSlice' + n]);
                     }
+                    $('#startingSeries').val(pagePopup.settings.startingSeries);
                 }
 
                 if (result[response.global]) {
@@ -252,6 +271,12 @@ $(document).on('change', '.slider', function () {
     storage.set('startingSlice' + seriesN, $(this).val());
 });
 
+$(document).on('change', '#startingSeries', function () {
+    storage.set('startingSeries', $(this).val());
+});
+
+
+
 $(document).on('click', '#downloadJson', () => {
     downloadJson();
 });
@@ -266,7 +291,6 @@ $(document).on('click', '#viewHelp', () => {
     $('.pane').hide();
     $('#helpPane').show();
 });
-
 
 $(document).on('click', '#saveJsonSubmit', () => {
     loadJson();
