@@ -3,12 +3,6 @@ function capitalizeFirstLetter(string) {
 }
 
 
-let init = function () {
-    loadForm();
-    $('#wrapper').css({'opacity': 1, 'transition': 'opacity .2s ease-out'});
-};
-
-
 let globalPopup = {
     settings: {},
     toggleHTML: (varName, text, related) => {
@@ -16,6 +10,9 @@ let globalPopup = {
         if (related) {
             globalPopup.toggleRelated(varName, related);
         }
+    },
+    hr: () => {
+        $('#globalInput').append('<hr/>');
     },
     toggleRelated: (varName, relatedName) => {
         let globalName = 'global' + capitalizeFirstLetter(varName);
@@ -33,6 +30,9 @@ let pagePopup = {
     settings: {},
     toggleHTML: (varName, text) => {
         createToggle('#pageInput', 'page', varName, text, pagePopup.settings[varName]);
+    },
+    hr: () => {
+        $('#pageInput').append('<hr/>');
     }
 };
 
@@ -89,6 +89,7 @@ let loadForm = function () {
                     }
 
                     $('#seriesInput').append(
+                        '<p>Default series</p>' +
                         '<select id="startingSeries" placeholder="Starting series">' +
                         options +
                         '</select>'
@@ -100,11 +101,12 @@ let loadForm = function () {
                 if (result[response.global][response.name]) {
                     pagePopup.settings = result[response.global][response.name];
                 }
+                pagePopup.toggleHTML('maximiseCase', 'Maximise');
+                pagePopup.hr();
                 pagePopup.toggleHTML('defaultToTopImage', 'Start on first slice');
                 pagePopup.toggleHTML('defaultSlice', 'Start on selected slice');
                 pagePopup.toggleHTML('hideFindings', 'Hide findings');
                 pagePopup.toggleHTML('showFindings', 'Show findings')
-                pagePopup.toggleHTML('maximiseCase', 'Maximise');
 
                 if (response.series) {
                     for (let n in response.series) {
@@ -115,6 +117,10 @@ let loadForm = function () {
 
                 if (result[response.global]) {
                     globalPopup.settings = result[response.global];
+                    globalPopup.toggleHTML('headerVisible', 'Visible header');
+                    globalPopup.toggleHTML('sidebarVisible', 'Visible sidebar');
+                    globalPopup.toggleHTML('footerVisible', 'Visible footer');
+                    globalPopup.hr();
                     globalPopup.toggleHTML('defaultToTopImage', 'Start on first slice', 'defaultSlice');
                     globalPopup.toggleHTML('hideFindings', 'Hide findings', 'showFindings');
                     globalPopup.toggleHTML('hideTabs', 'Hide tabs');
@@ -277,8 +283,20 @@ $(document).on('change', '#startingSeries', function () {
 
 
 
-$(document).on('click', '#downloadJson', () => {
-    downloadJson();
+
+$(document).on('click', '#viewPlaylist', () => {
+    $('.pane').hide();
+    $('#playlistPane').show();
+});
+
+$(document).on('click', '#viewStudy', () => {
+    $('.pane').hide();
+    $('#studyPane').show();
+});
+
+$(document).on('click', '#viewSeries', () => {
+    $('.pane').hide();
+    $('#seriesPane').show();
 });
 
 $(document).on('click', '#viewJson', () => {
@@ -290,6 +308,10 @@ $(document).on('click', '#viewJson', () => {
 $(document).on('click', '#viewHelp', () => {
     $('.pane').hide();
     $('#helpPane').show();
+});
+
+$(document).on('click', '#downloadJson', () => {
+    downloadJson();
 });
 
 $(document).on('click', '#saveJsonSubmit', () => {
@@ -307,6 +329,9 @@ $(document).on('click', '#helpCancel', () => {
 });
 
 
+
+
+
 $(document).ready(function() {
-    init();
+    loadForm();
 });
