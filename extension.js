@@ -85,7 +85,8 @@ let loadForm = function () {
                 pagePopup.toggleHTML('defaultToTopImage', 'Start on first slice');
                 pagePopup.toggleHTML('defaultSlice', 'Start on selected slice');
                 pagePopup.toggleHTML('hideFindings', 'Hide findings');
-                pagePopup.toggleHTML('showFindings', 'Show findings');
+                pagePopup.toggleHTML('showFindings', 'Show findings')
+                pagePopup.toggleHTML('maximiseCase', 'Maximise');
 
                 if (response.series) {
                     for (let n in response.series) {

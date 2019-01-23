@@ -103,16 +103,21 @@ elements = {
 
 function elementVisibility() {
     elements.presentingDefaults();
-    global.get('hideFindings', function (result) {
-        let globalHideFindings = result.hideFindings;
+    global.get('hideFindings', function (global) {
+        let globalHideFindings = global.hideFindings;
+
         store.get('hideFindings', function (result) {
             let pageHideFindings = result.hideFindings;
             let pageShowFindings = result.showFindings;
             if ((globalHideFindings === true && pageShowFindings !== true) || (globalHideFindings !== true && pageHideFindings === true)) {
-                elements.headerTab.disable();
+                elements.findingsTab.disable();
                 elements.rid.hide();
             }
+            if (result.maximiseCase === true) {
+                elements.maximise.hide();
+            }
         });
+
     });
 }
 
