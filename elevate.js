@@ -437,9 +437,6 @@ let header = {
         elements.header.hide();
         global.set('headerVisible', false);
         header.visible = false;
-    },
-    slideHide: function () {
-        elements.header.hide();
     }
 };
 
@@ -466,9 +463,6 @@ let sidebar = {
         elements.sidebar.hide();
         global.set('sidebarVisible', false);
         sidebar.visible = false;
-    },
-    slideHide: function () {
-        elements.sidebar.hide();
     }
 };
 
@@ -495,9 +489,6 @@ let footer = {
         elements.footer.hide();
         global.set('footerVisible', false);
         footer.visible = false;
-    },
-    slideHide: function () {
-        elements.footer.hide();
     }
 };
 
@@ -506,13 +497,8 @@ let maximise = {
     visible: true,
     state: {header, sidebar, footer},
     toggle: function () {
-        if (header.visible || sidebar.visible || footer.visible) {
-            maximise.hide();
-            alert()
-        }
-        else {
-            maximise.reShow();
-        }
+        if (header.visible || sidebar.visible || footer.visible) maximise.hide();
+        else maximise.reShow();
     },
     reShow: function () {
         if (maximise.state.header === true) header.show();
@@ -535,9 +521,9 @@ let maximise = {
         // TODO because of async, we can't saving all the state data - only the last one
     },
     slideHide: function () {
-        header.slideHide();
-        sidebar.slideHide();
-        footer.slideHide();
+        elements.header.hide();
+        elements.sidebar.hide();
+        elements.footer.hide();
     }
 };
 
