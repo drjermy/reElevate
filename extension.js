@@ -318,20 +318,10 @@ $(document).on('click', '#saveJsonSubmit', () => {
     loadJson();
 });
 
-$(document).on('click', '#saveJsonCancel', () => {
-    $('.pane').hide();
-    $('#wrapper').show();
-});
-
-$(document).on('click', '#helpCancel', () => {
-    $('.pane').hide();
-    $('#wrapper').show();
-});
-
-
 
 
 
 $(document).ready(function() {
     loadForm();
+    $('#viewPlaylist').click();
 });
