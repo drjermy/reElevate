@@ -227,6 +227,25 @@ let getCurrentSeriesNumber = () => {
 };
 
 
+let thumbs = {
+    currentSeriesNumber: () => {
+        if (isSlide) return false;
+        let currentTab = $('#navTab .thumbnails .active').parent('.thumb').attr('id');
+        if (typeof currentTab !== "undefined") {
+            return Number(currentTab.replace('offline-workflow-thumb-', ''));
+        }
+    },
+    markCurrentRead: () => {
+        let currentSeriesNumber = thumbs.currentSeriesNumber();
+        $('#offline-workflow-thumb-' + currentSeriesNumber).attr('data-read', true);
+    },
+    isCurrentRead: () => {
+        let currentSeriesNumber = thumbs.currentSeriesNumber();
+        return $('#offline-workflow-thumb-' + currentSeriesNumber).attr('data-read');
+    }
+};
+
+
 /**
  * Determine which is the first slice that should be shown and select it.
  */
@@ -240,16 +259,21 @@ function setFirstSlice()
                 let pageDefaultSlice = result.defaultSlice;
                 let studySliceName = 'startingSlice' + getCurrentSeriesNumber();
 
-                if ((globalDefaultToTopImage === true && pageDefaultSlice !== true) || (globalDefaultToTopImage !== true && pageDefaultToTopImage === true)) {
-                    navigate.top();
-                } else {
-                    if (result[studySliceName]) {
-                        navigate.to(result[studySliceName]);
+                let isRead = thumbs.isCurrentRead();
+                if (typeof isRead === "undefined") {
+                    if ((globalDefaultToTopImage === true && pageDefaultSlice !== true) || (globalDefaultToTopImage !== true && pageDefaultToTopImage === true)) {
+                        navigate.top();
+                    } else {
+                        if (result[studySliceName]) {
+                            navigate.to(result[studySliceName]);
+                        }
                     }
                 }
 
                 fadeIn();
                 $('#largeImage').css({'opacity': 1, 'transition': 'opacity .2s ease-out'});
+
+                thumbs.markCurrentRead();
             });
         });
     } else {
