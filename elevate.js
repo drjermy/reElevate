@@ -664,8 +664,18 @@ $(document).ready(function() {
     chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         do {
 
-            if (typeof request.reload !== "undefined" && request.reload === true) {
-                location.reload();
+            if (typeof request.action !== "undefined") {
+                switch(request.action) {
+                    case 'reload':
+                        location.reload();
+                        break;
+                    case 'prev':
+                        navigate.back();
+                        break;
+                    case 'next':
+                        navigate.next();
+                        break;
+                }
             }
 
             if (typeof request.series !== "undefined") {

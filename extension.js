@@ -242,6 +242,11 @@ let tabReload = () => {
     tabRequest({ reload: true });
 };
 
+let tabAction = (action) => {
+    let request = {};
+    request.action = action;
+    tabRequest(request);
+};
 
 let tabRequest = (request) => {
     chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
@@ -295,48 +300,51 @@ $(document).on('change', '#startingSeries', function () {
 
 
 
-$(document).on('click', '#viewPlaylist', () => {
+$(document).on('click', '#viewPlaylist', function() {
     $('.pane').hide();
     $('#playlistPane').show();
     $('#reloadPane').show();
 });
 
-$(document).on('click', '#viewStudy', () => {
+$(document).on('click', '#viewStudy', function() {
     $('.pane').hide();
     $('#studyPane').show();
     $('#reloadPane').show();
 });
 
-$(document).on('click', '#viewSeries', () => {
+$(document).on('click', '#viewSeries', function() {
     $('.pane').hide();
     $('#seriesPane').show();
     $('#reloadPane').show();
 });
 
-$(document).on('click', '#viewJson', () => {
+$(document).on('click', '#viewJson', function() {
     $('.pane').hide();
     $('#jsonPane').show();
     viewJson($('#jsonContent'));
 });
 
-$(document).on('click', '#viewHelp', () => {
+$(document).on('click', '#viewHelp', function() {
     $('.pane').hide();
     $('#helpPane').show();
 });
 
-$(document).on('click', '#downloadJson', () => {
+$(document).on('click', '#downloadJson', function() {
     downloadJson();
 });
 
-$(document).on('click', '#saveJsonSubmit', () => {
+$(document).on('click', '#saveJsonSubmit', function() {
     loadJson();
 });
 
-$(document).on('click', '#reloadButton', () => {
-    tabReload();
+$(document).on('click', '.actionButton', function() {
+    let action = $(this).attr('data-action');
+    tabAction(action);
 });
 
 
 $(document).ready(function() {
     loadDetails();
+    $('#seriesPane').show();
+    $('#reloadPane').show();
 });
