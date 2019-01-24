@@ -1,3 +1,5 @@
+let playlistDetails;
+
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
@@ -60,132 +62,130 @@ let createToggle = (selector, scope, varName, text, value) => {
 };
 
 
-let loadForm = function () {
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {}, function(response) {
-
-            if (typeof response.series !== "undefined") {
-
-                // Create sliders for selecting starting slices.
-                for (let n in response.series) {
-                    let series = response.series[n];
-                    if (series.count > 1) {
-                        let value = series.default;
-                        let int = Number(n) + 1;
-                        $('#seriesInput').append(
-                            '<div class="form-group">\n' +
-                            '<label for="startingSlice">Starting slice (' + int + ')</label>\n' +
-                            '<input type="range" min="1" max="' + series.count + '" value="' + value + '" class="form-control-range slider" id="startingSlice' + n + '" data-studyNumber="' + n + '">\n' +
-                            '</div>'
-                        );
-                    }
-                }
-
-                // Create a dropdown to select starting series.
-                if (Object.keys(response.series).length > 1) {
-                    let options = '<option disabled>Select default</option>';
-                    for (let n in response.series) {
-                        // We are saving them as if they started from 1 even though the thumbs are 0-indexed.
-                        let int = Number(n) + 1;
-                        options += '<option value="' + int + '">Series ' + int + '</option>';
-                    }
-
-                    $('#seriesInput').append(
-                        '<p>Default series</p>' +
-                        '<select id="startingSeries" placeholder="Starting series">' +
-                        options +
-                        '</select>'
-                    );
-                }
+let loadDetails = () => {
+    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {}, function (response) {
+            if (typeof response !== "undefined") {
+                playlistDetails = response;
+                $('#introduction').hide();
+                $('#navigation').show();
+                loadForm();
             }
-
-            chrome.storage.local.get([response.global], function(result) {
-                if (result[response.global][response.name]) {
-                    pagePopup.settings = result[response.global][response.name];
-                }
-                pagePopup.toggleHTML('maximiseCase', 'Maximise');
-                pagePopup.hr();
-                pagePopup.toggleHTML('defaultToTopImage', 'Start on first slice');
-                pagePopup.toggleHTML('defaultSlice', 'Start on selected slice');
-                pagePopup.toggleHTML('hideFindings', 'Hide findings');
-                pagePopup.toggleHTML('showFindings', 'Show findings')
-
-                if (response.series) {
-                    for (let n in response.series) {
-                        $('#startingSlice' + n).val(pagePopup.settings['startingSlice' + n]);
-                    }
-                    $('#startingSeries').val(pagePopup.settings.startingSeries);
-                }
-
-                if (result[response.global]) {
-                    globalPopup.settings = result[response.global];
-                    globalPopup.toggleHTML('headerVisible', 'Visible header');
-                    globalPopup.toggleHTML('sidebarVisible', 'Visible sidebar');
-                    globalPopup.toggleHTML('footerVisible', 'Visible footer');
-                    globalPopup.hr();
-                    globalPopup.toggleHTML('defaultToTopImage', 'Start on first slice', 'defaultSlice');
-                    globalPopup.toggleHTML('hideFindings', 'Hide findings', 'showFindings');
-                    globalPopup.toggleHTML('hideTabs', 'Hide tabs');
-                }
-            });
-
         });
     });
+};
+
+let loadForm = () => {
+    response = playlistDetails;
+
+    if (typeof response.series !== "undefined") {
+
+        // Create sliders for selecting starting slices.
+        for (let n in response.series) {
+            let series = response.series[n];
+            if (series.count > 1) {
+                let value = series.default;
+                let int = Number(n) + 1;
+                $('#seriesInput').append(
+                    '<div class="form-group">\n' +
+                    '<label for="startingSlice">Starting slice (' + int + ')</label>\n' +
+                    '<input type="range" min="1" max="' + series.count + '" value="' + value + '" class="form-control-range slider" id="startingSlice' + n + '" data-studyNumber="' + n + '">\n' +
+                    '</div>'
+                );
+            }
+        }
+
+        // Create a dropdown to select starting series.
+        if (Object.keys(response.series).length > 1) {
+            let options = '<option disabled>Select default</option>';
+            for (let n in response.series) {
+                // We are saving them as if they started from 1 even though the thumbs are 0-indexed.
+                let int = Number(n) + 1;
+                options += '<option value="' + int + '">Series ' + int + '</option>';
+            }
+
+            $('#seriesInput').append(
+                '<p>Default series</p>' +
+                '<select id="startingSeries" placeholder="Starting series">' +
+                options +
+                '</select>'
+            );
+        }
+    }
+
+    chrome.storage.local.get([response.global], function(result) {
+        if (result[response.global][response.name]) {
+            pagePopup.settings = result[response.global][response.name];
+        }
+        pagePopup.toggleHTML('maximiseCase', 'Maximise');
+        pagePopup.hr();
+        pagePopup.toggleHTML('defaultToTopImage', 'Start on first slice');
+        pagePopup.toggleHTML('defaultSlice', 'Start on selected slice');
+        pagePopup.toggleHTML('hideFindings', 'Hide findings');
+        pagePopup.toggleHTML('showFindings', 'Show findings')
+
+        if (response.series) {
+            for (let n in response.series) {
+                $('#startingSlice' + n).val(pagePopup.settings['startingSlice' + n]);
+            }
+            $('#startingSeries').val(pagePopup.settings.startingSeries);
+        }
+
+        if (result[response.global]) {
+            globalPopup.settings = result[response.global];
+            globalPopup.toggleHTML('headerVisible', 'Visible header');
+            globalPopup.toggleHTML('sidebarVisible', 'Visible sidebar');
+            globalPopup.toggleHTML('footerVisible', 'Visible footer');
+            globalPopup.hr();
+            globalPopup.toggleHTML('defaultToTopImage', 'Start on first slice', 'defaultSlice');
+            globalPopup.toggleHTML('hideFindings', 'Hide findings', 'showFindings');
+            globalPopup.toggleHTML('hideTabs', 'Hide tabs');
+        }
+    });
+
 };
 
 
 let storage = {
     set:(variableName, variableValue, global) => {
-        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, {}, function(response) {
+        response = playlistDetails;
+        let playlist_id = response.global;
+        let study_id = response.name;
 
-                let playlist_id = response.global;
-                let study_id = response.name;
-
-                chrome.storage.local.get([playlist_id], function (result) {
-                    if (!result[playlist_id]) result[playlist_id] = {};
-                    if (global) {
-                        if (!result[playlist_id]) result[playlist_id] = {};
-                        result[playlist_id][variableName] = variableValue;
-                    } else {
-                        if (!result[playlist_id][study_id]) result[playlist_id][study_id] = {};
-                        result[playlist_id][study_id][variableName] = variableValue;
-                    }
-                    console.log(result);
-                    chrome.storage.local.set(result, function () {});
-                });
-            });
+        chrome.storage.local.get([playlist_id], function (result) {
+            if (!result[playlist_id]) result[playlist_id] = {};
+            if (global) {
+                if (!result[playlist_id]) result[playlist_id] = {};
+                result[playlist_id][variableName] = variableValue;
+            } else {
+                if (!result[playlist_id][study_id]) result[playlist_id][study_id] = {};
+                result[playlist_id][study_id][variableName] = variableValue;
+            }
+            console.log(result);
+            chrome.storage.local.set(result, function () {});
         });
     }
 };
 
 
 function changeSlice(sliceNumber) {
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {slice: sliceNumber}, function(response) {});
-    });
+    tabRequest( {slice: sliceNumber} );
 }
 
 function changeSeries(seriesNumber) {
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {series: seriesNumber}, function(response) {});
-    });
+    tabRequest( {series: seriesNumber} );
 }
 
 
 
 function downloadJson() {
-    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {}, function (response) {
-
-            chrome.storage.local.get([response.global], function (result) {
-                let json = result[response.global];
-                if (json.backAction) delete json.backAction;
-                if (json.history) delete json.history;
-                let jsonOutput = JSON.stringify(json, null, 4);
-                saveText('playlist-' + response.global + '.json', jsonOutput);
-            });
-        });
+    response = playlistDetails;
+    chrome.storage.local.get([response.global], function (result) {
+        let json = result[response.global];
+        if (json.backAction) delete json.backAction;
+        if (json.history) delete json.history;
+        let jsonOutput = JSON.stringify(json, null, 4);
+        saveText('playlist-' + response.global + '.json', jsonOutput);
     });
 }
 
@@ -199,17 +199,13 @@ function saveText(filename, text) {
 
 
 function viewJson(jsonDOM) {
-    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {}, function (response) {
-
-            chrome.storage.local.get([response.global], function (result) {
-                let json = result[response.global];
-                if (json.backAction) delete json.backAction;
-                if (json.history) delete json.history;
-                let jsonOutput = JSON.stringify(json, null, 2);
-                jsonDOM.val(jsonOutput);
-            });
-        });
+    response = playlistDetails;
+    chrome.storage.local.get([response.global], function (result) {
+        let json = result[response.global];
+        if (json.backAction) delete json.backAction;
+        if (json.history) delete json.history;
+        let jsonOutput = JSON.stringify(json, null, 2);
+        jsonDOM.val(jsonOutput);
     });
 }
 
@@ -228,24 +224,30 @@ function loadJson() {
     $('#wrapper').show();
     $('#jsonPane').hide();
 
-    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {}, function (response) {
-            let store = {};
-            let playlist_id = response.global;
-            store[playlist_id] = jsonObj;
-            chrome.storage.local.set(store, function () {
-                location.reload();
-            });
-        });
+    response = playlistDetails;
+    let store = {};
+    let playlist_id = response.global;
+    store[playlist_id] = jsonObj;
+    chrome.storage.local.set(store, function () {
+        extensionReload();
     });
 }
 
 
-function tabRequest(request) {
+let extensionReload = () => {
+    location.reload();
+};
+
+let tabReload = () => {
+    tabRequest({ reload: true });
+};
+
+
+let tabRequest = (request) => {
     chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
         chrome.tabs.sendMessage(tabs[0].id, request, function (response) {});
     });
-}
+};
 
 
 $(document).on('change', '.toggle', function() {
@@ -331,10 +333,10 @@ $(document).on('click', '#saveJsonSubmit', () => {
 });
 
 $(document).on('click', '#reloadButton', () => {
-    tabRequest({ reload: true });
+    tabReload();
 });
 
 
 $(document).ready(function() {
-    loadForm();
+    loadDetails();
 });
