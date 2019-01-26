@@ -87,11 +87,6 @@ elements = {
             $('#offline-workflow-footer-courtesy .diagnostic-certainty').hide();
         }
     },
-    footerCourtesy: {
-        disableLinks: () => {
-            $('#offline-workflow-footer-courtesy a').addClass('disabled');
-        }
-    },
     rid: {
         hide: () => {
             let courtesy = $('#offline-workflow-footer-courtesy');
@@ -102,7 +97,6 @@ elements = {
     presentingDefaults: () => {
         elements.supporterOrnament.hide();
         elements.diagnosticCertainty.hide();
-        elements.footerCourtesy.disableLinks();
     },
 };
 

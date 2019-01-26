@@ -6,7 +6,13 @@ div.modality {
     display:none;
 }
 
+.footer-courtesy a {
+    color: #777 !important;
+}
 
+a.online-link.disabled {
+    color: #777 !important;
+}
 
 
 
