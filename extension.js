@@ -238,15 +238,13 @@ let extensionReload = () => {
     location.reload();
 };
 
-let tabReload = () => {
-    tabRequest({ reload: true });
-};
 
 let tabAction = (action) => {
     let request = {};
     request.action = action;
     tabRequest(request);
 };
+
 
 let tabRequest = (request) => {
     chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
