@@ -670,30 +670,42 @@ $(document).ready(function() {
                         navigate.next();
                         break;
                 }
-            }
 
-            if (typeof request.series !== "undefined") {
-                navigate.series(request.series);
-                break;
-            }
+                // Need to refresh the internal variables defined by current case.
+                getPlaylistVarsFromURL();
+                sendResponse({
+                    name: store.name(),
+                    global: global.name()
+                });
 
-            if (typeof request.slice !== "undefined") {
-                navigate.to(request.slice);
-                break;
-            }
+            } else {
 
-            let series = {};
-            for (let n in stackedImages) {
-                series[n] = {};
-                series[n].count = stackedImages[n].images.length;
-                series[n].default = stackedImages[n].images[0].position;
-            }
+                if (typeof request.series !== "undefined") {
+                    navigate.series(request.series);
+                    sendResponse({});
+                    break;
+                }
 
-            sendResponse({
-                name: store.name(),
-                global: global.name(),
-                series: series
-            });
+                if (typeof request.slice !== "undefined") {
+                    navigate.to(request.slice);
+                    sendResponse({});
+                    break;
+                }
+
+                let series = {};
+                for (let n in stackedImages) {
+                    series[n] = {};
+                    series[n].count = stackedImages[n].images.length;
+                    series[n].default = stackedImages[n].images[0].position;
+                }
+
+                sendResponse({
+                    name: store.name(),
+                    global: global.name(),
+                    series: series
+                });
+
+            }
 
         } while(false);
 
