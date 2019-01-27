@@ -13,6 +13,7 @@ function init() {
     elementVisibility();
     initVisibility();
     setFirstSlice();
+    presentation.init();
 }
 
 
@@ -411,6 +412,82 @@ let store = {
             }
             callback(result[playlist_id][study_id]);
         });
+    }
+};
+
+
+let presentation;
+presentation = {
+    response: '',
+    data: {},
+    init: () => {
+        presentation.getData();
+        presentation.createTab();
+        navigate.imagesTab();
+    },
+    url: () => {
+        let urlSansFilename = location.href.replace(/[^/]*$/, '');
+        return urlSansFilename + 'play_' + playlistVars.playlistId + '_entry_' + playlistVars.entryId + '_case_' + playlistVars.caseId + '_presentation.html';
+    },
+    getData: () => {
+        $.ajax({
+            url: presentation.url(),
+            cache: false,
+            success: function (response) {
+                presentation.response = response;
+                presentation.parse.all();
+                presentation.injectionIntoQuestions();
+            }
+        });
+    },
+    parse: {
+        all: () => {
+            presentation.parse.presentation();
+            presentation.parse.age();
+            presentation.parse.gender();
+        },
+        presentation: () => {
+            let response = presentation.response;
+            presentation.data.presentation = $(response).find("div.presentation p:first").html();
+        },
+        age: () => {
+            let response = presentation.response;
+            $(response).find("div.presentation tr").each(function () {
+                if (($(this).find('th').text()) == 'Age:') {
+                    presentation.data.age = $(this).find('td').text();
+                }
+            })
+        },
+        gender: () => {
+            let response = presentation.response;
+            $(response).find("div.presentation tr").each(function () {
+                if (($(this).find('th').text()) == 'Gender:') {
+                    presentation.data.gender = $(this).find('td').text();
+                }
+            })
+        }
+    },
+    createTab: () => {
+        $('.offline-workflow-tab-questions').removeClass('inactive');
+        $('.offline-workflow-tab-questions a').remove();
+        let presentationTab = '<a class="questions offline-workflow-tab-link" id="offline-workflow-link-questions" href="#questions">Presentation</a>';
+        $('.offline-workflow-tab-questions').append(presentationTab);
+    },
+    tabHTML: () => {
+        return '\n' +
+            '<p><strong>Age</strong></p>\n' +
+            '<p>' + presentation.data.age + '</p>\n' +
+            '<p><strong>Gender</strong></p>\n' +
+            '<p>' + presentation.data.gender + '</p>\n' +
+            '<p><strong>Presentation</strong></p>\n' +
+            '<p>' + presentation.data.presentation + '</p>\n' +
+            '</div>';
+    },
+    injectionIntoQuestions: () => {
+        $('#offline-workflow-questions-pane').html(presentation.tabHTML());
+    },
+    open: () => {
+        navigate.questionsTab();
     }
 };
 

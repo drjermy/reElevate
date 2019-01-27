@@ -64,6 +64,10 @@ $(document).ready(function() {
         navigate.findingsTab();
     });
 
+    $(document).bind('keyup', 'p', function () {
+        presentation.open();
+    });
+
 
     $('#offline-workflow-page-links li').each(function (n, value) {
         let key = n+1;

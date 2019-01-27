@@ -15,6 +15,10 @@ a.online-link.disabled {
 }
 
 
+#offline-workflow-questions-pane strong {
+    font-weight: bold !important;
+}
+
 
 /*
  * Dixon CSS
