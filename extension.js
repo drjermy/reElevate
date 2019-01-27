@@ -69,7 +69,8 @@ let createToggle = (selector, scope, varName, text, value) => {
 let createInput =  (selector, scope, varName, text, value) => {
     let id = scope + capitalizeFirstLetter(varName);
     $(selector).append(
-        '<div class="mt-1">' +
+        '<div class="form-group mt-1">' +
+        '<label for="' + id + '">' + text + '</label>' +
         '<input type="text" class="form-control" id="' + id + '" data-varName="' + varName + '" data-scope="' + scope + '" placeholder="' + text + '">' +
         '</div>'
     );
@@ -83,7 +84,8 @@ let createInput =  (selector, scope, varName, text, value) => {
 let createTextarea =  (selector, scope, varName, text, value) => {
     let id = scope + capitalizeFirstLetter(varName);
     $(selector).append(
-        '<div class="mt-1">' +
+        '<div class="form-group mt-1">' +
+        '<label for="' + id + '">' + text + '</label>' +
         '<textarea type="text" class="form-control" id="' + id + '" data-varName="' + varName + '" data-scope="' + scope + '" placeholder="' + text + '"></textarea>' +
         '</div>'
     );
