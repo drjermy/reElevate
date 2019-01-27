@@ -120,7 +120,7 @@ function elementVisibility() {
                 elements.sidebar.tabs.hide();
             }
             if ((global.showPresentation === true && result.hidePresentation !== true) || (global.showPresentation !== true && result.showPresentation === true)) {
-                presentation.init();
+                presentation.init(result);
             }
 
             if (typeof result.startingSeries !== "undefined") {
@@ -421,8 +421,10 @@ let store = {
 let presentation;
 presentation = {
     response: '',
+    storage: {},
     data: {},
-    init: () => {
+    init: (storage) => {
+        presentation.storage = storage;
         presentation.getData();
         presentation.createTab();
         navigate.imagesTab();
@@ -431,6 +433,12 @@ presentation = {
         let urlSansFilename = location.href.replace(/[^/]*$/, '');
         return urlSansFilename + 'play_' + playlistVars.playlistId + '_entry_' + playlistVars.entryId + '_case_' + playlistVars.caseId + '_presentation.html';
     },
+    loadFromStorage: () => {
+        let storage = presentation.storage;
+        if (storage.presentationAge) presentation.data.age = storage.presentationAge;
+        if (storage.presentationGender) presentation.data.gender = storage.presentationGender;
+        if (storage.presentationPresentation) presentation.data.presentation = storage.presentationPresentation;
+    },
     getData: () => {
         $.ajax({
             url: presentation.url(),
@@ -438,6 +446,7 @@ presentation = {
             success: function (response) {
                 presentation.response = response;
                 presentation.parse.all();
+                presentation.loadFromStorage();
                 presentation.injectionIntoQuestions();
             }
         });
@@ -478,11 +487,11 @@ presentation = {
     tabHTML: () => {
         return '\n' +
             '<p><strong>Age</strong></p>\n' +
-            '<p>' + presentation.data.age + '</p>\n' +
+            '<p id="presentation-tab-age">' + presentation.data.age + '</p>\n' +
             '<p><strong>Gender</strong></p>\n' +
-            '<p>' + presentation.data.gender + '</p>\n' +
+            '<p id="presentation-tab-gender">' + presentation.data.gender + '</p>\n' +
             '<p><strong>Presentation</strong></p>\n' +
-            '<p>' + presentation.data.presentation + '</p>\n' +
+            '<p id="presentation-tab-presentation">' + presentation.data.presentation + '</p>\n' +
             '</div>';
     },
     injectionIntoQuestions: () => {

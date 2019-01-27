@@ -33,6 +33,9 @@ let pagePopup = {
     toggleHTML: (varName, text) => {
         createToggle('#pageInput', 'page', varName, text, pagePopup.settings[varName]);
     },
+    textInput: (varName, text) => {
+        createInput('#pageInput', 'page', varName, text, pagePopup.settings[varName]);
+    },
     hr: () => {
         $('#pageInput').append('<hr/>');
     }
@@ -61,6 +64,21 @@ let createToggle = (selector, scope, varName, text, value) => {
     $('#' + id).prop("checked", value);
 };
 
+let createInput =  (selector, scope, varName, text, value) => {
+    let id = scope + capitalizeFirstLetter(varName);
+    $(selector).append(
+        '<div class="input-group mt-1">' +
+        '<input type="text" class="form-control" id="' + id + '" data-varName="' + varName + '" data-scope="' + scope + '" placeholder="' + text + '">' +
+        '<div class="input-group-append">\n' +
+        '<button class="btn btn-outline-secondary" type="button" id="save' + id + '">Save</button>\n' +
+        '</div>\n' +
+        '</div>'
+    );
+    $('#' + id).val(value);
+    $(document).on('click', '#save' + id, function() {
+        storage.set(varName, $('#' + id).val());
+    });
+};
 
 let loadDetails = () => {
     chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
@@ -125,6 +143,10 @@ let loadForm = () => {
         pagePopup.toggleHTML('showFindings', 'Show findings');
         pagePopup.toggleHTML('showPresentation', 'Show presentation');
         pagePopup.toggleHTML('hidePresentation', 'Hide presentation');
+        pagePopup.hr();
+        pagePopup.textInput('presentationAge', 'Age');
+        pagePopup.textInput('presentationGender', 'Gender');
+        pagePopup.textInput('presentationPresentation', 'Presentation');
 
         if (response.series) {
             for (let n in response.series) {
@@ -303,7 +325,6 @@ $(document).on('change', '.slider', function () {
 $(document).on('change', '#startingSeries', function () {
     storage.set('startingSeries', $(this).val());
 });
-
 
 
 
