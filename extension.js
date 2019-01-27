@@ -36,12 +36,13 @@ let pagePopup = {
     textInput: (varName, text) => {
         createInput('#pageInput', 'page', varName, text, pagePopup.settings[varName]);
     },
+    textarea: (varName, text) => {
+        createTextarea('#pageInput', 'page', varName, text, pagePopup.settings[varName]);
+    },
     hr: () => {
         $('#pageInput').append('<hr/>');
     }
 };
-
-
 
 
 let outputVar = (selector, variable, value) => {
@@ -64,21 +65,34 @@ let createToggle = (selector, scope, varName, text, value) => {
     $('#' + id).prop("checked", value);
 };
 
+
 let createInput =  (selector, scope, varName, text, value) => {
     let id = scope + capitalizeFirstLetter(varName);
     $(selector).append(
-        '<div class="input-group mt-1">' +
+        '<div class="mt-1">' +
         '<input type="text" class="form-control" id="' + id + '" data-varName="' + varName + '" data-scope="' + scope + '" placeholder="' + text + '">' +
-        '<div class="input-group-append">\n' +
-        '<button class="btn btn-outline-secondary" type="button" id="save' + id + '">Save</button>\n' +
-        '</div>\n' +
         '</div>'
     );
     $('#' + id).val(value);
-    $(document).on('click', '#save' + id, function() {
-        storage.set(varName, $('#' + id).val());
+    $(document).on('keyup', '#' + id, function() {
+        storage.set(varName, $(this).val());
     });
 };
+
+
+let createTextarea =  (selector, scope, varName, text, value) => {
+    let id = scope + capitalizeFirstLetter(varName);
+    $(selector).append(
+        '<div class="mt-1">' +
+        '<textarea type="text" class="form-control" id="' + id + '" data-varName="' + varName + '" data-scope="' + scope + '" placeholder="' + text + '"></textarea>' +
+        '</div>'
+    );
+    $('#' + id).val(value);
+    $(document).on('keyup', '#' + id, function() {
+        storage.set(varName, $(this).val());
+    });
+};
+
 
 let loadDetails = () => {
     chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
@@ -146,7 +160,7 @@ let loadForm = () => {
         pagePopup.hr();
         pagePopup.textInput('presentationAge', 'Age');
         pagePopup.textInput('presentationGender', 'Gender');
-        pagePopup.textInput('presentationPresentation', 'Presentation');
+        pagePopup.textarea('presentationPresentation', 'Presentation');
 
         if (response.series) {
             for (let n in response.series) {
