@@ -399,6 +399,9 @@ let store = {
     playlist_id: () => {
         return 'radiopaedia' + '-' + playlistVars.playlistId;
     },
+    case_id: () => {
+        return 'radiopaedia' + '-' + playlistVars.playlistId + '-' + playlistVars.entryId + '-' + playlistVars.caseId;
+    },
     name: () => {
         return 'radiopaedia' + '-' + playlistVars.playlistId + '-' + playlistVars.entryId + '-' + playlistVars.caseId + '-' + playlistVars.studyId;
     },
@@ -795,6 +798,7 @@ $(document).ready(function() {
 
                 sendResponse({
                     name: store.name(),
+                    case: store.case_id(),
                     global: global.name(),
                     series: series
                 });
