@@ -427,11 +427,14 @@ presentation = {
         presentation.storage = storage;
         presentation.getData();
         presentation.createTab();
-        navigate.imagesTab();
     },
     url: () => {
-        let urlSansFilename = location.href.replace(/[^/]*$/, '');
-        return urlSansFilename + 'play_' + playlistVars.playlistId + '_entry_' + playlistVars.entryId + '_case_' + playlistVars.caseId + '_presentation.html';
+        if (offlineMode) {
+            let urlSansFilename = location.href.replace(/[^/]*$/, '');
+            return urlSansFilename + 'play_' + playlistVars.playlistId + '_entry_' + playlistVars.entryId + '_case_' + playlistVars.caseId + '_presentation.html';
+        } else {
+            return 'https://radiopaedia.org/play/' + playlistVars.playlistId + '/entry/' + playlistVars.entryId + '/case/' + playlistVars.caseId + '/presentation';
+        }
     },
     loadFromStorage: () => {
         let storage = presentation.storage;
