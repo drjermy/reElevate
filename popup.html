@@ -22,7 +22,7 @@
         }
     </style>
 </head>
-<body style="width:300px">
+<body>
     <div id="introduction" class="container py-2">
         <h1>Radiopaedia Extension</h1>
         <p>
@@ -34,11 +34,12 @@
     </div>
     <div id="navigation" class="container py-2">
         <nobr>
-            <button id="viewPlaylist" class="btn-sm">Playlist</button>
-            <button id="viewStudy" class="btn-sm">Study</button>
-            <button id="viewSeries" class="btn-sm">Series</button>
-            <button id="viewJson" class="btn-sm">JSON</button>
-            <button id="viewHelp" class="btn-sm">?</button>
+            <button id="viewPlaylist" data-open="playlistPane" class="openButton btn-sm">Playlist</button>
+            <button id="viewCasePane" data-open="casePane" class="openButton btn-sm">Case</button>
+            <button id="viewStudy" data-open="studyPane" class="openButton btn-sm">Study</button>
+            <button id="viewSeries" data-open="seriesPane" class="openButton btn-sm">Series</button>
+            <button id="viewJson" data-open="jsonPane" class="openButton btn-sm">JSON</button>
+            <button id="viewHelp" data-open="helpPane" class="openButton btn-sm">?</button>
         </nobr>
     </div>
 
@@ -46,6 +47,12 @@
         <h1>Playlist</h1>
         <div id="globalInput"></div>
         <div id="globalStorage"></div>
+    </div>
+
+    <div id="casePane" class="container pane py-2">
+        <h1>Case</h1>
+        <div id="caseInput"></div>
+        <div id="caseStorage"></div>
     </div>
 
     <div id="studyPane" class="container pane py-2">

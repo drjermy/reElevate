@@ -4,6 +4,24 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+let elementCase = {
+    settings: {},
+    toggleHTML: (varName, text) => {
+        createToggle('#pageInput', 'case', varName, text, elementCase.settings[varName]);
+    },
+    textInput: (varName, text) => {
+        createInput('#pageInput', 'case', varName, text, elementCase.settings[varName]);
+    },
+    textarea: (varName, text) => {
+        createTextarea('#pageInput', 'case', varName, text, elementCase.settings[varName]);
+    },
+    hr: () => {
+        $('#pageInput').append('<hr/>');
+    }
+};
+
+
+
 
 let globalPopup = {
     settings: {},
@@ -148,9 +166,15 @@ let loadForm = () => {
     }
 
     chrome.storage.local.get([response.global], function(result) {
+
         if (result[response.global][response.name]) {
-            pagePopup.settings = result[response.global][response.name];
+            elementCase.settings = result[response.global][response.name];
         }
+
+        if (result[response.global][response.case]) {
+            pagePopup.settings = result[response.global][response.case];
+        }
+
         pagePopup.toggleHTML('maximiseCase', 'Maximise');
         pagePopup.hr();
         pagePopup.toggleHTML('defaultToTopImage', 'Start on first slice');
@@ -159,10 +183,10 @@ let loadForm = () => {
         pagePopup.toggleHTML('showFindings', 'Show findings');
         pagePopup.toggleHTML('showPresentation', 'Show presentation');
         pagePopup.toggleHTML('hidePresentation', 'Hide presentation');
-        pagePopup.hr();
-        pagePopup.textInput('presentationAge', 'Age');
-        pagePopup.textInput('presentationGender', 'Gender');
-        pagePopup.textarea('presentationPresentation', 'Presentation');
+        elementCase.hr();
+        elementCase.textInput('presentationAge', 'Age');
+        elementCase.textInput('presentationGender', 'Gender');
+        elementCase.textarea('presentationPresentation', 'Presentation');
 
         if (response.series) {
             for (let n in response.series) {
@@ -344,33 +368,8 @@ $(document).on('change', '#startingSeries', function () {
 
 
 
-$(document).on('click', '#viewPlaylist', function() {
-    $('.pane').hide();
-    $('#playlistPane').show();
-    $('#reloadPane').show();
-});
-
-$(document).on('click', '#viewStudy', function() {
-    $('.pane').hide();
-    $('#studyPane').show();
-    $('#reloadPane').show();
-});
-
-$(document).on('click', '#viewSeries', function() {
-    $('.pane').hide();
-    $('#seriesPane').show();
-    $('#reloadPane').show();
-});
-
 $(document).on('click', '#viewJson', function() {
-    $('.pane').hide();
-    $('#jsonPane').show();
     viewJson($('#jsonContent'));
-});
-
-$(document).on('click', '#viewHelp', function() {
-    $('.pane').hide();
-    $('#helpPane').show();
 });
 
 $(document).on('click', '#downloadJson', function() {
@@ -381,9 +380,18 @@ $(document).on('click', '#saveJsonSubmit', function() {
     loadJson();
 });
 
+
 $(document).on('click', '.actionButton', function() {
     let action = $(this).attr('data-action');
     tabAction(action);
+});
+
+
+$(document).on('click', '.openButton', function () {
+    let pane = $(this).attr('data-open');
+    $('.pane').hide();
+    $('#' + pane).show();
+    $('#reloadPane').show();
 });
 
 
