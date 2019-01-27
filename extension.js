@@ -122,7 +122,9 @@ let loadForm = () => {
         pagePopup.toggleHTML('defaultToTopImage', 'Start on first slice');
         pagePopup.toggleHTML('defaultSlice', 'Start on selected slice');
         pagePopup.toggleHTML('hideFindings', 'Hide findings');
-        pagePopup.toggleHTML('showFindings', 'Show findings')
+        pagePopup.toggleHTML('showFindings', 'Show findings');
+        pagePopup.toggleHTML('showPresentation', 'Show presentation');
+        pagePopup.toggleHTML('hidePresentation', 'Hide presentation');
 
         if (response.series) {
             for (let n in response.series) {
@@ -139,6 +141,7 @@ let loadForm = () => {
             globalPopup.hr();
             globalPopup.toggleHTML('defaultToTopImage', 'Start on first slice', 'defaultSlice');
             globalPopup.toggleHTML('hideFindings', 'Hide findings', 'showFindings');
+            globalPopup.toggleHTML('showPresentation', 'Show presentation', 'hidePresentation');
             globalPopup.toggleHTML('hideTabs', 'Hide tabs');
         }
     });
@@ -269,6 +272,12 @@ $(document).on('change', '#globalHideFindings', function() {
     $('#pageHideFindings').parent('div').toggle();
     $('#pageShowFindings').parent('div').toggle();
 });
+
+$(document).on('change', '#globalShowPresentation', function() {
+    $('#pageShowPresentation').parent('div').toggle();
+    $('#pageHidePresentation').parent('div').toggle();
+});
+
 
 $(document).on('change', '#pageDefaultToTopImage', function () {
     if ($(this).prop('checked') === true) {

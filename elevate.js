@@ -13,7 +13,6 @@ function init() {
     elementVisibility();
     initVisibility();
     setFirstSlice();
-    presentation.init();
 }
 
 
@@ -119,6 +118,9 @@ function elementVisibility() {
             }
             if (global.hideTabs === true) {
                 elements.sidebar.tabs.hide();
+            }
+            if ((global.showPresentation === true && result.hidePresentation !== true) || (global.showPresentation !== true && result.showPresentation === true)) {
+                presentation.init();
             }
 
             if (typeof result.startingSeries !== "undefined") {
