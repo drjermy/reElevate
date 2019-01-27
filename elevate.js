@@ -486,15 +486,18 @@ presentation = {
         $('.offline-workflow-tab-questions a').remove();
         let presentationTab = '<a class="questions offline-workflow-tab-link" id="offline-workflow-link-questions" href="#questions">Presentation</a>';
         $('.offline-workflow-tab-questions').append(presentationTab);
+
+        // We need to click on the images tab to make the questions (presentation) tab work - not sure why.
+        navigate.imagesTab();
     },
     tabHTML: () => {
         return '\n' +
-            '<p><strong>Age</strong></p>\n' +
-            '<p id="presentation-tab-age">' + presentation.data.age + '</p>\n' +
-            '<p><strong>Gender</strong></p>\n' +
-            '<p id="presentation-tab-gender">' + presentation.data.gender + '</p>\n' +
-            '<p><strong>Presentation</strong></p>\n' +
-            '<p id="presentation-tab-presentation">' + presentation.data.presentation + '</p>\n' +
+            '<p><strong>Age: </strong>\n' +
+            '<span id="presentation-tab-age">' + presentation.data.age + '</span></p>\n' +
+            '<p><strong>Gender: </strong>\n' +
+            '<span id="presentation-tab-gender">' + presentation.data.gender + '</span></p>\n' +
+            '<p><strong>Presentation: </strong>\n' +
+            '<span id="presentation-tab-presentation">' + presentation.data.presentation + '</span></p>\n' +
             '</div>';
     },
     injectionIntoQuestions: () => {
