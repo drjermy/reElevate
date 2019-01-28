@@ -1,22 +1,103 @@
-let playlistDetails;
-
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-let elementCase = {
-    settings: {},
+
+$(document).ready(function() {
+    chrome.tabs.getSelected(null, function(tab) {
+        playlist.init(tab);
+        loadDetails();
+    });
+});
+
+
+let playlist;
+playlist = {
+    offlineMode: null,
+    tab: null,
+    vars: {},
+    init: (tab) => {
+        playlist.tab = tab;
+        playlist.isOffline();
+        playlist.varsFromUrl();
+    },
+    isOffline: () => {
+        playlist.offlineMode = (playlist.tab.url.split('://')[0] === 'file');
+    },
+    varsFromUrl: () => {
+        let pathArray = playlist.tab.url.split('/');
+        if (playlist.offlineMode === true) {
+            let lastPart = pathArray.pop();
+            let partsArray = lastPart.split('.html')[0].split('_');
+            playlist.vars = {
+                playlistId: partsArray[1],
+                entryId: partsArray[3],
+                caseId: partsArray[5],
+                studyId: partsArray[7]
+            };
+        } else {
+            playlist.vars = {
+                playlistId: pathArray[2],
+                entryId: pathArray[4],
+                caseId: pathArray[6],
+                studyId: pathArray[8]
+            };
+        }
+    },
+    playlist_id: () => {
+        return 'radiopaedia' + '-' + playlist.vars.playlistId;
+    },
+    case_id: () => {
+        return 'radiopaedia' + '-' + playlist.vars.playlistId + '-' + playlist.vars.entryId + '-' + playlist.vars.caseId;
+    },
+    study_id: () => {
+        return 'radiopaedia' + '-' + playlist.vars.playlistId + '-' + playlist.vars.entryId + '-' + playlist.vars.caseId + '-' + playlist.vars.studyId;
+    },
+    store: (variableName, variableValue, scope = 'page') => {
+        let playlist_id = playlist.playlist_id();
+        let case_id = playlist.case_id();
+        let study_id = playlist.study_id();
+
+        chrome.storage.local.get([playlist_id], function (result) {
+            if (!result[playlist_id]) result[playlist_id] = {};
+            if (scope === 'global') {
+                if (!result[playlist_id]) result[playlist_id] = {};
+                result[playlist_id][variableName] = variableValue;
+            }
+            if (scope === 'case') {
+                if (!result[playlist_id][case_id]) result[playlist_id][case_id] = {};
+                result[playlist_id][case_id][variableName] = variableValue;
+            }
+            if (scope === 'page') {
+                if (!result[playlist_id][study_id]) result[playlist_id][study_id] = {};
+                result[playlist_id][study_id][variableName] = variableValue;
+            }
+            chrome.storage.local.set(result, function () {
+            });
+        });
+    }
+};
+
+
+
+let caseElements = {
+    settings: {
+        playlist: {},
+        case: {},
+        study: {},
+        series: {}
+    },
     toggleHTML: (varName, text) => {
-        createToggle('#pageInput', 'case', varName, text, elementCase.settings[varName]);
+        createToggle('#caseInput', 'case', varName, text, caseElements.settings[varName]);
     },
     textInput: (varName, text) => {
-        createInput('#pageInput', 'case', varName, text, elementCase.settings[varName]);
+        createInput('#caseInput', 'case', varName, text, caseElements.settings[varName]);
     },
     textarea: (varName, text) => {
-        createTextarea('#pageInput', 'case', varName, text, elementCase.settings[varName]);
+        createTextarea('#caseInput', 'case', varName, text, caseElements.settings[varName]);
     },
     hr: () => {
-        $('#pageInput').append('<hr/>');
+        $('#caseInput').append('<hr/>');
     }
 };
 
@@ -81,10 +162,14 @@ let createToggle = (selector, scope, varName, text, value) => {
         '</div>'
     );
     $('#' + id).prop("checked", value);
+    $(document).on('change', '#' + id, function() {
+        playlist.store(varName, $(this).prop("checked"), scope);
+
+    });
 };
 
 
-let createInput =  (selector, scope, varName, text, value) => {
+let createInput = (selector, scope, varName, text, value) => {
     let id = scope + capitalizeFirstLetter(varName);
     $(selector).append(
         '<div class="form-group mt-1">' +
@@ -94,12 +179,12 @@ let createInput =  (selector, scope, varName, text, value) => {
     );
     $('#' + id).val(value);
     $(document).on('keyup', '#' + id, function() {
-        storage.set(varName, $(this).val());
+        playlist.store(varName, $(this).val(), scope);
     });
 };
 
 
-let createTextarea =  (selector, scope, varName, text, value) => {
+let createTextarea = (selector, scope, varName, text, value) => {
     let id = scope + capitalizeFirstLetter(varName);
     $(selector).append(
         '<div class="form-group mt-1">' +
@@ -109,7 +194,7 @@ let createTextarea =  (selector, scope, varName, text, value) => {
     );
     $('#' + id).val(value);
     $(document).on('keyup', '#' + id, function() {
-        storage.set(varName, $(this).val());
+        playlist.store(varName, $(this).val(), scope);
     });
 };
 
@@ -122,6 +207,8 @@ let loadDetails = () => {
                 $('#introduction').hide();
                 $('#navigation').show();
                 loadForm();
+                $('#seriesPane').show();
+                $('#reloadPane').show();
             }
         });
     });
@@ -168,11 +255,7 @@ let loadForm = () => {
     chrome.storage.local.get([response.global], function(result) {
 
         if (result[response.global][response.name]) {
-            elementCase.settings = result[response.global][response.name];
-        }
-
-        if (result[response.global][response.case]) {
-            pagePopup.settings = result[response.global][response.case];
+            pagePopup.settings = result[response.global][response.name];
         }
 
         pagePopup.toggleHTML('maximiseCase', 'Maximise');
@@ -183,10 +266,15 @@ let loadForm = () => {
         pagePopup.toggleHTML('showFindings', 'Show findings');
         pagePopup.toggleHTML('showPresentation', 'Show presentation');
         pagePopup.toggleHTML('hidePresentation', 'Hide presentation');
-        elementCase.hr();
-        elementCase.textInput('presentationAge', 'Age');
-        elementCase.textInput('presentationGender', 'Gender');
-        elementCase.textarea('presentationPresentation', 'Presentation');
+
+
+        if (result[response.global][response.case]) {
+            caseElements.settings = result[response.global][response.case];
+        }
+
+        caseElements.textInput('presentationAge', 'Age');
+        caseElements.textInput('presentationGender', 'Gender');
+        caseElements.textarea('presentationPresentation', 'Presentation');
 
         if (response.series) {
             for (let n in response.series) {
@@ -318,13 +406,6 @@ let tabRequest = (request) => {
 };
 
 
-$(document).on('change', '.toggle', function() {
-    let varName = $(this).attr('data-varName');
-    let scope = $(this).attr('data-scope');
-    let global = (scope === 'global');
-    storage.set(varName, $(this).prop("checked"), global);
-});
-
 $(document).on('change', '#globalDefaultToTopImage', function() {
     $('#pageDefaultToTopImage').parent('div').toggle();
     $('#pageDefaultSlice').parent('div').toggle();
@@ -391,12 +472,5 @@ $(document).on('click', '.openButton', function () {
     let pane = $(this).attr('data-open');
     $('.pane').hide();
     $('#' + pane).show();
-    $('#reloadPane').show();
-});
-
-
-$(document).ready(function() {
-    loadDetails();
-    $('#seriesPane').show();
     $('#reloadPane').show();
 });
