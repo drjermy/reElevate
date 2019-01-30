@@ -94,13 +94,13 @@ let caseElements = {
         series: {}
     },
     toggleHTML: (varName, text) => {
-        createToggle('#caseInput', 'case', varName, text, caseElements.settings[varName]);
+        form.toggle('#caseInput', 'case', varName, text, caseElements.settings[varName]);
     },
     textInput: (varName, text) => {
-        createInput('#caseInput', 'case', varName, text, caseElements.settings[varName]);
+        form.input('#caseInput', 'case', varName, text, caseElements.settings[varName]);
     },
     textarea: (varName, text) => {
-        createTextarea('#caseInput', 'case', varName, text, caseElements.settings[varName]);
+        form.textarea('#caseInput', 'case', varName, text, caseElements.settings[varName]);
     },
     hr: () => {
         $('#caseInput').append('<hr/>');
@@ -111,7 +111,7 @@ let caseElements = {
 let globalPopup = {
     settings: {},
     toggleHTML: (varName, text, related) => {
-        createToggle('#globalInput', 'global', varName, text, globalPopup.settings[varName]);
+        form.toggle('#globalInput', 'global', varName, text, globalPopup.settings[varName]);
         if (related) {
             globalPopup.toggleRelated(varName, related);
         }
@@ -135,13 +135,13 @@ let globalPopup = {
 let pagePopup = {
     settings: {},
     toggleHTML: (varName, text) => {
-        createToggle('#pageInput', 'page', varName, text, pagePopup.settings[varName]);
+        form.toggle('#pageInput', 'page', varName, text, pagePopup.settings[varName]);
     },
     textInput: (varName, text) => {
-        createInput('#pageInput', 'page', varName, text, pagePopup.settings[varName]);
+        form.input('#pageInput', 'page', varName, text, pagePopup.settings[varName]);
     },
     textarea: (varName, text) => {
-        createTextarea('#pageInput', 'page', varName, text, pagePopup.settings[varName]);
+        form.textarea('#pageInput', 'page', varName, text, pagePopup.settings[varName]);
     },
     hr: () => {
         $('#pageInput').append('<hr/>');
@@ -149,58 +149,49 @@ let pagePopup = {
 };
 
 
-let outputVar = (selector, variable, value) => {
-    if (typeof value !== "undefined") {
-        $(selector).append('<nobr><div>' + variable + ' <code>' + value) + '</code></div></nobr>';
+let form = {
+    toggle: function(selector, scope, varName, text, value) {
+        let id = scope + capitalizeFirstLetter(varName);
+        $(selector).append(
+            '<div class="custom-control custom-switch">\n' +
+            '<input type="checkbox" class="custom-control-input toggle" id="' + id + '" data-varName="' + varName + '" data-scope="' + scope + '">\n' +
+            '<label class="custom-control-label" for="' + id + '">\n' +
+            '<nobr>' + text + '</nobr>\n' +
+            '</label>\n' +
+            '</div>'
+        );
+        $('#' + id).prop("checked", value);
+        $(document).on('change', '#' + id, function() {
+            playlist.store(varName, $(this).prop("checked"), scope);
+
+        });
+    },
+    input: function(selector, scope, varName, text, value) {
+        let id = scope + capitalizeFirstLetter(varName);
+        $(selector).append(
+            '<div class="form-group mt-1">' +
+            '<label for="' + id + '">' + text + '</label>' +
+            '<input type="text" class="form-control" id="' + id + '" data-varName="' + varName + '" data-scope="' + scope + '" placeholder="' + text + '">' +
+            '</div>'
+        );
+        $('#' + id).val(value);
+        $(document).on('keyup', '#' + id, function() {
+            playlist.store(varName, $(this).val(), scope);
+        });
+    },
+    textarea: function(selector, scope, varName, text, value) {
+        let id = scope + capitalizeFirstLetter(varName);
+        $(selector).append(
+            '<div class="form-group mt-1">' +
+            '<label for="' + id + '">' + text + '</label>' +
+            '<textarea type="text" class="form-control" id="' + id + '" data-varName="' + varName + '" data-scope="' + scope + '" placeholder="' + text + '"></textarea>' +
+            '</div>'
+        );
+        $('#' + id).val(value);
+        $(document).on('keyup', '#' + id, function() {
+            playlist.store(varName, $(this).val(), scope);
+        });
     }
-};
-
-
-let createToggle = (selector, scope, varName, text, value) => {
-    let id = scope + capitalizeFirstLetter(varName);
-    $(selector).append(
-        '<div class="custom-control custom-switch">\n' +
-        '<input type="checkbox" class="custom-control-input toggle" id="' + id + '" data-varName="' + varName + '" data-scope="' + scope + '">\n' +
-        '<label class="custom-control-label" for="' + id + '">\n' +
-        '<nobr>' + text + '</nobr>\n' +
-        '</label>\n' +
-        '</div>'
-    );
-    $('#' + id).prop("checked", value);
-    $(document).on('change', '#' + id, function() {
-        playlist.store(varName, $(this).prop("checked"), scope);
-
-    });
-};
-
-
-let createInput = (selector, scope, varName, text, value) => {
-    let id = scope + capitalizeFirstLetter(varName);
-    $(selector).append(
-        '<div class="form-group mt-1">' +
-        '<label for="' + id + '">' + text + '</label>' +
-        '<input type="text" class="form-control" id="' + id + '" data-varName="' + varName + '" data-scope="' + scope + '" placeholder="' + text + '">' +
-        '</div>'
-    );
-    $('#' + id).val(value);
-    $(document).on('keyup', '#' + id, function() {
-        playlist.store(varName, $(this).val(), scope);
-    });
-};
-
-
-let createTextarea = (selector, scope, varName, text, value) => {
-    let id = scope + capitalizeFirstLetter(varName);
-    $(selector).append(
-        '<div class="form-group mt-1">' +
-        '<label for="' + id + '">' + text + '</label>' +
-        '<textarea type="text" class="form-control" id="' + id + '" data-varName="' + varName + '" data-scope="' + scope + '" placeholder="' + text + '"></textarea>' +
-        '</div>'
-    );
-    $('#' + id).val(value);
-    $(document).on('keyup', '#' + id, function() {
-        playlist.store(varName, $(this).val(), scope);
-    });
 };
 
 
@@ -328,53 +319,51 @@ let storage = {
 
 
 
+let json = {
+    view: function(jsonDOM) {
+        response = playlistDetails;
+        chrome.storage.local.get([response.global], function (result) {
+            let json = result[response.global];
+            if (json.backAction) delete json.backAction;
+            if (json.history) delete json.history;
+            let jsonOutput = JSON.stringify(json, null, 2);
+            jsonDOM.val(jsonOutput);
+        });
+    },
+    load: function() {
+        let jsonDOM = $('#jsonContent');
+        let jsonString = jsonDOM.val();
+        let jsonObj;
+        try {
+            jsonObj = JSON.parse(jsonString);
+        } catch (e) {
+            alert('Failure parsing JSON. Make sure it is valid!');
+            jsonDOM.val();
+            return
+        }
+        $('#wrapper').show();
+        $('#jsonPane').hide();
 
-function downloadJson() {
-    response = playlistDetails;
-    chrome.storage.local.get([response.global], function (result) {
-        let json = result[response.global];
-        if (json.backAction) delete json.backAction;
-        if (json.history) delete json.history;
-        let jsonOutput = JSON.stringify(json, null, 4);
-        saveText('playlist-' + response.global + '.json', jsonOutput);
-    });
-}
-
-
-function viewJson(jsonDOM) {
-    response = playlistDetails;
-    chrome.storage.local.get([response.global], function (result) {
-        let json = result[response.global];
-        if (json.backAction) delete json.backAction;
-        if (json.history) delete json.history;
-        let jsonOutput = JSON.stringify(json, null, 2);
-        jsonDOM.val(jsonOutput);
-    });
-}
-
-
-function loadJson() {
-    let jsonDOM = $('#jsonContent');
-    let jsonString = jsonDOM.val();
-    let jsonObj;
-    try {
-        jsonObj = JSON.parse(jsonString);
-    } catch (e) {
-        alert('Failure parsing JSON. Make sure it is valid!');
-        jsonDOM.val();
-        return
+        response = playlistDetails;
+        let store = {};
+        let playlist_id = response.global;
+        store[playlist_id] = jsonObj;
+        chrome.storage.local.set(store, function () {
+            extensionReload();
+        });
+    },
+    download: function() {
+        response = playlistDetails;
+        chrome.storage.local.get([response.global], function (result) {
+            let json = result[response.global];
+            if (json.backAction) delete json.backAction;
+            if (json.history) delete json.history;
+            let jsonOutput = JSON.stringify(json, null, 4);
+            saveText('playlist-' + response.global + '.json', jsonOutput);
+        });
     }
-    $('#wrapper').show();
-    $('#jsonPane').hide();
+};
 
-    response = playlistDetails;
-    let store = {};
-    let playlist_id = response.global;
-    store[playlist_id] = jsonObj;
-    chrome.storage.local.set(store, function () {
-        extensionReload();
-    });
-}
 
 
 
@@ -430,17 +419,17 @@ $(document).on('change', '#startingSeries', function () {
 
 
 $(document).on('click', '#viewJson', function() {
-    viewJson($('#jsonContent'));
+    json.view($('#jsonContent'));
 });
 
 
 $(document).on('click', '#downloadJson', function() {
-    downloadJson();
+    json.download();
 });
 
 
 $(document).on('click', '#saveJsonSubmit', function() {
-    loadJson();
+    json.load();
 });
 
 
