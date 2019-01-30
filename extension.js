@@ -79,7 +79,105 @@ let extensionReload = () => {
 };
 
 
+/**
+ * Json object with methods for view, load and download.
+ */
+let json = {
+    view: function() {
+        response = playlistDetails;
+        chrome.storage.local.get([response.global], function (result) {
+            let json = result[response.global];
+            if (json.backAction) delete json.backAction;
+            if (json.history) delete json.history;
+            let jsonOutput = JSON.stringify(json, null, 2);
+            $('#jsonContent').val(jsonOutput);
+        });
+    },
 
+    load: function() {
+        let jsonDOM = $('#jsonContent');
+        let jsonString = jsonDOM.val();
+        let jsonObj;
+        try {
+            jsonObj = JSON.parse(jsonString);
+        } catch (e) {
+            alert('Failure parsing JSON. Make sure it is valid!');
+            jsonDOM.val();
+            return
+        }
+        $('#wrapper').show();
+        $('#jsonPane').hide();
+
+        response = playlistDetails;
+        let store = {};
+        let playlist_id = response.global;
+        store[playlist_id] = jsonObj;
+        chrome.storage.local.set(store, function () {
+            extensionReload();
+        });
+    },
+
+    download: function() {
+        response = playlistDetails;
+        chrome.storage.local.get([response.global], function (result) {
+            let json = result[response.global];
+            if (json.backAction) delete json.backAction;
+            if (json.history) delete json.history;
+            let jsonOutput = JSON.stringify(json, null, 4);
+            saveText('playlist-' + response.global + '.json', jsonOutput);
+        });
+    }
+};
+
+
+/**
+ * Form object with methods for toggle, input and textarea.
+ */
+let form = {
+    toggle: function(selector, scope, varName, text, value) {
+        let id = scope + capitalizeFirstLetter(varName);
+        $(selector).append(
+            '<div class="custom-control custom-switch">\n' +
+            '<input type="checkbox" class="custom-control-input toggle" id="' + id + '" data-varName="' + varName + '" data-scope="' + scope + '">\n' +
+            '<label class="custom-control-label" for="' + id + '">\n' +
+            '<nobr>' + text + '</nobr>\n' +
+            '</label>\n' +
+            '</div>'
+        );
+        $('#' + id).prop("checked", value);
+        $(document).on('change', '#' + id, function() {
+            playlist.store(varName, $(this).prop("checked"), scope);
+        });
+    },
+
+    input: function(selector, scope, varName, text, value) {
+        let id = scope + capitalizeFirstLetter(varName);
+        $(selector).append(
+            '<div class="form-group mt-1">' +
+            '<label for="' + id + '">' + text + '</label>' +
+            '<input type="text" class="form-control" id="' + id + '" data-varName="' + varName + '" data-scope="' + scope + '" placeholder="' + text + '">' +
+            '</div>'
+        );
+        $('#' + id).val(value);
+        $(document).on('keyup', '#' + id, function() {
+            playlist.store(varName, $(this).val(), scope);
+        });
+    },
+
+    textarea: function(selector, scope, varName, text, value) {
+        let id = scope + capitalizeFirstLetter(varName);
+        $(selector).append(
+            '<div class="form-group mt-1">' +
+            '<label for="' + id + '">' + text + '</label>' +
+            '<textarea type="text" class="form-control" id="' + id + '" data-varName="' + varName + '" data-scope="' + scope + '" placeholder="' + text + '"></textarea>' +
+            '</div>'
+        );
+        $('#' + id).val(value);
+        $(document).on('keyup', '#' + id, function() {
+            playlist.store(varName, $(this).val(), scope);
+        });
+    }
+};
 
 
 
@@ -149,48 +247,26 @@ let pagePopup = {
 };
 
 
-let form = {
-    toggle: function(selector, scope, varName, text, value) {
-        let id = scope + capitalizeFirstLetter(varName);
-        $(selector).append(
-            '<div class="custom-control custom-switch">\n' +
-            '<input type="checkbox" class="custom-control-input toggle" id="' + id + '" data-varName="' + varName + '" data-scope="' + scope + '">\n' +
-            '<label class="custom-control-label" for="' + id + '">\n' +
-            '<nobr>' + text + '</nobr>\n' +
-            '</label>\n' +
-            '</div>'
-        );
-        $('#' + id).prop("checked", value);
-        $(document).on('change', '#' + id, function() {
-            playlist.store(varName, $(this).prop("checked"), scope);
-
-        });
+let popup = {
+    introduction: {
+        hide: function() {
+            $('#introduction').hide();
+        }
     },
-    input: function(selector, scope, varName, text, value) {
-        let id = scope + capitalizeFirstLetter(varName);
-        $(selector).append(
-            '<div class="form-group mt-1">' +
-            '<label for="' + id + '">' + text + '</label>' +
-            '<input type="text" class="form-control" id="' + id + '" data-varName="' + varName + '" data-scope="' + scope + '" placeholder="' + text + '">' +
-            '</div>'
-        );
-        $('#' + id).val(value);
-        $(document).on('keyup', '#' + id, function() {
-            playlist.store(varName, $(this).val(), scope);
-        });
+    navigation: {
+        show: function() {
+            $('#navigation').show();
+        }
     },
-    textarea: function(selector, scope, varName, text, value) {
-        let id = scope + capitalizeFirstLetter(varName);
-        $(selector).append(
-            '<div class="form-group mt-1">' +
-            '<label for="' + id + '">' + text + '</label>' +
-            '<textarea type="text" class="form-control" id="' + id + '" data-varName="' + varName + '" data-scope="' + scope + '" placeholder="' + text + '"></textarea>' +
-            '</div>'
-        );
-        $('#' + id).val(value);
-        $(document).on('keyup', '#' + id, function() {
-            playlist.store(varName, $(this).val(), scope);
-        });
+    series: {
+        show: function() {
+            $('#seriesPane').show();
+        }
+    },
+    reload: {
+        show: function() {
+            $('#reloadPane').show();
+        }
     }
 };
 
@@ -200,11 +276,11 @@ let loadDetails = () => {
         chrome.tabs.sendMessage(tabs[0].id, {}, function (response) {
             if (typeof response !== "undefined") {
                 playlistDetails = response;
-                $('#introduction').hide();
-                $('#navigation').show();
+                popup.introduction.hide();
+                popup.navigation.show();
+                popup.series.show();
+                popup.reload.show();
                 loadForm();
-                $('#seriesPane').show();
-                $('#reloadPane').show();
             }
         });
     });
@@ -319,54 +395,6 @@ let storage = {
 
 
 
-let json = {
-    view: function(jsonDOM) {
-        response = playlistDetails;
-        chrome.storage.local.get([response.global], function (result) {
-            let json = result[response.global];
-            if (json.backAction) delete json.backAction;
-            if (json.history) delete json.history;
-            let jsonOutput = JSON.stringify(json, null, 2);
-            jsonDOM.val(jsonOutput);
-        });
-    },
-    load: function() {
-        let jsonDOM = $('#jsonContent');
-        let jsonString = jsonDOM.val();
-        let jsonObj;
-        try {
-            jsonObj = JSON.parse(jsonString);
-        } catch (e) {
-            alert('Failure parsing JSON. Make sure it is valid!');
-            jsonDOM.val();
-            return
-        }
-        $('#wrapper').show();
-        $('#jsonPane').hide();
-
-        response = playlistDetails;
-        let store = {};
-        let playlist_id = response.global;
-        store[playlist_id] = jsonObj;
-        chrome.storage.local.set(store, function () {
-            extensionReload();
-        });
-    },
-    download: function() {
-        response = playlistDetails;
-        chrome.storage.local.get([response.global], function (result) {
-            let json = result[response.global];
-            if (json.backAction) delete json.backAction;
-            if (json.history) delete json.history;
-            let jsonOutput = JSON.stringify(json, null, 4);
-            saveText('playlist-' + response.global + '.json', jsonOutput);
-        });
-    }
-};
-
-
-
-
 
 
 
@@ -419,7 +447,7 @@ $(document).on('change', '#startingSeries', function () {
 
 
 $(document).on('click', '#viewJson', function() {
-    json.view($('#jsonContent'));
+    json.view();
 });
 
 
@@ -434,8 +462,7 @@ $(document).on('click', '#saveJsonSubmit', function() {
 
 
 $(document).on('click', '.actionButton', function() {
-    let action = $(this).attr('data-action');
-    tabAction(action);
+    tabAction($(this).attr('data-action'));
 });
 
 
@@ -520,8 +547,7 @@ playlist = {
                 if (!result[playlist_id][study_id]) result[playlist_id][study_id] = {};
                 result[playlist_id][study_id][variableName] = variableValue;
             }
-            chrome.storage.local.set(result, function () {
-            });
+            chrome.storage.local.set(result, function () {});
         });
     }
 };
