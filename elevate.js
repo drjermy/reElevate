@@ -104,32 +104,32 @@ elements = {
 function elementVisibility() {
     elements.presentingDefaults();
     global.get('hideFindings', function (global) {
-        let globalHideFindings = global.hideFindings;
 
-        store.get('hideFindings', function (result) {
-            let pageHideFindings = result.hideFindings;
-            let pageShowFindings = result.showFindings;
-            if ((globalHideFindings === true && pageShowFindings !== true) || (globalHideFindings !== true && pageHideFindings === true)) {
-                elements.findingsTab.disable();
-                elements.rid.hide();
-            }
-            if (result.maximiseCase === true) {
-                elements.maximise.hide();
-            }
-            if (global.hideTabs === true) {
-                elements.sidebar.tabs.hide();
-            }
-            if ((global.showPresentation === true && result.hidePresentation !== true) || (global.showPresentation !== true && result.showPresentation === true)) {
-                presentation.init(result);
-            }
+        let caseEntry = global[store.case_id()];
+        let study = global[store.name()];
 
-            if (typeof result.startingSeries !== "undefined") {
+        if (global.hideTabs === true) {
+            elements.sidebar.tabs.hide();
+        }
 
-                // We save the starting Series as if they started from 1, but the thumbs are 0-indexed.
-                let n = Number(result.startingSeries) - 1;
-                navigate.series(n);
-            }
-        });
+        if ((global.hideFindings === true && study.showFindings !== true) || (global.hideFindings !== true && study.hideFindings === true)) {
+            elements.findingsTab.disable();
+            elements.rid.hide();
+        }
+
+        if ((global.showPresentation === true && study.hidePresentation !== true) || (global.showPresentation !== true && study.showPresentation === true)) {
+            presentation.init(caseEntry);
+        }
+
+        if (study.maximiseCase === true) {
+            elements.maximise.hide();
+        }
+
+        if (typeof study.startingSeries !== "undefined") {
+            // We save the starting Series as if they started from 1, but the thumbs are 0-indexed.
+            let n = Number(study.startingSeries) - 1;
+            navigate.series(n);
+        }
 
     });
 }
