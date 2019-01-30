@@ -36,7 +36,51 @@ function tabRequest(request) {
     chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
         chrome.tabs.sendMessage(tabs[0].id, request, function (response) {});
     });
+}
+
+
+/**
+ * Wrap up an action and ping the current tab.
+ *
+ * @param action
+ */
+function tabAction (action) {
+    let request = {};
+    request.action = action;
+    tabRequest(request);
+}
+
+
+/**
+ * Change the slicenumber in the live playlist tab.
+ *
+ * @param sliceNumber
+ */
+function changeSlice(sliceNumber) {
+    tabRequest( {slice: sliceNumber} );
+}
+
+
+/**
+ * Change the current series in the live playlist tab.
+ *
+ * @param seriesNumber
+ */
+function changeSeries(seriesNumber) {
+    tabRequest( {series: seriesNumber} );
+}
+
+
+/**
+ * Reload the extension.
+ */
+let extensionReload = () => {
+    location.reload();
 };
+
+
+
+
 
 
 
@@ -64,8 +108,6 @@ let caseElements = {
 };
 
 
-
-
 let globalPopup = {
     settings: {},
     toggleHTML: (varName, text, related) => {
@@ -88,6 +130,7 @@ let globalPopup = {
         }
     }
 };
+
 
 let pagePopup = {
     settings: {},
@@ -175,6 +218,7 @@ let loadDetails = () => {
         });
     });
 };
+
 
 let loadForm = () => {
     response = playlistDetails;
@@ -283,14 +327,6 @@ let storage = {
 };
 
 
-function changeSlice(sliceNumber) {
-    tabRequest( {slice: sliceNumber} );
-}
-
-function changeSeries(seriesNumber) {
-    tabRequest( {series: seriesNumber} );
-}
-
 
 
 function downloadJson() {
@@ -303,8 +339,6 @@ function downloadJson() {
         saveText('playlist-' + response.global + '.json', jsonOutput);
     });
 }
-
-
 
 
 function viewJson(jsonDOM) {
@@ -343,16 +377,6 @@ function loadJson() {
 }
 
 
-let extensionReload = () => {
-    location.reload();
-};
-
-
-let tabAction = (action) => {
-    let request = {};
-    request.action = action;
-    tabRequest(request);
-};
 
 
 
