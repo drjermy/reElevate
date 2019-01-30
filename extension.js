@@ -3,80 +3,6 @@ function capitalizeFirstLetter(string) {
 }
 
 
-$(document).ready(function() {
-    chrome.tabs.getSelected(null, function(tab) {
-        playlist.init(tab);
-        loadDetails();
-    });
-});
-
-
-let playlist;
-playlist = {
-    offlineMode: null,
-    tab: null,
-    vars: {},
-    init: (tab) => {
-        playlist.tab = tab;
-        playlist.isOffline();
-        playlist.varsFromUrl();
-    },
-    isOffline: () => {
-        playlist.offlineMode = (playlist.tab.url.split('://')[0] === 'file');
-    },
-    varsFromUrl: () => {
-        let pathArray = playlist.tab.url.split('/');
-        if (playlist.offlineMode === true) {
-            let lastPart = pathArray.pop();
-            let partsArray = lastPart.split('.html')[0].split('_');
-            playlist.vars = {
-                playlistId: partsArray[1],
-                entryId: partsArray[3],
-                caseId: partsArray[5],
-                studyId: partsArray[7]
-            };
-        } else {
-            playlist.vars = {
-                playlistId: pathArray[2],
-                entryId: pathArray[4],
-                caseId: pathArray[6],
-                studyId: pathArray[8]
-            };
-        }
-    },
-    playlist_id: () => {
-        return 'radiopaedia' + '-' + playlist.vars.playlistId;
-    },
-    case_id: () => {
-        return 'radiopaedia' + '-' + playlist.vars.playlistId + '-' + playlist.vars.entryId + '-' + playlist.vars.caseId;
-    },
-    study_id: () => {
-        return 'radiopaedia' + '-' + playlist.vars.playlistId + '-' + playlist.vars.entryId + '-' + playlist.vars.caseId + '-' + playlist.vars.studyId;
-    },
-    store: (variableName, variableValue, scope = 'page') => {
-        let playlist_id = playlist.playlist_id();
-        let case_id = playlist.case_id();
-        let study_id = playlist.study_id();
-
-        chrome.storage.local.get([playlist_id], function (result) {
-            if (!result[playlist_id]) result[playlist_id] = {};
-            if (scope === 'global') {
-                if (!result[playlist_id]) result[playlist_id] = {};
-                result[playlist_id][variableName] = variableValue;
-            }
-            if (scope === 'case') {
-                if (!result[playlist_id][case_id]) result[playlist_id][case_id] = {};
-                result[playlist_id][case_id][variableName] = variableValue;
-            }
-            if (scope === 'page') {
-                if (!result[playlist_id][study_id]) result[playlist_id][study_id] = {};
-                result[playlist_id][study_id][variableName] = variableValue;
-            }
-            chrome.storage.local.set(result, function () {
-            });
-        });
-    }
-};
 
 
 
@@ -473,4 +399,91 @@ $(document).on('click', '.openButton', function () {
     $('.pane').hide();
     $('#' + pane).show();
     $('#reloadPane').show();
+});
+
+
+
+
+
+
+
+
+
+
+/**
+ * An object of related playlist config values and methods.
+ * The init method is called immediately after page-load.
+ */
+let playlist;
+playlist = {
+    offlineMode: null, // (bool) for whether we are online or offline.
+    tab: null, // the tab object from the current chrome tab (used to get URL).
+    vars: {}, // extracted variables.
+    init: (tab) => {
+        playlist.tab = tab;
+        playlist.isOffline();
+        playlist.varsFromUrl();
+    },
+    isOffline: () => { // Determine whether we are online or offline.
+        playlist.offlineMode = (playlist.tab.url.split('://')[0] === 'file');
+    },
+    varsFromUrl: () => { // Gather all the vars from the URL (different format for online and offline).
+        let pathArray = playlist.tab.url.split('/');
+        if (playlist.offlineMode === true) {
+            let lastPart = pathArray.pop();
+            let partsArray = lastPart.split('.html')[0].split('_');
+            playlist.vars = {
+                playlistId: partsArray[1],
+                entryId: partsArray[3],
+                caseId: partsArray[5],
+                studyId: partsArray[7]
+            };
+        } else {
+            playlist.vars = {
+                playlistId: pathArray[2],
+                entryId: pathArray[4],
+                caseId: pathArray[6],
+                studyId: pathArray[8]
+            };
+        }
+    },
+    playlist_id: () => { // Create the playlist id that is used as the location for playlist config.
+        return 'radiopaedia' + '-' + playlist.vars.playlistId;
+    },
+    case_id: () => { // Create the case id that is used as the location for case config.
+        return 'radiopaedia' + '-' + playlist.vars.playlistId + '-' + playlist.vars.entryId + '-' + playlist.vars.caseId;
+    },
+    study_id: () => { // Create the study id that is used as the location for study config.
+        return 'radiopaedia' + '-' + playlist.vars.playlistId + '-' + playlist.vars.entryId + '-' + playlist.vars.caseId + '-' + playlist.vars.studyId;
+    },
+    store: (variableName, variableValue, scope = 'page') => { // Store a name => value pair to a scope.
+        let playlist_id = playlist.playlist_id();
+        let case_id = playlist.case_id();
+        let study_id = playlist.study_id();
+
+        chrome.storage.local.get([playlist_id], function (result) {
+            if (!result[playlist_id]) result[playlist_id] = {};
+            if (scope === 'global') {
+                if (!result[playlist_id]) result[playlist_id] = {};
+                result[playlist_id][variableName] = variableValue;
+            }
+            if (scope === 'case') {
+                if (!result[playlist_id][case_id]) result[playlist_id][case_id] = {};
+                result[playlist_id][case_id][variableName] = variableValue;
+            }
+            if (scope === 'page') {
+                if (!result[playlist_id][study_id]) result[playlist_id][study_id] = {};
+                result[playlist_id][study_id][variableName] = variableValue;
+            }
+            chrome.storage.local.set(result, function () {
+            });
+        });
+    }
+};
+
+$(document).ready(function() {
+    chrome.tabs.getSelected(null, function(tab) {
+        playlist.init(tab);
+        loadDetails();
+    });
 });
