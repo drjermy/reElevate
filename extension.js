@@ -486,8 +486,7 @@ $(document).on('click', '.openButton', function () {
  * An object of related playlist config values and methods.
  * The init method is called immediately after page-load.
  */
-let playlist;
-playlist = {
+let playlist = {
     offlineMode: null, // (bool) for whether we are online or offline.
     tab: null, // the tab object from the current chrome tab (used to get URL).
     vars: {}, // extracted variables.
