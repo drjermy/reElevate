@@ -1,6 +1,42 @@
+/*********************
+ * GENERAL FUNCTIONS *
+ *********************/
+
+/**
+ * Capitalise the first letter of a string.
+ *
+ * @param string
+ * @returns {string}
+ */
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
+
+
+/**
+ * Create a downloadable file with text.
+ *
+ * @param filename
+ * @param text
+ */
+function saveText(filename, text) {
+    let tempElem = document.createElement('a');
+    tempElem.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    tempElem.setAttribute('download', filename);
+    tempElem.click();
+}
+
+
+/**
+ * Send a request object to the current tab.
+ *
+ * @param request
+ */
+function tabRequest(request) {
+    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, request, function (response) {});
+    });
+};
 
 
 
@@ -269,12 +305,6 @@ function downloadJson() {
 }
 
 
-function saveText(filename, text) {
-    let tempElem = document.createElement('a');
-    tempElem.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-    tempElem.setAttribute('download', filename);
-    tempElem.click();
-}
 
 
 function viewJson(jsonDOM) {
@@ -325,11 +355,6 @@ let tabAction = (action) => {
 };
 
 
-let tabRequest = (request) => {
-    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, request, function (response) {});
-    });
-};
 
 
 $(document).on('change', '#globalDefaultToTopImage', function() {
@@ -337,10 +362,12 @@ $(document).on('change', '#globalDefaultToTopImage', function() {
     $('#pageDefaultSlice').parent('div').toggle();
 });
 
+
 $(document).on('change', '#globalHideFindings', function() {
     $('#pageHideFindings').parent('div').toggle();
     $('#pageShowFindings').parent('div').toggle();
 });
+
 
 $(document).on('change', '#globalShowPresentation', function() {
     $('#pageShowPresentation').parent('div').toggle();
@@ -356,32 +383,37 @@ $(document).on('change', '#pageDefaultToTopImage', function () {
     }
 });
 
+
 $(document).on('mousedown', '.slider', function () {
     changeSeries($(this).attr('data-studyNumber'));
 });
 
+
 $(document).on('input', '.slider', function () {
     changeSlice($(this).val());
 });
+
 
 $(document).on('change', '.slider', function () {
     let seriesN = $(this).attr('data-studyNumber');
     storage.set('startingSlice' + seriesN, $(this).val());
 });
 
+
 $(document).on('change', '#startingSeries', function () {
     storage.set('startingSeries', $(this).val());
 });
-
 
 
 $(document).on('click', '#viewJson', function() {
     viewJson($('#jsonContent'));
 });
 
+
 $(document).on('click', '#downloadJson', function() {
     downloadJson();
 });
+
 
 $(document).on('click', '#saveJsonSubmit', function() {
     loadJson();
@@ -481,6 +513,10 @@ playlist = {
     }
 };
 
+
+/**
+ * Wait until the document is ready and initialse the playlist and load.
+ */
 $(document).ready(function() {
     chrome.tabs.getSelected(null, function(tab) {
         playlist.init(tab);
