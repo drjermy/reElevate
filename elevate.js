@@ -108,16 +108,19 @@ function elementVisibility() {
         let caseEntry = global[store.case_id()];
         let study = global[store.name()];
 
+        caseEntry = (typeof caseEntry !== "undefined" ? caseEntry : {});
+        study = (typeof study !== "undefined" ? study : {});
+
         if (global.hideTabs === true) {
             elements.sidebar.tabs.hide();
         }
 
-        if ((global.hideFindings === true && study.showFindings !== true) || (global.hideFindings !== true && study.hideFindings === true)) {
+        if ((global.hideFindings === true && caseEntry.showFindings !== true) || (global.hideFindings !== true && caseEntry.hideFindings === true)) {
             elements.findingsTab.disable();
             elements.rid.hide();
         }
 
-        if ((global.showPresentation === true && study.hidePresentation !== true) || (global.showPresentation !== true && study.showPresentation === true)) {
+        if (caseEntry.showPresentation === true) {
             presentation.init(caseEntry);
         }
 
