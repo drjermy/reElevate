@@ -265,7 +265,7 @@ let popup = {
                     playlistDetails = response;
                     popup.introduction.hide();
                     popup.navigation.show();
-                    popup.series.show();
+                    popup.study.show();
                     popup.reload.show();
                     loadForm();
                 }
@@ -282,9 +282,9 @@ let popup = {
             $('#navigation').show();
         }
     },
-    series: {
+    study: {
         show: function() {
-            $('#seriesPane').show();
+            $('#studyPane').show();
         }
     },
     reload: {
@@ -361,18 +361,17 @@ let loadForm = () => {
         pagePopup.toggleHTML('maximiseCase', 'Maximise');
         pagePopup.toggleHTML('defaultToTopImage', 'Start on first slice');
         pagePopup.toggleHTML('defaultSlice', 'Start on selected slice');
-        pagePopup.hr();
 
         if (result[response.global][response.case]) {
             caseTab.settings = result[response.global][response.case];
         }
 
+        caseTab.toggleHTML('hideFindings', 'Hide findings');
+        caseTab.toggleHTML('showFindings', 'Show findings');
         caseTab.toggleHTML('showPresentation', 'Show presentation');
         caseTab.textInput('presentationAge', 'Age');
         caseTab.textInput('presentationGender', 'Gender');
         caseTab.textarea('presentationPresentation', 'Presentation');
-        caseTab.toggleHTML('hideFindings', 'Hide findings');
-        caseTab.toggleHTML('showFindings', 'Show findings');
 
 
         if (response.series) {
@@ -394,20 +393,27 @@ let loadForm = () => {
         }
 
         if (typeof response.series !== "undefined") {
+            pagePopup.hr();
 
             // Create sliders for selecting starting slices.
+            let hasSliders = false;
             for (let n in response.series) {
                 let series = response.series[n];
                 if (series.count > 1) {
+                    hasSliders = true;
                     let value = series.default;
                     let int = Number(n) + 1;
-                    $('#seriesInput').append(
+                    $('#pageInput').append(
                         '<div class="form-group">\n' +
-                        '<label for="startingSlice">Starting slice (' + int + ')</label>\n' +
+                        '<label for="startingSlice">Series ' + int + '</label>\n' +
+                        '<a class="selectSeries" data-series="' + int + '" href="#">&gt;</a>' +
                         '<input type="range" min="1" max="' + series.count + '" value="' + value + '" class="form-control-range slider" id="startingSlice' + n + '" data-studyNumber="' + n + '">\n' +
                         '</div>'
                     );
                 }
+            }
+            if (hasSliders === true) {
+                pagePopup.hr();
             }
 
             // Create a dropdown to select starting series.
@@ -418,10 +424,9 @@ let loadForm = () => {
                     let int = Number(n) + 1;
                     options += '<option value="' + int + '">Series ' + int + '</option>';
                 }
-
                 $('#pageInput').append(
-                    '<label for="startingSeries">Default series</label>\n' +
-                    '<select id="startingSeries" placeholder="Starting series">' +
+                    '<label for="startingSeries">Default</label>\n' +
+                    '<select class="form-control" id="startingSeries" placeholder="Starting series">' +
                     options +
                     '</select>'
                 );
@@ -498,6 +503,11 @@ $(document).on('change', '.slider', function () {
 
 $(document).on('change', '#startingSeries', function () {
     storage.set('startingSeries', $(this).val());
+});
+
+$(document).on('click', '.selectSeries', function  () {
+    let n = $(this).attr('data-series');
+    changeSeries(Number(n) - 1);
 });
 
 
