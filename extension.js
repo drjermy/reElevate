@@ -430,17 +430,17 @@ let storage = {
 
 
 
-$(document).on('click', '#viewJson', function() {
+$('#viewJson').click(function() {
     json.view();
 });
 
 
-$(document).on('click', '#downloadJson', function() {
+$('#downloadJson').click(function() {
     json.download();
 });
 
 
-$(document).on('click', '#saveJsonSubmit', function() {
+$('#saveJsonSubmit').click(function() {
     json.load();
 });
 
