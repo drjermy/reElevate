@@ -713,7 +713,7 @@ let navigate = {
         });
     },
     orange: function () {
-        if (isSlide) {
+        if ($('a.orange').length > 0) {
             $('a.orange')[0].click();
         } else {
             $('#offline-workflow-next-slide')[0].click();
