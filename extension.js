@@ -373,9 +373,9 @@ let loadForm = () => {
                     let int = Number(n) + 1;
                     $('#studyInput').append(
                         '<div class="form-group">\n' +
-                        '<input type="range" min="1" max="' + series.count + '" value="' + value + '" class="form-control-range slider" id="startingSlice' + n + '" data-studyNumber="' + n + '">\n' +
                         '<label for="startingSlice">Series' + int + '</label>\n' +
                         '<a class="selectSeries" data-series="' + int + '" href="#">-&gt;</a>' +
+                        '<input type="range" min="1" max="' + series.count + '" value="' + value + '" class="form-control-range slider" id="startingSlice' + n + '" data-studyNumber="' + n + '" disabled>\n' +
                         '</div>'
                     );
                 }
@@ -408,21 +408,6 @@ let loadForm = () => {
                     '</select>'
                 );
             }
-
-            $(document).on('mousedown', '.slider', function () {
-                changeSeries($(this).attr('data-studyNumber'));
-            });
-
-
-            $(document).on('input', '.slider', function () {
-                changeSlice($(this).val());
-            });
-
-
-            $(document).on('change', '.slider', function () {
-                let seriesN = $(this).attr('data-studyNumber');
-                storage.set('startingSlice' + seriesN, $(this).val());
-            });
 
         }
 
