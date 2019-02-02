@@ -126,7 +126,7 @@ let playlist = {
     study_id: () => { // Create the study id that is used as the location for study config.
         return 'radiopaedia' + '-' + playlist.vars.playlistId + '-' + playlist.vars.entryId + '-' + playlist.vars.caseId + '-' + playlist.vars.studyId;
     },
-    store: (variableName, variableValue, scope = 'page') => { // Store a name => value pair to a scope.
+    store: (variableName, variableValue, scope = 'study') => { // Store a name => value pair to a scope.
         let playlist_id = playlist.playlist_id();
         let case_id = playlist.case_id();
         let study_id = playlist.study_id();
@@ -167,7 +167,6 @@ let json = {
             $('#jsonContent').val(jsonOutput);
         });
     },
-
     load: function() {
         let jsonDOM = $('#jsonContent');
         let jsonString = jsonDOM.val();
@@ -190,7 +189,6 @@ let json = {
             extensionReload();
         });
     },
-
     download: function() {
         response = playlistDetails;
         chrome.storage.local.get([response.playlist], function (result) {
@@ -227,7 +225,6 @@ let popup = {
 let pagePopup = {
     settings: {},
 };
-
 
 
 let loadForm = () => {
@@ -328,12 +325,14 @@ let loadForm = () => {
             pagePopup.settings = result[response.playlist][response.name];
         }
 
+
         if (response.series) {
             for (let n in response.series) {
                 $('#startingSlice' + n).val(pagePopup.settings['startingSlice' + n]);
             }
             $('#startingSeries').val(pagePopup.settings.startingSeries);
         }
+
 
         $(document).on('change', '#startingSeries', function () {
             storage.set('startingSeries', $(this).val());
@@ -344,6 +343,7 @@ let loadForm = () => {
             let n = $(this).attr('data-series');
             changeSeries(Number(n) - 1);
         });
+
 
         $(document).on('click', '.getSeriesData', function () {
             let n = $(this).attr('data-series');
@@ -357,6 +357,7 @@ let loadForm = () => {
                 });
             });
         });
+
 
         if (typeof response.series !== "undefined") {
             $('#studyInput').append('<hr/>');
@@ -378,6 +379,7 @@ let loadForm = () => {
                     );
                 }
             }
+
             if (hasSliders === true) {
                 $('#studyInput').append('<hr/>');
             }
