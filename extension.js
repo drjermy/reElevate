@@ -135,7 +135,7 @@ let playlist = {
             if (!result[playlist_id]) {
                 result[playlist_id] = {};
             }
-            if (scope === 'global') {
+            if (scope === 'playlist') {
                 if (!result[playlist_id]) result[playlist_id] = {};
                 result[playlist_id][variableName] = variableValue;
             }
@@ -143,7 +143,7 @@ let playlist = {
                 if (!result[playlist_id][case_id]) result[playlist_id][case_id] = {};
                 result[playlist_id][case_id][variableName] = variableValue;
             }
-            if (scope === 'page') {
+            if (scope === 'study') {
                 if (!result[playlist_id][study_id]) result[playlist_id][study_id] = {};
                 result[playlist_id][study_id][variableName] = variableValue;
             }
@@ -159,8 +159,8 @@ let playlist = {
 let json = {
     view: function() {
         response = playlistDetails;
-        chrome.storage.local.get([response.global], function (result) {
-            let json = result[response.global];
+        chrome.storage.local.get([response.playlist], function (result) {
+            let json = result[response.playlist];
             if (json.backAction) delete json.backAction;
             if (json.history) delete json.history;
             let jsonOutput = JSON.stringify(json, null, 2);
@@ -184,7 +184,7 @@ let json = {
 
         response = playlistDetails;
         let store = {};
-        let playlist_id = response.global;
+        let playlist_id = response.playlist;
         store[playlist_id] = jsonObj;
         chrome.storage.local.set(store, function () {
             extensionReload();
@@ -193,62 +193,12 @@ let json = {
 
     download: function() {
         response = playlistDetails;
-        chrome.storage.local.get([response.global], function (result) {
-            let json = result[response.global];
+        chrome.storage.local.get([response.playlist], function (result) {
+            let json = result[response.playlist];
             if (json.backAction) delete json.backAction;
             if (json.history) delete json.history;
             let jsonOutput = JSON.stringify(json, null, 4);
-            saveText('playlist-' + response.global + '.json', jsonOutput);
-        });
-    }
-};
-
-
-/**
- * Form object with methods for toggle, input and textarea.
- */
-let form = {
-    toggle: function(selector, scope, varName, text, value) {
-        let id = scope + capitalizeFirstLetter(varName);
-        $(selector).append(
-            '<div class="custom-control custom-switch">\n' +
-            '<input type="checkbox" class="custom-control-input toggle" id="' + id + '" data-varName="' + varName + '" data-scope="' + scope + '">\n' +
-            '<label class="custom-control-label" for="' + id + '">\n' +
-            '<nobr>' + text + '</nobr>\n' +
-            '</label>\n' +
-            '</div>'
-        );
-        $('#' + id).prop("checked", value);
-        $(document).on('change', '#' + id, function() {
-            playlist.store(varName, $(this).prop("checked"), scope);
-        });
-    },
-
-    input: function(selector, scope, varName, text, value) {
-        let id = scope + capitalizeFirstLetter(varName);
-        $(selector).append(
-            '<div class="form-group mt-1">' +
-            '<label for="' + id + '">' + text + '</label>' +
-            '<input type="text" class="form-control" id="' + id + '" data-varName="' + varName + '" data-scope="' + scope + '" placeholder="' + text + '">' +
-            '</div>'
-        );
-        $('#' + id).val(value);
-        $(document).on('keyup', '#' + id, function() {
-            playlist.store(varName, $(this).val(), scope);
-        });
-    },
-
-    textarea: function(selector, scope, varName, text, value) {
-        let id = scope + capitalizeFirstLetter(varName);
-        $(selector).append(
-            '<div class="form-group mt-1">' +
-            '<label for="' + id + '">' + text + '</label>' +
-            '<textarea type="text" class="form-control" id="' + id + '" data-varName="' + varName + '" data-scope="' + scope + '" placeholder="' + text + '"></textarea>' +
-            '</div>'
-        );
-        $('#' + id).val(value);
-        $(document).on('keyup', '#' + id, function() {
-            playlist.store(varName, $(this).val(), scope);
+            saveText('playlist-' + response.playlist + '.json', jsonOutput);
         });
     }
 };
@@ -263,92 +213,21 @@ let popup = {
             chrome.tabs.sendMessage(tabs[0].id, {}, function (response) {
                 if (typeof response !== "undefined") {
                     playlistDetails = response;
-                    popup.introduction.hide();
-                    popup.navigation.show();
-                    popup.study.show();
-                    popup.reload.show();
+                    $('#introduction').hide();
+                    $('#navigation').show();
+                    $('#viewStudy').click().focus();
                     loadForm();
                 }
             });
         });
-    },
-    introduction: {
-        hide: function() {
-            $('#introduction').hide();
-        }
-    },
-    navigation: {
-        show: function() {
-            $('#navigation').show();
-        }
-    },
-    study: {
-        show: function() {
-            $('#studyPane').show();
-        }
-    },
-    reload: {
-        show: function() {
-            $('#reloadPane').show();
-        }
-    }
-};
-
-
-
-let playlistTab = {
-    settings: {},
-    toggle: (varName, text, bool) => {
-        let value = playlistTab.settings[varName];
-        if (typeof value === "undefined") value = bool;
-        form.toggle('#globalInput', 'global', varName, text, value);
-    },
-    toggleHTML: (varName, text, related, relatedScope = 'page') => {
-        form.toggle('#globalInput', 'global', varName, text, playlistTab.settings[varName]);
-        if (related) {
-            playlistTab.toggleRelated(varName, related, relatedScope);
-        }
-    },
-    hr: () => {
-        $('#globalInput').append('<hr/>');
-    },
-    toggleRelated: (varName, relatedName, scope) => {
-        let globalName = 'global' + capitalizeFirstLetter(varName);
-        let pageName = scope + capitalizeFirstLetter(varName);
-        let pageRelated = scope + capitalizeFirstLetter(relatedName);
-        if ($('#' + globalName).prop("checked") === true) {
-            $('#' + pageName).parent('div').hide();
-        } else {
-            $('#' + pageRelated).parent('div').hide()
-        }
-    }
-};
-
-
-let caseTab = {
-    settings: {},
-    toggleHTML: (varName, text) => {
-        form.toggle('#caseInput', 'case', varName, text, caseTab.settings[varName]);
-    },
-    textInput: (varName, text) => {
-        form.input('#caseInput', 'case', varName, text, caseTab.settings[varName]);
-    },
-    textarea: (varName, text) => {
-        form.textarea('#caseInput', 'case', varName, text, caseTab.settings[varName]);
-    },
-    hr: () => {
-        $('#caseInput').append('<hr/>');
     }
 };
 
 
 let pagePopup = {
     settings: {},
-    toggleHTML: (varName, text) => {
-        form.toggle('#pageInput', 'page', varName, text, pagePopup.settings[varName]);
-    },
     hr: () => {
-        $('#pageInput').append('<hr/>');
+        $('#studyInput').append('<hr/>');
     }
 };
 
@@ -357,27 +236,84 @@ let pagePopup = {
 let loadForm = () => {
     response = playlistDetails;
 
-    chrome.storage.local.get([response.global], function(result) {
+    chrome.storage.local.get([response.playlist], function(result) {
 
-        if (result[response.global][response.name]) {
-            pagePopup.settings = result[response.global][response.name];
+        let getValueFromStorage = function (that) {
+            let varName = $(that).attr('data-variable');
+            let scope = $(that).parents('.popper-wrapper').attr('data-scope');
+
+            if (typeof scope !== "undefined") {
+
+                let settings = result[response.playlist];
+                if (scope !== 'playlist') {
+                    settings = settings[response[scope]];
+                }
+                if (typeof settings === "undefined") {
+                    settings = {};
+                }
+
+                let defaultValue = $(that).attr('data-default');
+                if (typeof settings[varName] === "undefined") {
+                    settings[varName] = defaultValue;
+                }
+                return settings[varName];
+            }
+        };
+
+        let setVisibility = function (that) {
+            let varName = $(that).attr('data-variable');
+            let scope = $(that).parents('.popper-wrapper').attr('data-scope');
+
+            if ($(that).prop('checked') === true) {
+                if (scope === 'playlist') {
+                    $('#caseInput .toggle[data-variable="' + varName + '"]').parent('div').hide();
+                    $('#caseInput .toggle[data-relation="' + varName + '"]').parent('div').show();
+                }
+                if (scope !== 'study') {
+                    $('#studyInput .toggle[data-variable="' + varName + '"]').parent('div').hide();
+                    $('#studyInput .toggle[data-relation="' + varName + '"]').parent('div').show();
+                }
+            } else {
+                if (scope === 'playlist') {
+                    $('#caseInput .toggle[data-relation="' + varName + '"]').parent('div').hide();
+                    $('#caseInput .toggle[data-variable="' + varName + '"]').parent('div').show();
+                }
+                if (scope !== 'study') {
+                    $('#studyInput .toggle[data-relation="' + varName + '"]').parent('div').hide();
+                    $('#studyInput .toggle[data-variable="' + varName + '"]').parent('div').show();
+                }
+            }
+        };
+
+
+        // Set up initial state of the toggles.
+        $('.popup-toggle').each(function () {
+            let value = getValueFromStorage(this);
+            $(this).prop('checked', value);
+
+            if ($(this).attr('data-paired') === 'true') {
+                setVisibility(this);
+            }
+        }).change(function() {
+            let varName = $(this).attr('data-variable');
+            let scope = $(this).parents('.popper-wrapper').attr('data-scope');
+            playlist.store(varName, $(this).prop("checked"), scope);
+            setVisibility(this);
+        });
+
+
+        $('.popup-text').each(function () {
+            $(this).val(getValueFromStorage(this));
+        }).keyup(function() {
+            let varName = $(this).attr('data-variable');
+            let scope = $(this).parents('.popper-wrapper').attr('data-scope');
+            playlist.store(varName, $(this).val(), scope);
+        });
+
+
+        if (result[response.playlist][response.name]) {
+            pagePopup.settings = result[response.playlist][response.name];
         }
-
-        pagePopup.toggleHTML('maximiseCase', 'Maximise');
-        pagePopup.toggleHTML('defaultToTopImage', 'Start on first slice');
-        pagePopup.toggleHTML('defaultSlice', 'Start on selected slice');
-
-        if (result[response.global][response.case]) {
-            caseTab.settings = result[response.global][response.case];
-        }
-
-        caseTab.toggleHTML('hideFindings', 'Hide findings');
-        caseTab.toggleHTML('showFindings', 'Show findings');
-        caseTab.toggleHTML('showPresentation', 'Show presentation');
-        caseTab.textInput('presentationAge', 'Age');
-        caseTab.textInput('presentationGender', 'Gender');
-        caseTab.textarea('presentationPresentation', 'Presentation');
-
 
         if (response.series) {
             for (let n in response.series) {
@@ -386,16 +322,6 @@ let loadForm = () => {
             $('#startingSeries').val(pagePopup.settings.startingSeries);
         }
 
-        if (result[response.global]) {
-            playlistTab.settings = result[response.global];
-            playlistTab.toggle('headerVisible', 'Visible header', true);
-            playlistTab.toggle('sidebarVisible', 'Visible sidebar', true);
-            playlistTab.toggle('footerVisible', 'Visible footer', true);
-            playlistTab.hr();
-            playlistTab.toggleHTML('defaultToTopImage', 'Start on first slice', 'defaultSlice');
-            playlistTab.toggleHTML('hideFindings', 'Hide findings', 'showFindings', 'case');
-            playlistTab.toggleHTML('hideTabs', 'Hide tabs');
-        }
 
         if (typeof response.series !== "undefined") {
             pagePopup.hr();
@@ -408,7 +334,7 @@ let loadForm = () => {
                     hasSliders = true;
                     let value = series.default;
                     let int = Number(n) + 1;
-                    $('#pageInput').append(
+                    $('#studyInput').append(
                         '<div class="form-group">\n' +
                         '<label for="startingSlice">Series ' + int + '</label>\n' +
                         '<a class="selectSeries" data-series="' + int + '" href="#">&gt;</a>' +
@@ -429,7 +355,7 @@ let loadForm = () => {
                     let int = Number(n) + 1;
                     options += '<option value="' + int + '">Series ' + int + '</option>';
                 }
-                $('#pageInput').append(
+                $('#studyInput').append(
                     '<label for="startingSeries">Default</label>\n' +
                     '<select class="form-control" id="startingSeries" placeholder="Starting series">' +
                     options +
@@ -446,7 +372,7 @@ let loadForm = () => {
 let storage = {
     set:(variableName, variableValue, global) => {
         response = playlistDetails;
-        let playlist_id = response.global;
+        let playlist_id = response.playlist;
         let study_id = response.name;
 
         chrome.storage.local.get([playlist_id], function (result) {
@@ -465,29 +391,6 @@ let storage = {
 };
 
 
-
-
-
-
-$(document).on('change', '#globalDefaultToTopImage', function() {
-    $('#pageDefaultToTopImage').parent('div').toggle();
-    $('#pageDefaultSlice').parent('div').toggle();
-});
-
-
-$(document).on('change', '#globalHideFindings', function() {
-    $('#caseHideFindings').parent('div').toggle();
-    $('#caseShowFindings').parent('div').toggle();
-});
-
-
-$(document).on('change', '#pageDefaultToTopImage', function () {
-    if ($(this).prop('checked') === true) {
-        $('#startingSlice').parent('div').hide();
-    } else {
-        $('#startingSlice').parent('div').show();
-    }
-});
 
 
 $(document).on('mousedown', '.slider', function () {
@@ -540,7 +443,6 @@ $(document).on('click', '.openButton', function () {
     let pane = $(this).attr('data-open');
     $('.pane').hide();
     $('#' + pane).show();
-    $('#reloadPane').show();
 });
 
 

@@ -774,8 +774,8 @@ $(document).ready(function() {
                 // Need to refresh the internal variables defined by current case.
                 getPlaylistVarsFromURL();
                 sendResponse({
-                    name: store.name(),
-                    global: global.name()
+                    study: store.name(),
+                    playlist: global.name()
                 });
 
             } else {
@@ -800,9 +800,9 @@ $(document).ready(function() {
                 }
 
                 sendResponse({
-                    name: store.name(),
+                    study: store.name(),
                     case: store.case_id(),
-                    global: global.name(),
+                    playlist: global.name(),
                     series: series
                 });
 

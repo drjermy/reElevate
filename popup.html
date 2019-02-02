@@ -20,6 +20,12 @@
             padding-bottom: 0.2rem;
             margin-bottom: 1rem;
         }
+        .toggle-alt {
+            display: none;
+        }
+        .nobr {
+            white-space:nowrap;
+        }
     </style>
 </head>
 <body>
@@ -39,25 +45,88 @@
             <button id="viewStudy" data-open="studyPane" class="openButton btn-sm">Study</button>
             <button id="viewJson" data-open="jsonPane" class="openButton btn-sm">JSON</button>
             <button id="viewHelp" data-open="helpPane" class="openButton btn-sm">?</button>
+            <button class="actionButton btn-sm" data-action="reload">&#8635;</button>
         </nobr>
     </div>
 
     <div id="playlistPane" class="container pane py-2">
         <h1>Playlist</h1>
-        <div id="globalInput"></div>
-        <div id="globalStorage"></div>
+        <div id="playlistInput" class="popper-wrapper" data-scope="playlist">
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input toggle popup-toggle" id="playlistHeaderVisible" data-variable="headerVisible" data-default=true>
+                <label class="custom-control-label nobr" for="playlistHeaderVisible">Visible header</label>
+            </div>
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input toggle popup-toggle" id="playlistSidebarVisible" data-variable="sidebarVisible" data-default=true>
+                <label class="custom-control-label nobr" for="playlistSidebarVisible">Visible sidebar</label>
+            </div>
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input toggle popup-toggle" id="playlistFooterVisible" data-variable="footerVisible" data-default=true>
+                <label class="custom-control-label nobr" for="playlistFooterVisible">Visible footer</label>
+            </div>
+            <hr/>
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input toggle popup-toggle" id="playlistHideTabs" data-variable="hideTabs">
+                <label class="custom-control-label nobr" for="playlistHideTabs">Hide tabs</label>
+            </div>
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input toggle popup-toggle" id="playlistDefaultToTopImage" data-variable="defaultToTopImage" data-paired=true>
+                <label class="custom-control-label nobr" for="playlistDefaultToTopImage">Start on first slice</label>
+            </div>
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input toggle popup-toggle" id="playlistHideFindings" data-variable="hideFindings" data-paired=true>
+                <label class="custom-control-label nobr" for="playlistHideFindings">Hide findings</label>
+            </div>
+        </div>
     </div>
 
     <div id="casePane" class="container pane py-2">
         <h1>Case</h1>
-        <div id="caseInput"></div>
-        <div id="caseStorage"></div>
+        <div id="caseInput" class="popper-wrapper" data-scope="case">
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input toggle popup-toggle" id="caseShowPresentation" data-variable="showPresentation">
+                <label class="custom-control-label nobr" for="caseShowPresentation">Show presentation</label>
+            </div>
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input toggle popup-toggle" id="caseHideFindings" data-variable="hideFindings">
+                <label class="custom-control-label nobr" for="caseHideFindings">Hide Findings</label>
+            </div>
+            <div class="custom-control custom-switch toggle-alt">
+                <input type="checkbox" class="custom-control-input toggle popup-toggle" id="caseShowFindings" data-variable="showFindings" data-relation="hideFindings">
+                <label class="custom-control-label nobr" for="caseShowFindings">Show Findings</label>
+            </div>
+            <hr/>
+            <div class="form-group mt-1">
+                <label for="casePresentationAge">Age</label>
+                <input type="text" class="form-control popup-text" id="casePresentationAge" data-variable="presentationAge" placeholder="Age">
+            </div>
+            <div class="form-group mt-1">
+                <label for="casePresentationGender">Gender</label>
+                <input type="text" class="form-control popup-text" id="casePresentationGender" data-variable="presentationGender" placeholder="Gender">
+            </div>
+            <div class="form-group mt-1">
+                <label for="casePresentationPresentation">Presentation</label>
+                <textarea type="text" class="form-control popup-text" id="casePresentationPresentation" data-variable="presentationPresentation" placeholder="Presentation"></textarea>
+            </div>
+        </div>
     </div>
 
     <div id="studyPane" class="container pane py-2">
         <h1>Study</h1>
-        <div id="pageInput"></div>
-        <div id="pageStorage"></div>
+        <div id="studyInput" class="popper-wrapper" data-scope="study">
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input toggle popup-toggle" id="studyMaximiseCase" data-variable="maximiseCase">
+                <label class="custom-control-label nobr" for="studyMaximiseCase">Maximise</label>
+            </div>
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input toggle popup-toggle" id="studyDefaultToTopImage" data-variable="defaultToTopImage">
+                <label class="custom-control-label nobr" for="studyDefaultToTopImage">Start on first slice</label>
+            </div>
+            <div class="custom-control custom-switch toggle-alt">
+                <input type="checkbox" class="custom-control-input toggle popup-toggle" id="studyDefaultSlice" data-variable="defaultSlice" data-relation="defaultToTopImage">
+                <label class="custom-control-label nobr" for="studyDefaultSlice">Start on selected slice</label>
+            </div>
+        </div>
     </div>
 
     <div id="jsonPane" class="container pane py-2">
@@ -65,7 +134,7 @@
         <p>
             Make edits, or change completely and then hit "Save".
         </p>
-        <textarea id="jsonContent" rows="20" class="form-control"></textarea>
+        <textarea id="jsonContent" rows="15" class="form-control"></textarea>
         <div class="py-2">
             <button id="saveJsonSubmit" class="btn-sm btn-primary">Save</button>
             <button id="downloadJson" class="btn-sm btn-warning">Download</button>
@@ -94,12 +163,6 @@
         <div>e: findings tab</div>
         <div>p: show presentation info</div>
 
-    </div>
-
-    <div id="reloadPane" class="pane container py-2">
-        <!--<button class="actionButton btn-sm" data-action="prev">&lt;</button>-->
-        <button class="actionButton btn-sm" data-action="reload">reload</button>
-        <!--<button class="actionButton btn-sm" data-action="next">&gt;</button>-->
     </div>
 
     <script src="/vendor/jquery-3.3.1.slim.min.js" type="text/javascript"></script>
