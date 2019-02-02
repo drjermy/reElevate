@@ -373,9 +373,9 @@ let loadForm = () => {
                     let int = Number(n) + 1;
                     $('#studyInput').append(
                         '<div class="form-group">\n' +
-                        '<label for="startingSlice">Series</label>\n' +
-                        '<a class="selectSeries" data-series="' + int + '" href="#">' + int + '</a>' +
                         '<input type="range" min="1" max="' + series.count + '" value="' + value + '" class="form-control-range slider" id="startingSlice' + n + '" data-studyNumber="' + n + '">\n' +
+                        '<label for="startingSlice">Series' + int + '</label>\n' +
+                        '<a class="selectSeries" data-series="' + int + '" href="#">-&gt;</a>' +
                         '</div>'
                     );
                 }
