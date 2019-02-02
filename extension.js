@@ -226,9 +226,6 @@ let popup = {
 
 let pagePopup = {
     settings: {},
-    hr: () => {
-        $('#studyInput').append('<hr/>');
-    }
 };
 
 
@@ -238,6 +235,11 @@ let loadForm = () => {
 
     chrome.storage.local.get([response.playlist], function(result) {
 
+        /**
+         * Take a selector and get the value from storage that relates to it.
+         * @param that
+         * @returns {*}
+         */
         let getValueFromStorage = function (that) {
             let varName = $(that).attr('data-variable');
             let scope = $(that).parents('.popper-wrapper').attr('data-scope');
@@ -260,6 +262,11 @@ let loadForm = () => {
             }
         };
 
+
+        /**
+         * Take a selector and make sure visibility of it and related elements are set.
+         * @param that
+         */
         let setVisibility = function (that) {
             let varName = $(that).attr('data-variable');
             let scope = $(that).parents('.popper-wrapper').attr('data-scope');
@@ -286,7 +293,9 @@ let loadForm = () => {
         };
 
 
-        // Set up initial state of the toggles.
+        /**
+         * Set up initial state for toggles and introduce triggers for change.
+         */
         $('.popup-toggle').each(function () {
             let value = getValueFromStorage(this);
             $(this).prop('checked', value);
@@ -302,6 +311,10 @@ let loadForm = () => {
         });
 
 
+        /**
+         * Set up initial state for text/textarea inputs and introduce triggers for keyup.
+         * Triggering update on keyup means that every keystroke updates the local storage.
+         */
         $('.popup-text').each(function () {
             $(this).val(getValueFromStorage(this));
         }).keyup(function() {
@@ -322,9 +335,18 @@ let loadForm = () => {
             $('#startingSeries').val(pagePopup.settings.startingSeries);
         }
 
+        $(document).on('change', '#startingSeries', function () {
+            storage.set('startingSeries', $(this).val());
+        });
+
+
+        $(document).on('click', '.selectSeries', function  () {
+            let n = $(this).attr('data-series');
+            changeSeries(Number(n) - 1);
+        });
 
         if (typeof response.series !== "undefined") {
-            pagePopup.hr();
+            $('#studyInput').append('<hr/>');
 
             // Create sliders for selecting starting slices.
             let hasSliders = false;
@@ -344,7 +366,7 @@ let loadForm = () => {
                 }
             }
             if (hasSliders === true) {
-                pagePopup.hr();
+                $('#studyInput').append('<hr/>');
             }
 
             // Create a dropdown to select starting series.
@@ -362,6 +384,22 @@ let loadForm = () => {
                     '</select>'
                 );
             }
+
+            $(document).on('mousedown', '.slider', function () {
+                changeSeries($(this).attr('data-studyNumber'));
+            });
+
+
+            $(document).on('input', '.slider', function () {
+                changeSlice($(this).val());
+            });
+
+
+            $(document).on('change', '.slider', function () {
+                let seriesN = $(this).attr('data-studyNumber');
+                storage.set('startingSlice' + seriesN, $(this).val());
+            });
+
         }
 
     });
@@ -390,33 +428,6 @@ let storage = {
     }
 };
 
-
-
-
-$(document).on('mousedown', '.slider', function () {
-    changeSeries($(this).attr('data-studyNumber'));
-});
-
-
-$(document).on('input', '.slider', function () {
-    changeSlice($(this).val());
-});
-
-
-$(document).on('change', '.slider', function () {
-    let seriesN = $(this).attr('data-studyNumber');
-    storage.set('startingSlice' + seriesN, $(this).val());
-});
-
-
-$(document).on('change', '#startingSeries', function () {
-    storage.set('startingSeries', $(this).val());
-});
-
-$(document).on('click', '.selectSeries', function  () {
-    let n = $(this).attr('data-series');
-    changeSeries(Number(n) - 1);
-});
 
 
 $(document).on('click', '#viewJson', function() {
