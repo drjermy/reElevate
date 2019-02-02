@@ -298,6 +298,11 @@ let popup = {
 
 let playlistTab = {
     settings: {},
+    toggle: (varName, text, bool) => {
+        let value = playlistTab.settings[varName];
+        if (typeof value === "undefined") value = bool;
+        form.toggle('#globalInput', 'global', varName, text, value);
+    },
     toggleHTML: (varName, text, related, relatedScope = 'page') => {
         form.toggle('#globalInput', 'global', varName, text, playlistTab.settings[varName]);
         if (related) {
@@ -383,9 +388,9 @@ let loadForm = () => {
 
         if (result[response.global]) {
             playlistTab.settings = result[response.global];
-            playlistTab.toggleHTML('headerVisible', 'Visible header');
-            playlistTab.toggleHTML('sidebarVisible', 'Visible sidebar');
-            playlistTab.toggleHTML('footerVisible', 'Visible footer');
+            playlistTab.toggle('headerVisible', 'Visible header', true);
+            playlistTab.toggle('sidebarVisible', 'Visible sidebar', true);
+            playlistTab.toggle('footerVisible', 'Visible footer', true);
             playlistTab.hr();
             playlistTab.toggleHTML('defaultToTopImage', 'Start on first slice', 'defaultSlice');
             playlistTab.toggleHTML('hideFindings', 'Hide findings', 'showFindings', 'case');
