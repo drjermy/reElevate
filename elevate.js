@@ -316,13 +316,12 @@ let findIndex = function (key, val, arr) {
     if (Array.isArray(arr)) {
         for (let i = 0, j = arr.length; i < j; i++) {
             if (arr[i].hasOwnProperty(key)) {
-                if (arr[i][key] == val) {
+                if (arr[i][key] === val) {
                     return i;
                 }
             }
         }
     }
-    return -1;
 };
 
 
@@ -372,7 +371,7 @@ function setImageWrapperSize()
 function currentStudyImages()
 {
     let currentSeriesNumber = getCurrentSeriesNumber();
-    if (currentSeriesNumber) {
+    if (typeof currentSeriesNumber !== "undefined") {
         return stackedImages[currentSeriesNumber]['images'];
     }
 }
@@ -420,6 +419,23 @@ let store = {
             }
             callback(result[playlist_id][study_id]);
         });
+    }
+};
+
+
+let current;
+current = {
+    image: function () {
+        return $('#largeImage img').attr('src');
+    },
+    series: function () {
+        return getCurrentSeriesNumber();
+    },
+    slice: function () {
+        let filename = current.image();
+        let images = currentStudyImages();
+        let slice = findIndex('fullscreen_filename', filename, images);
+        return images[slice]['position'];
     }
 };
 
@@ -779,6 +795,14 @@ $(document).ready(function() {
                 });
 
             } else {
+
+                if (typeof request.getData !== "undefined") {
+                    sendResponse({
+                        series: current.series(),
+                        slice: current.slice()
+                    });
+                    break;
+                }
 
                 if (typeof request.series !== "undefined") {
                     navigate.series(request.series);

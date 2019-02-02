@@ -345,6 +345,19 @@ let loadForm = () => {
             changeSeries(Number(n) - 1);
         });
 
+        $(document).on('click', '.getSeriesData', function () {
+            let n = $(this).attr('data-series');
+            let request = {getData: n};
+            chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+                chrome.tabs.sendMessage(tabs[0].id, request, function (response) {
+                    if (typeof response.series !== "undefined") {
+                        let id = 'startingSlice' + response.series;
+                        $('#' + id).val(response.slice);
+                    }
+                });
+            });
+        });
+
         if (typeof response.series !== "undefined") {
             $('#studyInput').append('<hr/>');
 
@@ -358,8 +371,8 @@ let loadForm = () => {
                     let int = Number(n) + 1;
                     $('#studyInput').append(
                         '<div class="form-group">\n' +
-                        '<label for="startingSlice">Series ' + int + '</label>\n' +
-                        '<a class="selectSeries" data-series="' + int + '" href="#">&gt;</a>' +
+                        '<label for="startingSlice">Series</label>\n' +
+                        '<a class="selectSeries" data-series="' + int + '" href="#">' + int + '</a>' +
                         '<input type="range" min="1" max="' + series.count + '" value="' + value + '" class="form-control-range slider" id="startingSlice' + n + '" data-studyNumber="' + n + '">\n' +
                         '</div>'
                     );
