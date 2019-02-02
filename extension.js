@@ -335,7 +335,7 @@ let loadForm = () => {
 
 
         $(document).on('change', '#startingSeries', function () {
-            storage.set('startingSeries', $(this).val());
+            playlist.store('startingSeries', $(this).val());
         });
 
 
@@ -353,6 +353,7 @@ let loadForm = () => {
                     if (typeof response.series !== "undefined") {
                         let id = 'startingSlice' + response.series;
                         $('#' + id).val(response.slice);
+                        playlist.store(id, response.slice);
                     }
                 });
             });
@@ -420,29 +421,6 @@ let loadForm = () => {
     });
 
 };
-
-
-let storage = {
-    set:(variableName, variableValue, global) => {
-        response = playlistDetails;
-        let playlist_id = response.playlist;
-        let study_id = response.name;
-
-        chrome.storage.local.get([playlist_id], function (result) {
-            if (!result[playlist_id]) result[playlist_id] = {};
-            if (global) {
-                if (!result[playlist_id]) result[playlist_id] = {};
-                result[playlist_id][variableName] = variableValue;
-            } else {
-                if (!result[playlist_id][study_id]) result[playlist_id][study_id] = {};
-                result[playlist_id][study_id][variableName] = variableValue;
-            }
-            console.log(result);
-            chrome.storage.local.set(result, function () {});
-        });
-    }
-};
-
 
 
 $('#viewJson').click(function() {
