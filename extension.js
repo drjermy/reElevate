@@ -385,6 +385,14 @@ let loadForm = () => {
                 $('#studyInput').append('<hr/>');
             }
 
+            $('.slider').each(function () {
+                let id = $(this).attr('id');
+                if (typeof result[response.playlist][response.study] !== "undefined") {
+                    let slice = result[response.playlist][response.study][id];
+                    $(this).val(Number(slice));
+                }
+            });
+
             // Create a dropdown to select starting series.
             if (Object.keys(response.series).length > 1) {
                 let options = '<option disabled>Select default</option>';
