@@ -346,8 +346,8 @@ let loadForm = () => {
                     $('#studyInput').append(
                         '<div class="form-group">\n' +
                         '<label for="startingSlice">Series' + int + '</label>\n' +
-                        '<span class="selectLink">[<a class="selectSeries" data-series="' + int + '" href="#">select</a>]</span>' +
-                        '<span class="selectLink">[<a class="deselectSlice" data-series="' + int + '" href="#">x</a>]</span>' +
+                        '<button class="ml-2 btn-sm selectSeries" data-series="' + int + '">select</button>' +
+                        '<button class="ml-2 btn-sm deselectSlice" data-series="' + int + '">x</button>' +
                         '<input type="range" min="1" max="' + series.count + '" value="' + value + '" class="form-control-range slider" id="startingSlice' + n + '" data-studyNumber="' + n + '" data-default="' + value + '" disabled>\n' +
                         '</div>'
                     );
@@ -407,7 +407,7 @@ let loadForm = () => {
             $(document).on('change', '#startingSeries', function () {
                 playlist.store('startingSeries', $(this).val());
             });
-            
+
         }
 
     });
