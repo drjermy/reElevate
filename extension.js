@@ -316,65 +316,62 @@ let loadForm = () => {
         });
 
 
-        $(document).on('click', '.getSeriesData', function () {
-            let n = $(this).attr('data-series');
-            let request = {getData: n};
-            chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
-                chrome.tabs.sendMessage(tabs[0].id, request, function (response) {
-                    if (typeof response.series !== "undefined") {
-                        let id = 'startingSlice' + response.series;
-                        $('#' + id).val(response.slice);
-                        playlist.store(id, response.slice);
-                    }
-                });
-            });
-        });
-
-
         if (typeof response.series !== "undefined") {
-            $('#studyInput').append('<hr/>');
-
 
             // Create sliders for selecting starting slices.
-            let hasSliders = false;
+            for (let n in response.series) {
+                let int = Number(n) + 1;
+                $('#seriesSelectorWrapper').append(
+                    '<button class="ml-2 btn-sm selectSeries" data-series="' + int + '">' + int + '</button>'
+                );
+            }
+
+            // Create sliders for selecting starting slices.
             for (let n in response.series) {
                 let series = response.series[n];
-                if (series.count > 1) {
-                    hasSliders = true;
-                    let value = series.default;
-                    let int = Number(n) + 1;
-                    $('#studyInput').append(
-                        '<div class="form-group">\n' +
-                        '<label for="startingSlice">Series' + int + '</label>\n' +
-                        '<button class="ml-2 btn-sm selectSeries" data-series="' + int + '">select</button>' +
-                        '<button class="ml-2 btn-sm deselectSlice" data-series="' + int + '">x</button>' +
-                        '<input type="range" min="1" max="' + series.count + '" value="' + value + '" class="form-control-range slider" id="startingSlice' + n + '" data-studyNumber="' + n + '" data-default="' + value + '" disabled>\n' +
-                        '</div>'
-                    );
+                let defaultValue = series.default;
+                let int = Number(n) + 1;
+
+                let sliceValue;
+                if (typeof result[response.playlist][response.study] !== "undefined" || typeof result[response.playlist][response.study][id] !== "undefined") {
+                    sliceValue = result[response.playlist][response.study][id];
+                } else {
+                    sliceValue = defaultValue;
                 }
+
+                $('#seriesEditorWrapper').append(
+                    '<div class="form-group seriesSelector" data-series="' + int + '">\n' +
+                    '<button class="ml-2 btn-sm getSeriesData" data-series="' + int + '">save</button>' +
+                    '<button class="ml-2 btn-sm deselectSlice" data-series="' + int + '">&#8635;</button>' +
+                    '<input type="range" min="1" max="' + series.count + '" value="' + sliceValue + '" class="mt-2 form-control-range slider" id="startingSlice' + n + '" ' +
+                    '   data-studyNumber="' + n + '" data-default="' + defaultValue + '"  data-series="' + int + '" disabled>\n' +
+                    '</div>'
+                );
             }
-
-
-            // We only set this to true if we have created sliders.
-            if (hasSliders === true) {
-                $('#studyInput').append('<hr/>');
-            }
-
-
-            // Set the value for each of the sliders.
-            $('.slider').each(function () {
-                let id = $(this).attr('id');
-                if (typeof result[response.playlist][response.study] !== "undefined") {
-                    let slice = result[response.playlist][response.study][id];
-                    $(this).val(Number(slice));
-                }
-            });
 
 
             // Create a trigger for the select button.
-            $(document).on('click', '.selectSeries', function  () {
+            $(document).on('mousedown', '.selectSeries', function  () {
                 let n = $(this).attr('data-series');
                 changeSeries(Number(n) - 1);
+                $('.seriesSelector').hide();
+                $('.seriesSelector[data-series="' + n + '"]').show();
+            });
+
+
+            // Create a trigger to get the current values for the selected series and save them.
+            $(document).on('click', '.getSeriesData', function () {
+                let n = $(this).attr('data-series');
+                let request = {getData: n};
+                chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+                    chrome.tabs.sendMessage(tabs[0].id, request, function (response) {
+                        if (typeof response.series !== "undefined") {
+                            let id = 'startingSlice' + response.series;
+                            $('#' + id).val(response.slice);
+                            playlist.store(id, response.slice);
+                        }
+                    });
+                });
             });
 
 
@@ -396,7 +393,7 @@ let loadForm = () => {
                     let int = Number(n) + 1;
                     options += '<option value="' + int + '">Series ' + int + '</option>';
                 }
-                $('#studyInput').append(
+                $('#seriesEditorWrapper').append(
                     '<label for="startingSeries">Default</label>\n' +
                     '<select class="form-control" id="startingSeries" placeholder="Starting series">' +
                     options +
@@ -440,9 +437,6 @@ $(document).on('click', '.openButton', function () {
     $('.pane').hide();
     $('#' + pane).show();
 });
-
-
-
 
 
 /**

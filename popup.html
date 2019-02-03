@@ -26,6 +26,9 @@
         .nobr {
             white-space:nowrap;
         }
+        .seriesSelector {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -127,7 +130,8 @@
                 <label class="custom-control-label nobr" for="studyDefaultSlice">Start on selected slice</label>
             </div>
             <hr/>
-            <a class="getSeriesData" data-series="' + int + '" href="#">Save current params</a>
+            <div id="seriesSelectorWrapper"></div>
+            <div id="seriesEditorWrapper" class="mt-4"></div>
         </div>
     </div>
 
