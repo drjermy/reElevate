@@ -335,7 +335,7 @@ let loadForm = () => {
 
                 let defaultValue = series.default;
                 let sliceValue;
-                if (typeof result[response.playlist][response.study] !== "undefined" || typeof result[response.playlist][response.study]['startingSlice' + n] !== "undefined") {
+                if (typeof result[response.playlist] !== "undefined" && typeof result[response.playlist][response.study] !== "undefined" && typeof result[response.playlist][response.study]['startingSlice' + n] !== "undefined") {
                     sliceValue = result[response.playlist][response.study]['startingSlice' + n];
                 } else {
                     sliceValue = defaultValue;
@@ -409,7 +409,7 @@ let loadForm = () => {
 
             // Select the default series.
             let defaultSeries
-            if (typeof result[response.playlist][response.study]['startingSeries'] !== "undefined") {
+            if (typeof result[response.playlist] !== "undefined" && typeof result[response.playlist][response.study] !== "undefined" && typeof result[response.playlist][response.study]['startingSeries'] !== "undefined") {
                 defaultSeries = Number(result[response.playlist][response.study]['startingSeries']);
             } else {
                 defaultSeries = 1;
