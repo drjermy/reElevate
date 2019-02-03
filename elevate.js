@@ -827,7 +827,8 @@ $(document).ready(function() {
                     study: store.name(),
                     case: store.case_id(),
                     playlist: global.name(),
-                    series: series
+                    series: series,
+                    currentSeries: getCurrentSeriesNumber()
                 });
 
             }

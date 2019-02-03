@@ -360,7 +360,6 @@ let loadForm = () => {
                 }
             }
 
-
             // Create a trigger for the select button.
             $(document).on('mousedown', '.selectSeries', function  () {
                 let n = $(this).attr('data-series');
@@ -368,6 +367,9 @@ let loadForm = () => {
                 $('.seriesSelector').hide();
                 $('.seriesSelector[data-series="' + n + '"]').show();
             });
+
+            let currentSeries = Number(response.currentSeries) + 1;
+            $('.selectSeries[data-series="' + currentSeries + '"]').mousedown().focus();
 
 
             // Create a trigger to get the current values for the selected series and save them.
