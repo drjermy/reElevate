@@ -324,14 +324,17 @@ let loadForm = () => {
                 $('#seriesSelectorWrapper').append(
                     '<button class="ml-2 btn-sm selectSeries" data-series="' + int + '">' + int + '</button>'
                 );
+                $('#seriesEditorWrapper').append(
+                    '<div class="form-group seriesSelector" data-series="' + int + '"></div>'
+                );
             }
 
             // Create sliders for selecting starting slices.
             for (let n in response.series) {
                 let series = response.series[n];
-                let defaultValue = series.default;
                 let int = Number(n) + 1;
 
+                let defaultValue = series.default;
                 let sliceValue;
                 if (typeof result[response.playlist][response.study] !== "undefined" || typeof result[response.playlist][response.study][id] !== "undefined") {
                     sliceValue = result[response.playlist][response.study]['startingSlice' + n];
@@ -339,14 +342,22 @@ let loadForm = () => {
                     sliceValue = defaultValue;
                 }
 
-                $('#seriesEditorWrapper').append(
-                    '<div class="form-group seriesSelector" data-series="' + int + '">\n' +
+                // Get the pane where the items are added.
+                let seriesEditor = $('.seriesSelector[data-series="' + int + '"]');
+
+                // Add buttons for saving current values and reset.
+                // Saving will include any canvas elements that we have set up.
+                seriesEditor.append(
                     '<button class="ml-2 btn-sm getSeriesData" data-series="' + int + '">save</button>' +
-                    '<button class="ml-2 btn-sm deselectSlice" data-series="' + int + '">&#8635;</button>' +
-                    '<input type="range" min="1" max="' + series.count + '" value="' + sliceValue + '" class="mt-2 form-control-range slider" id="startingSlice' + n + '" ' +
-                    '   data-studyNumber="' + n + '" data-default="' + defaultValue + '"  data-series="' + int + '" disabled>\n' +
-                    '</div>'
+                    '<button class="ml-2 btn-sm deselectSlice" data-series="' + int + '">&#8635;</button>'
                 );
+
+                // If we have more than 1 slice in a series, add the slider.
+                if (series.count > 1) {
+                    seriesEditor.append(
+                        '<input type="range" min="1" max="' + series.count + '" value="' + sliceValue + '" class="mt-2 form-control-range slider" id="startingSlice' + n + '" data-studyNumber="' + n + '" data-default="' + defaultValue + '"  data-series="' + int + '" disabled>'
+                    );
+                }
             }
 
 
