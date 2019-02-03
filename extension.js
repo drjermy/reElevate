@@ -336,7 +336,7 @@ let loadForm = () => {
 
                 let defaultValue = series.default;
                 let sliceValue;
-                if (typeof result[response.playlist][response.study] !== "undefined" || typeof result[response.playlist][response.study][id] !== "undefined") {
+                if (typeof result[response.playlist][response.study] !== "undefined" || typeof result[response.playlist][response.study]['startingSlice' + n] !== "undefined") {
                     sliceValue = result[response.playlist][response.study]['startingSlice' + n];
                 } else {
                     sliceValue = defaultValue;
@@ -368,9 +368,13 @@ let loadForm = () => {
                 $('.seriesSelector[data-series="' + n + '"]').show();
             });
 
+            // Select the current series.
             let currentSeries = Number(response.currentSeries) + 1;
             $('.selectSeries[data-series="' + currentSeries + '"]').mousedown().focus();
 
+            // Select the default series.
+            let defaultSeries = Number(result[response.playlist][response.study]['startingSeries']);
+            $('.selectSeries[data-series="' + defaultSeries + '"]').addClass('btn-primary')
 
             // Create a trigger to get the current values for the selected series and save them.
             $(document).on('click', '.getSeriesData', function () {
