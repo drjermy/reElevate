@@ -368,14 +368,17 @@ let loadForm = () => {
                 $('.seriesSelector[data-series="' + n + '"]').show();
             });
 
+
             // Select the current series.
             let currentSeries = Number(response.currentSeries) + 1;
             $('.selectSeries[data-series="' + currentSeries + '"]').mousedown().focus();
+
 
             // Select the default series.
             let defaultSeries = Number(result[response.playlist][response.study]['startingSeries']);
             $('.selectSeries[data-series="' + defaultSeries + '"]').addClass('btn-primary')
 
+            
             // Create a trigger to get the current values for the selected series and save them.
             $(document).on('click', '.getSeriesData', function () {
                 let n = $(this).attr('data-series');
