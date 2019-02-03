@@ -222,11 +222,6 @@ let popup = {
 };
 
 
-let pagePopup = {
-    settings: {},
-};
-
-
 let loadForm = () => {
     response = playlistDetails;
 
@@ -321,39 +316,6 @@ let loadForm = () => {
         });
 
 
-        if (result[response.playlist][response.name]) {
-            pagePopup.settings = result[response.playlist][response.name];
-        }
-
-
-        if (response.series) {
-            for (let n in response.series) {
-                $('#startingSlice' + n).val(pagePopup.settings['startingSlice' + n]);
-            }
-            $('#startingSeries').val(pagePopup.settings.startingSeries);
-        }
-
-
-        $(document).on('change', '#startingSeries', function () {
-            playlist.store('startingSeries', $(this).val());
-        });
-
-
-        $(document).on('click', '.selectSeries', function  () {
-            let n = $(this).attr('data-series');
-            changeSeries(Number(n) - 1);
-        });
-
-
-        $(document).on('click', '.deselectSlice', function () {
-            let n = Number($(this).attr('data-series')) - 1;
-            let id = 'startingSlice' + n;
-            let defaultValue = Number($(this).attr('data-default'));
-            playlist.store(id, undefined);
-            $('#' + id).val(defaultValue);
-        });
-
-
         $(document).on('click', '.getSeriesData', function () {
             let n = $(this).attr('data-series');
             let request = {getData: n};
@@ -371,6 +333,7 @@ let loadForm = () => {
 
         if (typeof response.series !== "undefined") {
             $('#studyInput').append('<hr/>');
+
 
             // Create sliders for selecting starting slices.
             let hasSliders = false;
@@ -391,10 +354,14 @@ let loadForm = () => {
                 }
             }
 
+
+            // We only set this to true if we have created sliders.
             if (hasSliders === true) {
                 $('#studyInput').append('<hr/>');
             }
 
+
+            // Set the value for each of the sliders.
             $('.slider').each(function () {
                 let id = $(this).attr('id');
                 if (typeof result[response.playlist][response.study] !== "undefined") {
@@ -402,6 +369,24 @@ let loadForm = () => {
                     $(this).val(Number(slice));
                 }
             });
+
+
+            // Create a trigger for the select button.
+            $(document).on('click', '.selectSeries', function  () {
+                let n = $(this).attr('data-series');
+                changeSeries(Number(n) - 1);
+            });
+
+
+            // Create a trigger for the deselect button - set back to default and remove storage item.
+            $(document).on('click', '.deselectSlice', function () {
+                let n = Number($(this).attr('data-series')) - 1;
+                let id = 'startingSlice' + n;
+                let defaultValue = Number($(this).attr('data-default'));
+                playlist.store(id, undefined);
+                $('#' + id).val(defaultValue);
+            });
+
 
             // Create a dropdown to select starting series.
             if (Object.keys(response.series).length > 1) {
@@ -419,6 +404,10 @@ let loadForm = () => {
                 );
             }
 
+            $(document).on('change', '#startingSeries', function () {
+                playlist.store('startingSeries', $(this).val());
+            });
+            
         }
 
     });
