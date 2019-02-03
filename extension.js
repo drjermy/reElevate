@@ -345,6 +345,15 @@ let loadForm = () => {
         });
 
 
+        $(document).on('click', '.deselectSlice', function () {
+            let n = Number($(this).attr('data-series')) - 1;
+            let id = 'startingSlice' + n;
+            let defaultValue = Number($(this).attr('data-default'));
+            playlist.store(id, undefined);
+            $('#' + id).val(defaultValue);
+        });
+
+
         $(document).on('click', '.getSeriesData', function () {
             let n = $(this).attr('data-series');
             let request = {getData: n};
@@ -375,7 +384,8 @@ let loadForm = () => {
                         '<div class="form-group">\n' +
                         '<label for="startingSlice">Series' + int + '</label>\n' +
                         '<span class="selectLink">[<a class="selectSeries" data-series="' + int + '" href="#">select</a>]</span>' +
-                        '<input type="range" min="1" max="' + series.count + '" value="' + value + '" class="form-control-range slider" id="startingSlice' + n + '" data-studyNumber="' + n + '" disabled>\n' +
+                        '<span class="selectLink">[<a class="deselectSlice" data-series="' + int + '" href="#">x</a>]</span>' +
+                        '<input type="range" min="1" max="' + series.count + '" value="' + value + '" class="form-control-range slider" id="startingSlice' + n + '" data-studyNumber="' + n + '" data-default="' + value + '" disabled>\n' +
                         '</div>'
                     );
                 }
