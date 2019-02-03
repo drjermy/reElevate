@@ -213,7 +213,6 @@ let popup = {
                     playlistDetails = response;
                     $('#introduction').hide();
                     $('#navigation').show();
-                    $('#viewStudy').click().focus();
                     loadForm();
                 }
             });
@@ -348,6 +347,7 @@ let loadForm = () => {
                 // Add buttons for saving current values and reset.
                 // Saving will include any canvas elements that we have set up.
                 seriesEditor.append(
+                    '<button class="ml-2 btn-sm selectDefaultSeries" data-series="' + int + '">D</button>' +
                     '<button class="ml-2 btn-sm getSeriesData" data-series="' + int + '">save</button>' +
                     '<button class="ml-2 btn-sm deselectSlice" data-series="' + int + '">&#8635;</button>'
                 );
@@ -360,25 +360,27 @@ let loadForm = () => {
                 }
             }
 
+            
             // Create a trigger for the select button.
-            $(document).on('mousedown', '.selectSeries', function  () {
+            $(document).on('click', '.selectSeries', function  () {
                 let n = $(this).attr('data-series');
+                $('.selectSeries').removeClass('outline-warning');
+                $(this).addClass('outline-warning');
                 changeSeries(Number(n) - 1);
                 $('.seriesSelector').hide();
                 $('.seriesSelector[data-series="' + n + '"]').show();
             });
 
 
-            // Select the current series.
-            let currentSeries = Number(response.currentSeries) + 1;
-            $('.selectSeries[data-series="' + currentSeries + '"]').mousedown().focus();
+            // UX change and save default series.
+            $(document).on('click', '.selectDefaultSeries', function () {
+                let seriesNumber = $(this).attr('data-series');
+                $('.selectSeries').removeClass('btn-warning');
+                $('.selectSeries[data-series="' + seriesNumber + '"]').addClass('btn-warning');
+                playlist.store('startingSeries', seriesNumber);
+            });
 
 
-            // Select the default series.
-            let defaultSeries = Number(result[response.playlist][response.study]['startingSeries']);
-            $('.selectSeries[data-series="' + defaultSeries + '"]').addClass('btn-primary')
-
-            
             // Create a trigger to get the current values for the selected series and save them.
             $(document).on('click', '.getSeriesData', function () {
                 let n = $(this).attr('data-series');
@@ -405,25 +407,21 @@ let loadForm = () => {
             });
 
 
-            // Create a dropdown to select starting series.
-            if (Object.keys(response.series).length > 1) {
-                let options = '<option disabled>Select default</option>';
-                for (let n in response.series) {
-                    // We are saving them as if they started from 1 even though the thumbs are 0-indexed.
-                    let int = Number(n) + 1;
-                    options += '<option value="' + int + '">Series ' + int + '</option>';
-                }
-                $('#seriesEditorWrapper').append(
-                    '<label for="startingSeries">Default</label>\n' +
-                    '<select class="form-control" id="startingSeries" placeholder="Starting series">' +
-                    options +
-                    '</select>'
-                );
+            // Select the default series.
+            let defaultSeries
+            if (typeof result[response.playlist][response.study]['startingSeries'] !== "undefined") {
+                defaultSeries = Number(result[response.playlist][response.study]['startingSeries']);
+            } else {
+                defaultSeries = 1;
             }
+            $('.selectSeries[data-series="' + defaultSeries + '"]').addClass('btn-warning');
 
-            $(document).on('change', '#startingSeries', function () {
-                playlist.store('startingSeries', $(this).val());
-            });
+            // Select the current series.
+            let currentSeries = Number(response.currentSeries) + 1;
+            $('.selectSeries[data-series="' + currentSeries + '"]').click().focus();
+
+            // Click the viewStudy pane button and give it focus.
+            $('#viewStudy').click().focus();
 
         }
 
@@ -454,6 +452,8 @@ $(document).on('click', '.actionButton', function() {
 
 $(document).on('click', '.openButton', function () {
     let pane = $(this).attr('data-open');
+    $('.openButton').removeClass('btn-primary');
+    $(this).addClass('btn-primary');
     $('.pane').hide();
     $('#' + pane).show();
 });
