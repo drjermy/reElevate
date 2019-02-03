@@ -318,7 +318,7 @@ let loadForm = () => {
 
         if (typeof response.series !== "undefined") {
 
-            // Create sliders for selecting starting slices.
+            // Create a set of selector buttons for each of the series.
             for (let n in response.series) {
                 let int = Number(n) + 1;
                 $('#seriesSelectorWrapper').append(
@@ -334,7 +334,7 @@ let loadForm = () => {
 
                 let sliceValue;
                 if (typeof result[response.playlist][response.study] !== "undefined" || typeof result[response.playlist][response.study][id] !== "undefined") {
-                    sliceValue = result[response.playlist][response.study][id];
+                    sliceValue = result[response.playlist][response.study]['startingSlice' + n];
                 } else {
                     sliceValue = defaultValue;
                 }
