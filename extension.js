@@ -110,10 +110,10 @@ let playlist = {
             };
         } else {
             playlist.vars = {
-                playlistId: pathArray[2],
-                entryId: pathArray[4],
-                caseId: pathArray[6],
-                studyId: pathArray[8]
+                playlistId: pathArray[4],
+                entryId: pathArray[6],
+                caseId: pathArray[8],
+                studyId: pathArray[10]
             };
         }
     },
