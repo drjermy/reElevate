@@ -353,22 +353,27 @@ let loadForm = () => {
                 // Add buttons for saving current values and reset.
                 // Saving will include any canvas elements that we have set up.
                 seriesEditor.append(
-                    '<span>' + int + '</span>' +
-                    '<button class="ml-2 btn-sm selectDefaultSeries" data-series="' + int + '">D</button>' +
-                    '<button class="ml-2 btn-sm getSeriesData" data-series="' + int + '">save</button>' +
-                    '<button class="ml-2 btn-sm deselectSlice" data-series="' + int + '">&#8635;</button>'
+                    '<button class="ml-2 btn-sm selectDefaultSeries" data-series="' + int + '">Make default</button>'
                 );
 
                 let hideSeries = getPageValue('hideSeries' + n);
                 if (hideSeries === true) {
                     seriesEditor.append(
-                        '<button class="ml-2 btn-sm hideSeries" data-series="' + int + '">unhide</button>'
+                        '<button class="ml-2 btn-sm hideSeries" data-series="' + int + '">Unhide</button>'
                     );
                 } else {
                     seriesEditor.append(
-                        '<button class="ml-2 btn-sm hideSeries" data-series="' + int + '">hide</button>'
+                        '<button class="ml-2 btn-sm hideSeries" data-series="' + int + '">Hide</button>'
                     );
                 }
+
+                seriesEditor.append(
+                    '<div class="mt-2">' +
+                    '<button class="ml-2 btn-sm getSeriesData" data-series="' + int + '">Save current settings</button>' +
+                    '<button class="ml-2 btn-sm deselectSlice" data-series="' + int + '">&#8635;</button>' +
+                    '</div>'
+                );
+
 
                 // If we have more than 1 slice in a series, add the slider.
                 if (series.count > 1) {
@@ -432,11 +437,11 @@ let loadForm = () => {
             $(document).on('click', '.hideSeries',  function() {
                 let that = $(this);
                 let n = Number(that.attr('data-series')) - 1;
-                if (that.text() === 'hide') {
-                    that.text('unhide');
+                if (that.text() === 'Hide') {
+                    that.text('Unhide');
                     playlist.store('hideSeries' + n, true);
                 } else {
-                    that.text('hide');
+                    that.text('Hide');
                     playlist.store('hideSeries' + n, undefined);
                 }
             });
@@ -447,9 +452,11 @@ let loadForm = () => {
             if (typeof defaultSeries === "undefined") defaultSeries = 1;
             $('.selectSeries[data-series="' + defaultSeries + '"]').addClass('btn-warning');
 
+            
             // Select the current series.
             let currentSeries = Number(response.currentSeries) + 1;
             $('.selectSeries[data-series="' + currentSeries + '"]').click().focus();
+
 
             // Click the viewStudy pane button and give it focus.
             $('#viewStudy').click().focus();
