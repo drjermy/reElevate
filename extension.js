@@ -358,6 +358,7 @@ let loadForm = () => {
 
                 let hideSeries = getPageValue('hideSeries' + n);
                 if (hideSeries === true) {
+                    $('.selectSeries[data-series="' + int + '"]').addClass('hiddenSlice')
                     seriesEditor.append(
                         '<button class="ml-2 btn-sm hideSeries" data-series="' + int + '">Unhide</button>'
                     );
@@ -436,13 +437,16 @@ let loadForm = () => {
             // Create trigger to show/hide series.
             $(document).on('click', '.hideSeries',  function() {
                 let that = $(this);
-                let n = Number(that.attr('data-series')) - 1;
+                let n = Number(that.attr('data-series'));
+                let int = n - 1;
                 if (that.text() === 'Hide') {
                     that.text('Unhide');
-                    playlist.store('hideSeries' + n, true);
+                    $('.selectSeries[data-series="' + n + '"]').addClass('hiddenSlice');
+                    playlist.store('hideSeries' + int, true);
                 } else {
                     that.text('Hide');
-                    playlist.store('hideSeries' + n, undefined);
+                    $('.selectSeries[data-series="' + n + '"]').removeClass('hiddenSlice');
+                    playlist.store('hideSeries' + int, undefined);
                 }
             });
 
