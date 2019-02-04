@@ -378,7 +378,7 @@ let loadForm = () => {
                 // If we have more than 1 slice in a series, add the slider.
                 if (series.count > 1) {
                     seriesEditor.append(
-                        '<div class="form-group mt-4">' +
+                        '<div class="form-group mt-4 mx-2">' +
                         '<label>Slice position</label>' +
                         '<input type="range" min="1" max="' + series.count + '" value="' + sliceValue + '" class="form-control-range slider" id="startingSlice' + n + '" data-studyNumber="' + n + '" data-default="' + defaultValue + '"  data-series="' + int + '" disabled>' +
                         '</div>'
@@ -452,7 +452,7 @@ let loadForm = () => {
             if (typeof defaultSeries === "undefined") defaultSeries = 1;
             $('.selectSeries[data-series="' + defaultSeries + '"]').addClass('btn-warning');
 
-            
+
             // Select the current series.
             let currentSeries = Number(response.currentSeries) + 1;
             $('.selectSeries[data-series="' + currentSeries + '"]').click().focus();
