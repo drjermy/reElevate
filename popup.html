@@ -52,7 +52,6 @@
             <button id="viewPlaylist" data-open="playlistPane" class="openButton btn-sm">Playlist</button>
             <button id="viewCasePane" data-open="casePane" class="openButton btn-sm">Case</button>
             <button id="viewStudy" data-open="studyPane" class="openButton btn-sm">Study</button>
-            <button id="viewJson" data-open="jsonPane" class="openButton btn-sm">JSON</button>
             <button id="viewHelp" data-open="helpPane" class="openButton btn-sm">?</button>
             <button class="actionButton btn-sm" data-action="reload">&#8635;</button>
         </nobr>
@@ -143,9 +142,7 @@
 
     <div id="jsonPane" class="container pane py-2">
         <h1>JSON</h1>
-        <p>
-            Make edits, or change completely and then hit "Save".
-        </p>
+        <p>Make edits, or change completely and then hit "Save".</p>
         <textarea id="jsonContent" rows="15" class="form-control"></textarea>
         <div class="py-2">
             <button id="saveJsonSubmit" class="btn-sm btn-primary">Save</button>
@@ -155,9 +152,10 @@
 
     <div id="helpPane" class="container pane py-2">
         <h1>Help</h1>
+        <button id="viewJson" data-open="jsonPane" class="openButton btn-sm float-right">JSON</button>
 
-        <div>left, right (prev/next step)</div>
-        <div>shift+left, right (prev/next case)</div>
+        <div>left, right</div>
+        <div>shift+left, right</div>
         <div>up, down</div>
         <div>pageup, pagedown (fn+up/down)</div>
         <div>home, end (fn+left/right)</div>
