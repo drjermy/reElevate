@@ -14,6 +14,10 @@ a.online-link.disabled {
     color: #777 !important;
 }
 
+#largeImage img, #largeImage video, #largeImage object, #largeImage .video-link {
+    padding: 0 !important;
+    border: 0 !important;
+}
 
 #offline-workflow-questions-pane strong {
     font-weight: bold !important;
