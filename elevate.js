@@ -70,6 +70,11 @@ elements = {
             elements.header.hide();
             elements.sidebar.hide();
             elements.footer.hide();
+        },
+        show: () => {
+            elements.header.show();
+            elements.sidebar.show();
+            elements.footer.show();
         }
     },
     findingsTab: {
@@ -126,6 +131,7 @@ function elementVisibility() {
 
         if (study.maximiseCase === true) {
             elements.maximise.hide();
+            maximise.visible = false;
         }
 
         // We save the starting Series as if they started from 1, but the thumbs are 0-indexed.
@@ -406,32 +412,6 @@ function lastStudyImage()
 }
 
 
-let store = {
-    playlist_id: () => {
-        return 'radiopaedia' + '-' + playlistVars.playlistId;
-    },
-    case_id: () => {
-        return 'radiopaedia' + '-' + playlistVars.playlistId + '-' + playlistVars.entryId + '-' + playlistVars.caseId;
-    },
-    name: () => {
-        return 'radiopaedia' + '-' + playlistVars.playlistId + '-' + playlistVars.entryId + '-' + playlistVars.caseId + '-' + playlistVars.studyId;
-    },
-    get: (name, callback) => {
-        let playlist_id = store.playlist_id();
-        let study_id = store.name();
-        chrome.storage.local.get([playlist_id], function(result) {
-            if (typeof result[playlist_id] === "undefined") {
-                result[playlist_id] = {};
-            }
-            if (typeof result[playlist_id][study_id] === "undefined") {
-                result[playlist_id][study_id] = {};
-            }
-            callback(result[playlist_id][study_id]);
-        });
-    }
-};
-
-
 let current;
 current = {
     image: function () {
@@ -544,6 +524,46 @@ presentation = {
 };
 
 
+let store = {
+    playlist_id: () => {
+        return 'radiopaedia' + '-' + playlistVars.playlistId;
+    },
+    case_id: () => {
+        return 'radiopaedia' + '-' + playlistVars.playlistId + '-' + playlistVars.entryId + '-' + playlistVars.caseId;
+    },
+    name: () => {
+        return 'radiopaedia' + '-' + playlistVars.playlistId + '-' + playlistVars.entryId + '-' + playlistVars.caseId + '-' + playlistVars.studyId;
+    },
+    get: (name, callback) => {
+        let playlist_id = store.playlist_id();
+        let study_id = store.name();
+        chrome.storage.local.get([playlist_id], function(result) {
+            if (typeof result[playlist_id] === "undefined") {
+                result[playlist_id] = {};
+            }
+            if (typeof result[playlist_id][study_id] === "undefined") {
+                result[playlist_id][study_id] = {};
+            }
+            callback(result[playlist_id][study_id]);
+        });
+    },
+    study: function (varName, value) {
+        let gContext = global.name();
+        chrome.storage.local.get([gContext], function(result) {
+            if (typeof result[gContext] === "undefined") {
+                result[gContext] = {};
+            }
+            let studyContext = store.name();
+            if (typeof result[gContext][studyContext] === "undefined") {
+                result[gContext][studyContext] = {};
+            }
+            result[gContext][studyContext][varName] = value;
+            chrome.storage.local.set(result, function () {});
+        });
+    }
+};
+
+
 let global = {
     name: () => {
         return 'radiopaedia' + '-' + playlistVars.playlistId;
@@ -650,30 +670,22 @@ let footer = {
 
 let maximise = {
     visible: true,
-    state: {header, sidebar, footer},
     toggle: function () {
-        if (header.visible || sidebar.visible || footer.visible) maximise.hide();
-        else maximise.reShow();
-    },
-    reShow: function () {
-        if (maximise.state.header === true) header.show();
-        if (maximise.state.sidebar === true) sidebar.show();
-        if (maximise.state.footer === true) footer.show();
+        if (maximise.visible === false) {
+            maximise.show();
+        } else {
+            maximise.hide();
+        }
     },
     show: function () {
-        header.show();
-        sidebar.show();
-        footer.show();
-        // TODO because of async, we can't saving all the state data - only the last one
+        elements.maximise.show();
+        maximise.visible = true;
+        store.study('maximiseCase', undefined);
     },
     hide: function () {
-        maximise.state.header = header.visible;
-        maximise.state.sidebar = sidebar.visible;
-        maximise.state.footer = footer.visible;
-        header.hide();
-        sidebar.hide();
-        footer.hide();
-        // TODO because of async, we can't saving all the state data - only the last one
+        maximise.visible = false;
+        elements.maximise.hide();
+        store.study('maximiseCase', true);
     },
     slideHide: function () {
         elements.header.hide();
