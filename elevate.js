@@ -139,6 +139,8 @@ function elementVisibility() {
             if (study['hideSeries' + id] === true) {
                 $(this).hide();
             }
+            $('#offline-workflow-thumbnails-pane .thumb').removeClass('clear-left');
+            $('#offline-workflow-thumbnails-pane .thumb:visible:even').addClass('clear-left');
         });
 
     });
