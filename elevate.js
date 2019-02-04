@@ -128,11 +128,18 @@ function elementVisibility() {
             elements.maximise.hide();
         }
 
+        // We save the starting Series as if they started from 1, but the thumbs are 0-indexed.
         if (typeof study.startingSeries !== "undefined") {
-            // We save the starting Series as if they started from 1, but the thumbs are 0-indexed.
             let n = Number(study.startingSeries) - 1;
             navigate.series(n);
         }
+
+        $('#offline-workflow-thumbnails-pane .thumb').each(function () {
+            let id = $(this).attr('id').split('offline-workflow-thumb-')[1];
+            if (study['hideSeries' + id] === true) {
+                $(this).hide();
+            }
+        });
 
     });
 }
