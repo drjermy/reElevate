@@ -226,6 +226,14 @@ let loadForm = () => {
 
     chrome.storage.local.get([response.playlist], function(result) {
 
+        let getPageValue = function (varName) {
+            if (typeof result[response.playlist] !== "undefined" &&
+                typeof result[response.playlist][response.study] !== "undefined" &&
+                typeof result[response.playlist][response.study][varName] !== "undefined") {
+                return result[response.playlist][response.study][varName];
+            }
+        };
+
         /**
          * Take a selector and get the value from storage that relates to it.
          * @param that
@@ -334,10 +342,8 @@ let loadForm = () => {
                 let int = Number(n) + 1;
 
                 let defaultValue = series.default;
-                let sliceValue;
-                if (typeof result[response.playlist] !== "undefined" && typeof result[response.playlist][response.study] !== "undefined" && typeof result[response.playlist][response.study]['startingSlice' + n] !== "undefined") {
-                    sliceValue = result[response.playlist][response.study]['startingSlice' + n];
-                } else {
+                let sliceValue = getPageValue('startingSlice' + n);
+                if (typeof sliceValue === "undefined") {
                     sliceValue = defaultValue;
                 }
 
@@ -347,15 +353,30 @@ let loadForm = () => {
                 // Add buttons for saving current values and reset.
                 // Saving will include any canvas elements that we have set up.
                 seriesEditor.append(
+                    '<span>' + int + '</span>' +
                     '<button class="ml-2 btn-sm selectDefaultSeries" data-series="' + int + '">D</button>' +
                     '<button class="ml-2 btn-sm getSeriesData" data-series="' + int + '">save</button>' +
                     '<button class="ml-2 btn-sm deselectSlice" data-series="' + int + '">&#8635;</button>'
                 );
 
+                let hideSeries = getPageValue('hideSeries' + n);
+                if (hideSeries === true) {
+                    seriesEditor.append(
+                        '<button class="ml-2 btn-sm hideSeries" data-series="' + int + '">unhide</button>'
+                    );
+                } else {
+                    seriesEditor.append(
+                        '<button class="ml-2 btn-sm hideSeries" data-series="' + int + '">hide</button>'
+                    );
+                }
+
                 // If we have more than 1 slice in a series, add the slider.
                 if (series.count > 1) {
                     seriesEditor.append(
-                        '<input type="range" min="1" max="' + series.count + '" value="' + sliceValue + '" class="mt-2 form-control-range slider" id="startingSlice' + n + '" data-studyNumber="' + n + '" data-default="' + defaultValue + '"  data-series="' + int + '" disabled>'
+                        '<div class="form-group mt-4">' +
+                        '<label>Slice position</label>' +
+                        '<input type="range" min="1" max="' + series.count + '" value="' + sliceValue + '" class="form-control-range slider" id="startingSlice' + n + '" data-studyNumber="' + n + '" data-default="' + defaultValue + '"  data-series="' + int + '" disabled>' +
+                        '</div>'
                     );
                 }
             }
@@ -407,13 +428,23 @@ let loadForm = () => {
             });
 
 
+            // Create trigger to show/hide series.
+            $(document).on('click', '.hideSeries',  function() {
+                let that = $(this);
+                let n = Number(that.attr('data-series')) - 1;
+                if (that.text() === 'hide') {
+                    that.text('unhide');
+                    playlist.store('hideSeries' + n, true);
+                } else {
+                    that.text('hide');
+                    playlist.store('hideSeries' + n, undefined);
+                }
+            });
+
+
             // Select the default series.
-            let defaultSeries
-            if (typeof result[response.playlist] !== "undefined" && typeof result[response.playlist][response.study] !== "undefined" && typeof result[response.playlist][response.study]['startingSeries'] !== "undefined") {
-                defaultSeries = Number(result[response.playlist][response.study]['startingSeries']);
-            } else {
-                defaultSeries = 1;
-            }
+            let defaultSeries = getPageValue('startingSeries');
+            if (typeof defaultSeries === "undefined") defaultSeries = 1;
             $('.selectSeries[data-series="' + defaultSeries + '"]').addClass('btn-warning');
 
             // Select the current series.
