@@ -535,7 +535,11 @@ presentation = {
         $('#offline-workflow-questions-pane').html(presentation.tabHTML());
     },
     open: () => {
-        navigate.questionsTab();
+        if ($('.offline-workflow-tabs .active a').attr('id') === 'offline-workflow-link-questions') {
+            navigate.imagesTab();
+        } else {
+            navigate.questionsTab();
+        }
     }
 };
 

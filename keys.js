@@ -16,6 +16,10 @@ $(document).ready(function() {
         maximise.toggle();
     });
 
+    $(document).bind('keyup', 'n', function () {
+        maximise.show();
+    });
+
     $(document).bind('keyup', 'shift+m', function () {
         maximise.show();
     });
