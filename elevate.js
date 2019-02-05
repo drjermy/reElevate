@@ -493,12 +493,10 @@ presentation = {
         }
     },
     createTab: () => {
-        $('.offline-workflow-tab-questions').removeClass('inactive');
-        $('.offline-workflow-tab-questions a').remove();
-        let presentationTab = '<a class="questions offline-workflow-tab-link" id="offline-workflow-link-questions" href="#questions">Presentation</a>';
-        $('.offline-workflow-tab-questions').append(presentationTab);
-
-        // We need to click on the images tab to make the questions (presentation) tab work - not sure why.
+        let questionsTab = $('.offline-workflow-tab-questions');
+        questionsTab.removeClass('inactive');
+        questionsTab.find('a').remove();
+        questionsTab.append('<a class="questions offline-workflow-tab-link" id="offline-workflow-link-questions" href="#questions">Presentation</a>');
         navigate.imagesTab();
     },
     tabHTML: () => {
