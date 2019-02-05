@@ -488,6 +488,7 @@ let loadForm = () => {
                 }
             });
 
+            
             // Select the default series.
             let defaultSeries = getPageValue('startingSeries');
             if (typeof defaultSeries === "undefined") defaultSeries = 1;
