@@ -109,6 +109,7 @@ elements = {
 function elementVisibility() {
     elements.presentingDefaults();
     global.get('hideFindings', function (global) {
+        console.log(global);
 
         let caseEntry = global[store.case_id()];
         let study = global[store.name()];
@@ -125,7 +126,7 @@ function elementVisibility() {
             elements.rid.hide();
         }
 
-        if (caseEntry.showPresentation === true) {
+        if (global.showPresentation === true || caseEntry.showPresentation === true) {
             presentation.init(caseEntry);
         }
 

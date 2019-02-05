@@ -170,6 +170,7 @@ let json = {
     load: function() {
         let jsonDOM = $('#jsonContent');
         let jsonString = jsonDOM.val();
+        if (jsonString === '') jsonString = '{}';
         let jsonObj;
         try {
             jsonObj = JSON.parse(jsonString);
