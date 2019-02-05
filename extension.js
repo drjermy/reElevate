@@ -369,10 +369,11 @@ let loadForm = () => {
                     );
                 }
 
+                // https://dev.w3.org/html5/html-author/charref
                 seriesEditor.append(
                     '<div class="mt-2">' +
-                    '<button class="ml-2 btn-sm getSeriesData" data-series="' + int + '">Save current settings</button>' +
-                    '<button class="ml-2 btn-sm deselectSlice" data-series="' + int + '">&#8635;</button>' +
+                    '<button class="ml-2 btn-sm getSeriesData" data-series="' + int + '">Save current</button>' +
+                    '<button class="ml-2 btn-sm deselectSlice" data-series="' + int + '">Reset</button>' +
                     '</div>'
                 );
 
