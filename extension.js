@@ -453,6 +453,15 @@ let loadForm = () => {
             });
 
 
+            // Create bindings for keys 1 to n to select this series in the popup.
+            $(document).bind('keyup', function (e) {
+                let keyCode = e.which;
+                if (keyCode >=49 && keyCode <= 57) {
+                    let n = keyCode - 48;
+                    $('.selectSeries[data-series="' + n + '"]').click().focus();
+                }
+            });
+
             // Select the default series.
             let defaultSeries = getPageValue('startingSeries');
             if (typeof defaultSeries === "undefined") defaultSeries = 1;
