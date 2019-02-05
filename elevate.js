@@ -109,8 +109,6 @@ elements = {
 function elementVisibility() {
     elements.presentingDefaults();
     global.get('hideFindings', function (global) {
-        console.log(global);
-
         let caseEntry = global[store.case_id()];
         let study = global[store.name()];
 
@@ -745,6 +743,7 @@ let navigate = {
         global.set('backAction', true);
         global.get('history', function (result) {
             let history = result.history;
+            console.log(history)
             if (Array.isArray(history) && history.slice(-2)[0]) {
                 window.location.href = history.slice(-2)[0];
             } else {

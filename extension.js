@@ -32,9 +32,13 @@ function saveText(filename, text) {
  *
  * @param request
  */
-function tabRequest(request) {
+function tabRequest(request, bClose) {
     chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, request, function (response) {});
+        chrome.tabs.sendMessage(tabs[0].id, request, function (response) {
+            if (bClose === true) {
+                window.close();
+            }
+        });
     });
 }
 
@@ -44,10 +48,10 @@ function tabRequest(request) {
  *
  * @param action
  */
-function tabAction (action) {
+function tabAction (action, bClose) {
     let request = {};
     request.action = action;
-    tabRequest(request);
+    tabRequest(request, bClose);
 }
 
 
@@ -456,9 +460,31 @@ let loadForm = () => {
             // Create bindings for keys 1 to n to select this series in the popup.
             $(document).bind('keyup', function (e) {
                 let keyCode = e.which;
+                //alert(keyCode)
                 if (keyCode >=49 && keyCode <= 57) {
                     let n = keyCode - 48;
                     $('.selectSeries[data-series="' + n + '"]').click().focus();
+                }
+                if (keyCode === 81) { // q
+                    $('#viewPlaylist').click().focus();
+                }
+                if (keyCode === 87) { // w
+                    $('#viewCasePane').click().focus();
+                }
+                if (keyCode === 69) { // e
+                    $('#viewStudy').click().focus();
+                }
+                if (keyCode === 82) { // r
+                    $('#reloadTab').click().focus();
+                }
+                if (keyCode === 72) { // h
+                    $('#viewHelp').click().focus();
+                }
+                if (keyCode === 37) { // left
+                    tabAction('prev', true);
+                }
+                if (keyCode === 39) { // right
+                    tabAction('next', true);
                 }
             });
 
