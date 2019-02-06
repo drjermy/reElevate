@@ -356,7 +356,7 @@ let loadForm = () => {
                 );
             }
 
-            // Create sliders for selecting starting slices.
+            // Create panes for editing series.
             for (let n in response.series) {
                 let series = response.series[n];
                 let int = Number(n) + 1;
@@ -501,6 +501,7 @@ let loadForm = () => {
                 if (isTypeable !== true) {
 
                     let keyCode = e.which;
+                    let shifted = e.shiftKey;
                     //alert(keyCode)
                     if (keyCode >=49 && keyCode <= 57) {
                         let n = keyCode - 48;
