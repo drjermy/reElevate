@@ -375,26 +375,26 @@ let loadForm = () => {
                 // Add buttons for saving current values and reset.
                 // Saving will include any canvas elements that we have set up.
                 seriesEditor.append(
-                    '<button class="ml-2 btn-sm selectDefaultSeries" data-series="' + int + '">Make default</button>'
+                    '<button class="ml-2 btn-sm selectDefaultSeries" data-series="' + int + '"><strong>D</strong>efault series</button>'
                 );
 
                 let hideSeries = getPageValue('hideSeries' + n);
                 if (hideSeries === true) {
                     $('.selectSeries[data-series="' + int + '"]').addClass('hiddenSlice')
                     seriesEditor.append(
-                        '<button class="ml-2 btn-sm hideSeries" data-series="' + int + '">Unhide</button>'
+                        '<button class="ml-2 btn-sm hideSeries" data-series="' + int + '">Un<strong>h</strong>ide</button>'
                     );
                 } else {
                     seriesEditor.append(
-                        '<button class="ml-2 btn-sm hideSeries" data-series="' + int + '">Hide</button>'
+                        '<button class="ml-2 btn-sm hideSeries" data-series="' + int + '"><strong>H</strong>ide</button>'
                     );
                 }
 
                 // https://dev.w3.org/html5/html-author/charref
                 seriesEditor.append(
                     '<div class="mt-2">' +
-                    '<button class="ml-2 btn-sm getSeriesData" data-series="' + int + '">Save series state</button>' +
-                    '<button class="ml-2 btn-sm deselectSlice" data-series="' + int + '">Reset</button>' +
+                    '<button class="ml-2 btn-sm getSeriesData" data-series="' + int + '"><strong>S</strong>ave series state</button>' +
+                    '<button class="ml-2 btn-sm deselectSlice" data-series="' + int + '"><strong>R</strong>eset</button>' +
                     '</div>'
                 );
 
