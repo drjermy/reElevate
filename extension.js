@@ -518,7 +518,7 @@ let loadForm = () => {
                     if (keyCode === 82) { // r
                         $('#reloadTab').click().focus();
                     }
-                    if (keyCode === 72) { // h
+                    if (keyCode === 191 && shifted) { // h
                         $('#viewHelp').click().focus();
                     }
                     if (keyCode === 37) { // left
