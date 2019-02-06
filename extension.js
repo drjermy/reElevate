@@ -516,10 +516,10 @@ let loadForm = () => {
                     if (keyCode === 69) { // e
                         $('#viewStudy').click().focus();
                     }
-                    if (keyCode === 82) { // r
+                    if (keyCode === 82 && shifted) { // shift+r
                         $('#reloadTab').click().focus();
                     }
-                    if (keyCode === 191 && shifted) { // h
+                    if (keyCode === 191 && shifted) { // ?
                         $('#viewHelp').click().focus();
                     }
                     if (keyCode === 37) { // left
