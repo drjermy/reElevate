@@ -279,7 +279,7 @@ function setFirstSlice()
                         navigate.top();
                     } else {
                         if (result[studySliceName]) {
-                            navigate.to(result[studySliceName]);
+                            navigate.to(result[studySliceName] - 1);
                         }
                     }
                 }
