@@ -765,10 +765,10 @@ let navigate = {
         });
     },
     orange: function () {
-        if ($('a.orange').length > 0) {
+        if (isSlide) {
             $('a.orange')[0].click();
         } else {
-            $('#offline-workflow-next-slide')[0].click();
+            $('.continue')[0].click();
         }
     },
     series: function (n) {
