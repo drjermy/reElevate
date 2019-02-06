@@ -411,6 +411,20 @@ function lastStudyImage()
 }
 
 
+/**
+ * Get an object that records the last positions of the images in each series.
+ */
+function getLastImagePositions()
+{
+    let lastPositions = {};
+    $('.thumb').each(function () {
+        let id = $(this).attr('id').split('offline-workflow-thumb-')[1];
+        lastPositions[id] = $(this).attr('data-last-image');
+    });
+    return lastPositions;
+}
+
+
 let current;
 current = {
     image: function () {
@@ -743,7 +757,6 @@ let navigate = {
         global.set('backAction', true);
         global.get('history', function (result) {
             let history = result.history;
-            console.log(history)
             if (Array.isArray(history) && history.slice(-2)[0]) {
                 window.location.href = history.slice(-2)[0];
             } else {
@@ -794,6 +807,16 @@ $(document).ready(function() {
     });
 
 
+    /**
+     * Save the position of the last viewed image to the div.
+     */
+    $('#largeImage img').on('load', function (e) {
+        let currentSeries = getCurrentSeriesNumber();
+        let slice = findIndex('fullscreen_filename', $(this).attr('src'), stackedImages[currentSeries]['images']);
+        $('#offline-workflow-thumb-' + currentSeries).attr('data-last-image', stackedImages[currentSeries]['images'][slice].position);
+    });
+
+
     chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         do {
 
@@ -818,6 +841,11 @@ $(document).ready(function() {
                 });
 
             } else {
+
+                if (typeof request.lastPositions !== "undefined") {
+                    sendResponse(getLastImagePositions());
+                    break;
+                }
 
                 if (typeof request.getData !== "undefined") {
                     sendResponse({

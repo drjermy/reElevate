@@ -153,6 +153,21 @@ let playlist = {
             }
             chrome.storage.local.set(result, function () {});
         });
+    },
+    storeStudy: (saveObject) => { // Store a name => value pair to a scope.
+        let playlist_id = playlist.playlist_id();
+        let study_id = playlist.study_id();
+
+        chrome.storage.local.get([playlist_id], function (result) {
+            if (!result[playlist_id]) result[playlist_id] = {};
+            if (!result[playlist_id][study_id]) result[playlist_id][study_id] = {};
+
+            $.each(saveObject, function(variableName, variableValue) {
+                result[playlist_id][study_id][variableName] = variableValue;
+            });
+
+            chrome.storage.local.set(result, function () {});
+        });
     }
 };
 
@@ -393,6 +408,22 @@ let loadForm = () => {
                 }
             }
 
+
+            $(document).on('click', '#saveStudyState', function () {
+                let request = {lastPositions: true};
+                chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+                    chrome.tabs.sendMessage(tabs[0].id, request, function (response) {
+                        let storeObject = {};
+                        $.each(response, function(seriesNumber, lastPosition) {
+                            let id = 'startingSlice' + seriesNumber;
+                            storeObject[id] = lastPosition;
+                            $('#' + id).val(lastPosition);
+                        });
+                        playlist.storeStudy(storeObject);
+                    });
+                });
+            });
+
             
             // Create a trigger for the select button.
             $(document).on('click', '.selectSeries', function  () {
@@ -488,7 +519,7 @@ let loadForm = () => {
                 }
             });
 
-            
+
             // Select the default series.
             let defaultSeries = getPageValue('startingSeries');
             if (typeof defaultSeries === "undefined") defaultSeries = 1;

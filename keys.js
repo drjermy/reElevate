@@ -72,6 +72,10 @@ $(document).ready(function() {
         presentation.open();
     });
 
+    $(document).bind('keyup', 't', function () {
+        getLastImagePositions();
+    });
+
 
     $('#offline-workflow-page-links li').each(function (n, value) {
         let key = n+1;
