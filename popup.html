@@ -91,8 +91,13 @@
             </div>
             <hr/>
             <div class="form-group mt-1">
-                <label for="playlistJumpURL">Jump to... (j)</label>
-                <input type="text" class="form-control popup-text" id="playlistJumpURL" data-variable="jumpURL" placeholder="Jump to... (j)">
+                <label for="playlistJumpURL">Jump to...</label>
+                <input type="text" class="form-control popup-text" id="playlistJumpURL" data-variable="jumpURL" placeholder="Jump to... " disabled>
+            </div>
+            <div class="my-2 ml-0">
+                <span>Location: </span>
+                <button id="saveJumpTo" class="ml-2 btn-sm">Save</button>
+                <button id="removeJumpTo" class="ml-2 btn-sm">Remove</button>
             </div>
         </div>
     </div>

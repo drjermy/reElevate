@@ -130,6 +130,13 @@ let playlist = {
     study_id: () => { // Create the study id that is used as the location for study config.
         return 'radiopaedia' + '-' + playlist.vars.playlistId + '-' + playlist.vars.entryId + '-' + playlist.vars.caseId + '-' + playlist.vars.studyId;
     },
+    jumpTo_url: () => {
+        if (playlist.offlineMode === true) {
+            return playlist.tab.url.split('pages/')[1].split('.html')[0].split('_').join('/');
+        } else {
+            return 'play/' + playlist.tab.url.split('play/')[1].split('#')[0];
+        }
+    },
     store: (variableName, variableValue, scope = 'study') => { // Store a name => value pair to a scope.
         let playlist_id = playlist.playlist_id();
         let case_id = playlist.case_id();
@@ -409,6 +416,18 @@ let loadForm = () => {
                     );
                 }
             }
+
+
+            $('#saveJumpTo').click(function () {
+                $('#playlistJumpURL').val(playlist.jumpTo_url());
+                playlist.store('jumpURL', playlist.jumpTo_url(), 'playlist');
+            });
+
+
+            $('#removeJumpTo').click(function () {
+                $('#playlistJumpURL').val('');
+                playlist.store('jumpURL', '', 'playlist');
+            });
 
 
             $(document).on('click', '#saveStudyState', function () {

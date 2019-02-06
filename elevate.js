@@ -786,7 +786,14 @@ let navigate = {
         }
     },
     jumpTo: function () {
-        window.location.replace(jumpURL);
+        if (typeof jumpURL !== "undefined") {
+            if (offlineMode === true) {
+                jumpURL = jumpURL.replace('/play', 'play').split('/').join('_') + '.html';
+            } else {
+                jumpURL = 'https://radiopaedia.org' + jumpURL;
+            }
+            window.location.replace(jumpURL);
+        }
     },
     imagesTab: function () {
         $('#offline-workflow-link-images')[0].click();
