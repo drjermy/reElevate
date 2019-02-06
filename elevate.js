@@ -109,9 +109,11 @@ elements = {
 function elementVisibility() {
     elements.presentingDefaults();
     global.get('hideFindings', function (global) {
+
         let caseEntry = global[store.case_id()];
         let study = global[store.name()];
 
+        jumpURL = global.jumpURL;
         caseEntry = (typeof caseEntry !== "undefined" ? caseEntry : {});
         study = (typeof study !== "undefined" ? study : {});
 
@@ -147,10 +149,6 @@ function elementVisibility() {
             $('#offline-workflow-thumbnails-pane .thumb').removeClass('clear-left');
             $('#offline-workflow-thumbnails-pane .thumb:visible:even').addClass('clear-left');
         });
-
-        if (global.jumpURL) {
-            jumpURL = global.jumpURL;
-        }
 
     });
 }
