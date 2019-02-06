@@ -345,6 +345,8 @@ let loadForm = () => {
 
         if (typeof response.series !== "undefined") {
 
+            let numberOfSeries = Object.keys(response.series).length;
+
             // Create a set of selector buttons for each of the series.
             for (let n in response.series) {
                 let int = Number(n) + 1;
@@ -547,6 +549,11 @@ let loadForm = () => {
             // Select the current series.
             let currentSeries = Number(response.currentSeries) + 1;
             $('.selectSeries[data-series="' + currentSeries + '"]').click().focus();
+
+            if (numberOfSeries === 1) {
+                $('.selectDefaultSeries').prop('disabled', true).addClass('disabled');
+                $('.hideSeries').prop('disabled', true).addClass('disabled');
+            }
 
             if (response.isSlide === true) {
                 $('#viewStudy').prop('disabled', true).addClass('disabled');
