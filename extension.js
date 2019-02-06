@@ -528,6 +528,12 @@ let loadForm = () => {
                     if (keyCode === 39) { // right
                         tabAction('next', true);
                     }
+                    if (keyCode === 38) { // up
+                        tabAction('up');
+                    }
+                    if (keyCode === 40) { // down
+                        tabAction('down');
+                    }
                 }
             });
 

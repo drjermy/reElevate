@@ -838,6 +838,12 @@ $(document).ready(function() {
                     case 'next':
                         navigate.next();
                         break;
+                    case 'up':
+                        navigate.up(1);
+                        break;
+                    case 'down':
+                        navigate.down(1);
+                        break;
                 }
 
                 // Need to refresh the internal variables defined by current case.
