@@ -430,8 +430,8 @@ let loadForm = () => {
             // Create a trigger for the select button.
             $(document).on('click', '.selectSeries', function  () {
                 let n = $(this).attr('data-series');
-                $('.selectSeries').removeClass('outline-warning');
-                $(this).addClass('outline-warning');
+                $('.selectSeries').removeClass('outline-warning active');
+                $(this).addClass('outline-warning active');
                 changeSeries(Number(n) - 1);
                 $('.seriesSelector').hide();
                 $('.seriesSelector[data-series="' + n + '"]').show();
@@ -502,9 +502,12 @@ let loadForm = () => {
 
                 if (isTypeable !== true) {
 
+                    // Determine which series is active.
+
                     let keyCode = e.which;
                     let shifted = e.shiftKey;
-                    //alert(keyCode)
+                    let currentSeries = $('.selectSeries.active').attr('data-series');
+
                     if (keyCode >=49 && keyCode <= 57) {
                         let n = keyCode - 48;
                         $('.selectSeries[data-series="' + n + '"]').click().focus();
@@ -536,6 +539,20 @@ let loadForm = () => {
                     if (keyCode === 40) { // down
                         tabAction('down');
                     }
+
+                    // Perform study actions - default, hide, save state and reset
+                    if (keyCode === 68) { // d
+                        $('.selectDefaultSeries[data-series="' + currentSeries + '"]').click().focus();
+                    }
+                    if (keyCode === 72) { // h
+                        $('.hideSeries[data-series="' + currentSeries + '"]').click().focus();
+                    }
+                    if (keyCode === 83) { // s
+                        $('.getSeriesData[data-series="' + currentSeries + '"]').click().focus();
+                    }
+                    if (keyCode === 82) { // r
+                        $('.deselectSlice[data-series="' + currentSeries + '"]').click().focus();
+                    }
                 }
             });
 
@@ -543,7 +560,7 @@ let loadForm = () => {
             // Select the default series.
             let defaultSeries = getPageValue('startingSeries');
             if (typeof defaultSeries === "undefined") defaultSeries = 1;
-            $('.selectSeries[data-series="' + defaultSeries + '"]').addClass('btn-warning');
+            $('.selectSeries[data-series="' + defaultSeries + '"]').addClass('btn-warning active');
 
 
             // Select the current series.
