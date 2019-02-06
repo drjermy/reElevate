@@ -1,4 +1,4 @@
-let wrapper, wrapperPaddingTop, wrapperPaddingBottom, largeImageMarginLeft, isSlide, stackedImages, offlineMode, playlistVars;
+let wrapper, wrapperPaddingTop, wrapperPaddingBottom, largeImageMarginLeft, isSlide, stackedImages, offlineMode, playlistVars, jumpURL;
 
 function init() {
     wrapper = $('#wrapper');
@@ -147,6 +147,10 @@ function elementVisibility() {
             $('#offline-workflow-thumbnails-pane .thumb').removeClass('clear-left');
             $('#offline-workflow-thumbnails-pane .thumb:visible:even').addClass('clear-left');
         });
+
+        if (global.jumpURL) {
+            jumpURL = global.jumpURL;
+        }
 
     });
 }
@@ -782,6 +786,9 @@ let navigate = {
         if (button.length > 0) {
             button[0].click();
         }
+    },
+    jumpTo: function () {
+        window.location.replace(jumpURL);
     },
     imagesTab: function () {
         $('#offline-workflow-link-images')[0].click();

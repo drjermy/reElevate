@@ -72,8 +72,8 @@ $(document).ready(function() {
         presentation.open();
     });
 
-    $(document).bind('keyup', 't', function () {
-        getLastImagePositions();
+    $(document).bind('keyup', 'j', function () {
+        navigate.jumpTo();
     });
 
 
