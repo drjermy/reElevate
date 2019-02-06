@@ -132,9 +132,9 @@ let playlist = {
     },
     jumpTo_url: () => {
         if (playlist.offlineMode === true) {
-            return playlist.tab.url.split('pages/')[1].split('.html')[0].split('_').join('/');
+            return '/' + playlist.tab.url.split('pages/')[1].split('.html')[0].split('_').join('/');
         } else {
-            return 'play/' + playlist.tab.url.split('play/')[1].split('#')[0];
+            return '/play/' + playlist.tab.url.split('/play/')[1].split('#')[0];
         }
     },
     store: (variableName, variableValue, scope = 'study') => { // Store a name => value pair to a scope.
