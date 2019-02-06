@@ -517,7 +517,7 @@ let loadForm = () => {
                         $('#viewStudy').click().focus();
                     }
                     if (keyCode === 82 && shifted) { // shift+r
-                        $('#reloadTab').click().focus();
+                        $('#reloadTab').click();
                     }
                     if (keyCode === 191 && shifted) { // ?
                         $('#viewHelp').click().focus();
@@ -548,9 +548,14 @@ let loadForm = () => {
             let currentSeries = Number(response.currentSeries) + 1;
             $('.selectSeries[data-series="' + currentSeries + '"]').click().focus();
 
-
-            // Click the viewStudy pane button and give it focus.
-            $('#viewStudy').click().focus();
+            if (response.isSlide === true) {
+                $('#viewStudy').prop('disabled', true).addClass('disabled');
+                $('#viewCasePane').prop('disabled', true).addClass('disabled');
+                $('#viewPlaylist').click().focus();
+            } else {
+                // Click the viewStudy pane button and give it focus.
+                $('#viewStudy').click().focus();
+            }
 
         }
 

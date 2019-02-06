@@ -892,7 +892,8 @@ $(document).ready(function() {
                     case: store.case_id(),
                     playlist: global.name(),
                     series: series,
-                    currentSeries: getCurrentSeriesNumber()
+                    currentSeries: getCurrentSeriesNumber(),
+                    isSlide: isSlide
                 });
 
             }
