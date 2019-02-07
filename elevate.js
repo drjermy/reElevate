@@ -7,6 +7,7 @@ function init() {
     largeImageMarginLeft = $('#largeImage').css('margin-left');
     if ($('.slide').length > 0) isSlide = true;
 
+    canvasSetup();
     getPageVariables();
     getPlaylistVarsFromURL();
     saveHistory();
@@ -198,6 +199,54 @@ function saveHistory() {
 }
 
 
+let canvasSetup = function () {
+    let wrapper = $('#largeImage');
+    wrapper.append('<canvas id="imageCanvas"></canvas>');
+    $('.offline-workflow-outer-wrapper').hide();
+    context = document.getElementById('imageCanvas').getContext("2d");
+
+    // If the height/width is any closer to the parent, we end up with scrollbars.
+    context.canvas.width = $('#largeImage').width()-5;
+    context.canvas.height = $('#largeImage').height()-5;
+
+    let imageObj = new Image();
+    imageObj.onload = function () {
+
+        let canvasHeight, canvasWidth, canvasRatio;
+        canvasHeight = context.canvas.height;
+        canvasWidth = context.canvas.width;
+        canvasRatio = canvasHeight/canvasWidth;
+
+        let baseImageHeight, baseImageWidth, imageRatio;
+        baseImageHeight = imageObj.height;
+        baseImageWidth = imageObj.width;
+        imageRatio = baseImageHeight/baseImageWidth;
+
+        let imageHeight, imageWidth, imageOffsetTop, imageOffsetLeft;
+        if (imageRatio > canvasRatio) {
+            imageHeight = canvasHeight;
+            imageWidth = canvasHeight / imageRatio;
+            imageOffsetTop = 0;
+            imageOffsetLeft = (canvasWidth - imageWidth)/2;
+        } else {
+            imageWidth = canvasWidth;
+            imageHeight = canvasWidth * imageRatio;
+            imageOffsetTop = (canvasHeight - imageHeight)/2;
+            imageOffsetLeft = 0;
+        }
+
+
+        context.drawImage(imageObj, imageOffsetLeft, imageOffsetTop, imageWidth, imageHeight);
+    };
+    imageObj.src = $('#offline-workflow-study-large-image').attr('src');
+
+    $('#largeImage img').on('load', function (e) {
+        imageObj.src = $('#largeImage img').attr('src');
+        $('#offline-workflow-study-large-image').hide();
+    });
+};
+
+
 function getPageVariables()
 {
     let pageVariables = retrieveWindowVariables(["stackedImages", "caseIDs", "currentCaseID", "studies", "components", "offlineMode"]);
@@ -381,6 +430,7 @@ function setImageWrapperSize()
     let imageWrapperSize = calculateImageWrapperSize();
     $('.offline-workflow-image-wrapper').css(imageWrapperSize);
     $('#offline-workflow-study-large-image').css({width: imageWrapperSize.width, height: imageWrapperSize.height});
+    //$('#imageCanvas').css({width: imageWrapperSize.width, height: imageWrapperSize.height});
 }
 
 

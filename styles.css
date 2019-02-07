@@ -23,3 +23,7 @@ a.online-link.disabled {
     font-weight: bold !important;
     color: white;
 }
+
+canvas {
+    background-color: black;
+}
