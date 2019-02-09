@@ -3,7 +3,7 @@
 <head>
     <link rel="stylesheet" href="vendor/bootstrap.min.css">
     <style>
-        .pane {
+        .pane, .subPane {
             display: none;
         }
         #navigation {
@@ -149,47 +149,73 @@
                 <label class="custom-control-label nobr" for="studyDefaultSlice">Start on selected slice</label>
             </div>
             <hr/>
-            <div class="my-2 ml-0">
-                <button id="saveStudyState" class="ml-2 btn-sm">Save state for all series</button>
-            </div>
             <div id="seriesSelectorWrapper"></div>
             <div id="seriesEditorWrapper" class="mt-4"></div>
         </div>
     </div>
 
-    <div id="jsonPane" class="container pane py-2">
-        <h1>JSON</h1>
-        <p>Make edits, or change completely and then hit "Save".</p>
-        <textarea id="jsonContent" rows="15" class="form-control"></textarea>
-        <div class="py-2">
-            <button id="saveJsonSubmit" class="btn-sm btn-primary">Save</button>
-            <button id="downloadJson" class="btn-sm btn-warning">Download</button>
-        </div>
-    </div>
-
     <div id="helpPane" class="container pane py-2">
         <h1>Help</h1>
-        <button id="viewJson" data-open="jsonPane" class="openButton btn-sm float-right">JSON</button>
 
-        <div>left, right</div>
-        <div>shift+left, right</div>
-        <div>up, down</div>
-        <div>pageup, pagedown (fn+up/down)</div>
-        <div>home, end (fn+left/right)</div>
-        <hr/>
-        <div>h: header toggle</div>
-        <div>s: sider toggle</div>
-        <div>f: footer toggle</div>
-        <div>m: maximise</div>
-        <hr/>
-        <div>1, 2, 3: select series</div>
-        <div>shift+1, 2, 3: select study</div>
-        <hr/>
-        <div>q: image tab</div>
-        <div>w: question tab</div>
-        <div>e: findings tab</div>
-        <div>p: show presentation info</div>
-        <div>j: jump to set URL</div>
+        <div class="mb-2">
+            <button id="viewTabHelp" data-open="helpTabSubPane" class="openSubButton btn-sm">Tab Help</button>
+            <button id="viewPopupHelp" data-open="helpPopupSubPane" class="openSubButton btn-sm">Popup Help</button>
+            <button id="viewJson" data-open="jsonSubPane" class="openSubButton btn-sm">JSON</button>
+        </div>
+
+        <div id="helpTabSubPane" class="subPane py-2">
+            <div>b: back</div>
+            <div>left: previous case</div>
+            <div>right: next action (orange)</div>
+            <div>shift+left: previous case</div>
+            <div>shift+right: next case</div>
+            <hr/>
+            <div>up, down</div>
+            <div>pageup, pagedown: up/down 5</div>
+            <div>home: top slice</div>
+            <hr/>
+            <div>h: header toggle</div>
+            <div>s: sider toggle</div>
+            <div>f: footer toggle</div>
+            <div>m: maximise</div>
+            <hr/>
+            <div>1, 2, 3: select series</div>
+            <div>shift+1, 2, 3: select study</div>
+            <hr/>
+            <div>q: image tab</div>
+            <div>w: question tab</div>
+            <div>e: findings tab</div>
+            <div>p: show presentation info</div>
+            <div>j: jump to set URL</div>
+        </div>
+
+        <div id="helpPopupSubPane" class="subPane py-2">
+            <div>q: playlist tab</div>
+            <div>w: case tab</div>
+            <div>e: study tab</div>
+            <div>shift+r: reload Tab</div>
+            <div>?: help tab</div>
+            <hr/>
+            <div>1,2,3: select series</div>
+            <div>a: save state for all series</div>
+            <hr/>
+            <div><strong>Current series</strong></div>
+            <div>d: set asdefault</div>
+            <div>h: hide</div>
+            <div>s: save state</div>
+            <div>r: reset default state</div>
+            <div></div>
+        </div>
+
+        <div id="jsonSubPane" class="subPane py-2">
+            <h1>JSON</h1>
+            <p>Make edits, or change completely and then hit "Save".</p>
+            <textarea id="jsonContent" rows="15" class="form-control"></textarea>
+            <div class="py-2">
+                <button id="saveJsonSubmit" class="btn-sm btn-primary">Save</button>
+                <button id="downloadJson" class="btn-sm btn-warning">Download</button>
+            </div>
+        </div>
 
     </div>
 
