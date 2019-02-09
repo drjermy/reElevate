@@ -251,7 +251,7 @@ let popup = {
 let loadForm = () => {
     response = playlistDetails;
 
-    chrome.storage.local.get([response.playlist], function(result) {
+    chrome.storage.local.get([response.playlist], function (result) {
 
         let getPageValue = function (varName) {
             if (typeof result[response.playlist] !== "undefined" &&
@@ -329,7 +329,7 @@ let loadForm = () => {
             if ($(this).attr('data-paired') === 'true') {
                 setVisibility(this);
             }
-        }).change(function() {
+        }).change(function () {
             let varName = $(this).attr('data-variable');
             let scope = $(this).parents('.popper-wrapper').attr('data-scope');
             playlist.store(varName, $(this).prop("checked"), scope);
@@ -343,7 +343,7 @@ let loadForm = () => {
          */
         $('.popup-text').each(function () {
             $(this).val(getValueFromStorage(this));
-        }).keyup(function() {
+        }).keyup(function () {
             let varName = $(this).attr('data-variable');
             let scope = $(this).parents('.popper-wrapper').attr('data-scope');
             playlist.store(varName, $(this).val(), scope);
@@ -353,6 +353,12 @@ let loadForm = () => {
         if (typeof response.series !== "undefined") {
 
             let numberOfSeries = Object.keys(response.series).length;
+
+
+            $('#seriesSelectorWrapper').append(
+                '<div class="mb-4"><button id="saveStudyState" class="ml-2 btn-sm">Save state for <strong>a</strong>ll series</button></div>'
+            );
+
 
             // Create a set of selector buttons for each of the series.
             for (let n in response.series) {
@@ -435,7 +441,7 @@ let loadForm = () => {
                 chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
                     chrome.tabs.sendMessage(tabs[0].id, request, function (response) {
                         let storeObject = {};
-                        $.each(response, function(seriesNumber, lastPosition) {
+                        $.each(response, function (seriesNumber, lastPosition) {
                             let id = 'startingSlice' + seriesNumber;
                             storeObject[id] = lastPosition;
                             $('#' + id).val(lastPosition);
@@ -445,9 +451,9 @@ let loadForm = () => {
                 });
             });
 
-            
+
             // Create a trigger for the select button.
-            $(document).on('click', '.selectSeries', function  () {
+            $(document).on('click', '.selectSeries', function () {
                 let n = $(this).attr('data-series');
                 $('.selectSeries').removeClass('outline-warning active');
                 $(this).addClass('outline-warning active');
@@ -493,7 +499,7 @@ let loadForm = () => {
 
 
             // Create trigger to show/hide series.
-            $(document).on('click', '.hideSeries',  function() {
+            $(document).on('click', '.hideSeries', function () {
                 let that = $(this);
                 let n = Number(that.attr('data-series'));
                 let int = n - 1;
@@ -529,7 +535,7 @@ let loadForm = () => {
 
                     //alert(keyCode);
 
-                    if (keyCode >=49 && keyCode <= 57) {
+                    if (keyCode >= 49 && keyCode <= 57) {
                         let n = keyCode - 48;
                         $('.selectSeries[data-series="' + n + '"]').click().focus();
                     }
