@@ -201,7 +201,7 @@ function saveHistory() {
 let canvasSetup = function () {
     let wrapper = $('#largeImage');
     wrapper.append('<canvas id="imageCanvas"></canvas>');
-    $('.offline-workflow-outer-wrapper').hide();
+    //$('.offline-workflow-outer-wrapper').hide();
     context = document.getElementById('imageCanvas').getContext("2d");
 
     // If the height/width is any closer to the parent, we end up with scrollbars.
