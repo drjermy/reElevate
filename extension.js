@@ -248,7 +248,8 @@ let popup = {
 };
 
 
-let loadForm = () => {
+let loadForm;
+loadForm = () => {
     response = playlistDetails;
 
     chrome.storage.local.get([response.playlist], function (result) {
