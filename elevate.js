@@ -199,14 +199,14 @@ function saveHistory() {
 
 
 let canvasSetup = function () {
-    let wrapper = $('#largeImage');
-    wrapper.append('<canvas id="imageCanvas"></canvas>');
-    //$('.offline-workflow-outer-wrapper').hide();
+    let wrapper = $('.offline-workflow-image-wrapper');
+    wrapper.append('<canvas id="imageCanvas" style="margin 0px auto"></canvas>');
+    $('#offline-workflow-study-large-image').hide();
     context = document.getElementById('imageCanvas').getContext("2d");
 
     // If the height/width is any closer to the parent, we end up with scrollbars.
-    context.canvas.width = $('#largeImage').width()-5;
-    context.canvas.height = $('#largeImage').height()-5;
+    context.canvas.width = $('.offline-workflow-image-wrapper').width()-5;
+    context.canvas.height = $('.offline-workflow-image-wrapper').height()-5;
 
     let imageObj = new Image();
     imageObj.onload = function () {
@@ -429,7 +429,7 @@ function setImageWrapperSize()
     let imageWrapperSize = calculateImageWrapperSize();
     $('.offline-workflow-image-wrapper').css(imageWrapperSize);
     $('#offline-workflow-study-large-image').css({width: imageWrapperSize.width, height: imageWrapperSize.height});
-    //$('#imageCanvas').css({width: imageWrapperSize.width, height: imageWrapperSize.height});
+    $('#imageCanvas').css({width: imageWrapperSize.width, height: imageWrapperSize.height});
 }
 
 
@@ -858,6 +858,10 @@ let navigate = {
 
 $(document).ready(function() {
     init();
+
+    $( window ).resize(function() {
+        setImageWrapperSize();
+    });
 
     /**
      * When we click a thumb (with the mouse or triggered via js, select the first slice.
