@@ -28,15 +28,21 @@ $(document).ready(function() {
         navigate.previous();
     });
 
+    $(document).bind('keyup', 'b', function () {
+        navigate.back();
+    });
+
     $(document).bind('keyup', 'shift+right', function () {
         navigate.next();
     });
 
     $(document).bind('keyup', 'left', function () {
-        navigate.back();
+        // Need to have this to make maximised forward action work correctly.
+        navigate.previous();
     });
 
     $(document).bind('keyup', 'right', function () {
+        // Need to have this to make maximised forward action work correctly.
         navigate.orange();
     });
 

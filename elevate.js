@@ -9,7 +9,6 @@ function init() {
 
     getPageVariables();
     getPlaylistVarsFromURL();
-    saveHistory();
     elementVisibility();
     initVisibility();
     setFirstSlice();
@@ -163,38 +162,6 @@ function initVisibility()
         sidebar.setVisibility();
         footer.setVisibility();
     }
-}
-
-
-function saveHistory() {
-    global.get('backAction', function (result) {
-        if (result.backAction === true) {
-            global.get('history', function (result) {
-                if (result.history) {
-                    result.history.pop();
-                    global.set('history', result.history);
-                }
-            });
-        } else {
-            let currentURL = window.location.href;
-            global.get('history', function (result) {
-                let history = result.history;
-                if (Array.isArray(history)) {
-                    if (history.slice(-1)[0] !== currentURL) {
-                        // Only add the URL if it's not the same as the last one.
-                        history.push(currentURL);
-                    }
-                } else {
-                    history = [currentURL];
-                }
-                if (history.length > 20) {
-                    history.splice(0, history.length - 20);
-                }
-                global.set('history', history);
-            });
-        }
-    });
-    global.set('backAction', false);
 }
 
 
@@ -756,15 +723,8 @@ let navigate = {
         }
     },
     back: function () {
-        global.set('backAction', true);
-        global.get('history', function (result) {
-            let history = result.history;
-            if (Array.isArray(history) && history.slice(-2)[0]) {
-                window.location.href = history.slice(-2)[0];
-            } else {
-                navigate.previous();
-            }
-        });
+        window.history.back();
+        window.history.back();
     },
     orange: function () {
         if (isSlide) {
