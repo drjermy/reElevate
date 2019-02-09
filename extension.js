@@ -527,6 +527,8 @@ let loadForm = () => {
                     let shifted = e.shiftKey;
                     let currentSeries = $('.selectSeries.active').attr('data-series');
 
+                    //alert(keyCode);
+
                     if (keyCode >=49 && keyCode <= 57) {
                         let n = keyCode - 48;
                         $('.selectSeries[data-series="' + n + '"]').click().focus();
@@ -560,6 +562,10 @@ let loadForm = () => {
                     }
 
                     // Perform study actions - default, hide, save state and reset
+                    if (keyCode === 65) { // a
+                        $('.selectDefaultSeries[data-series="' + currentSeries + '"]').click().focus();
+                        $('#saveStudyState').click().focus();
+                    }
                     if (keyCode === 68) { // d
                         $('.selectDefaultSeries[data-series="' + currentSeries + '"]').click().focus();
                     }
