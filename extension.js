@@ -633,12 +633,26 @@ $(document).on('click', '.actionButton', function() {
 });
 
 
+$(document).on('click', '#viewHelp', function() {
+    $('#viewTabHelp').addClass('btn-secondary').focus();
+    $('#helpTabSubPane').show();
+});
+
+
 $(document).on('click', '.openButton', function () {
     let pane = $(this).attr('data-open');
     $('.openButton').removeClass('btn-primary');
     $(this).addClass('btn-primary');
     $('.pane').hide();
     $('#' + pane).show();
+});
+
+$(document).on('click', '.openSubButton', function () {
+    let subPane = $(this).attr('data-open');
+    $('.openSubButton').removeClass('btn-secondary');
+    $(this).addClass('btn-secondary');
+    $('.subPane').hide();
+    $('#' + subPane).show();
 });
 
 
