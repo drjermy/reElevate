@@ -576,6 +576,8 @@ let header = {
         global.get('headerVisible', function (result) {
             if (result.headerVisible === false) {
                 header.hide();
+            } else {
+                header.show();
             }
         });
     },
@@ -602,6 +604,8 @@ let sidebar = {
         global.get('sidebarVisible', function (result) {
             if (result.sidebarVisible === false) {
                 sidebar.hide();
+            } else {
+                sidebar.show();
             }
         });
     },
@@ -628,6 +632,8 @@ let footer = {
         global.get('footerVisible', function (result) {
             if (result.footerVisible === false) {
                 footer.hide();
+            } else {
+                footer.show();
             }
         });
     },
@@ -658,7 +664,9 @@ let maximise = {
         }
     },
     show: function () {
-        elements.maximise.show();
+        header.setVisibility();
+        sidebar.setVisibility();
+        footer.setVisibility();
         maximise.visible = true;
         store.study('maximiseCase', undefined);
     },
