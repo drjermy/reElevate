@@ -9,7 +9,6 @@ function init() {
 
     getPageVariables();
     getPlaylistVarsFromURL();
-    saveHistory();
     elementVisibility();
     initVisibility();
     setFirstSlice();
@@ -163,38 +162,6 @@ function initVisibility()
         sidebar.setVisibility();
         footer.setVisibility();
     }
-}
-
-
-function saveHistory() {
-    global.get('backAction', function (result) {
-        if (result.backAction === true) {
-            global.get('history', function (result) {
-                if (result.history) {
-                    result.history.pop();
-                    global.set('history', result.history);
-                }
-            });
-        } else {
-            let currentURL = window.location.href;
-            global.get('history', function (result) {
-                let history = result.history;
-                if (Array.isArray(history)) {
-                    if (history.slice(-1)[0] !== currentURL) {
-                        // Only add the URL if it's not the same as the last one.
-                        history.push(currentURL);
-                    }
-                } else {
-                    history = [currentURL];
-                }
-                if (history.length > 20) {
-                    history.splice(0, history.length - 20);
-                }
-                global.set('history', history);
-            });
-        }
-    });
-    global.set('backAction', false);
 }
 
 
@@ -609,6 +576,8 @@ let header = {
         global.get('headerVisible', function (result) {
             if (result.headerVisible === false) {
                 header.hide();
+            } else {
+                header.show();
             }
         });
     },
@@ -635,6 +604,8 @@ let sidebar = {
         global.get('sidebarVisible', function (result) {
             if (result.sidebarVisible === false) {
                 sidebar.hide();
+            } else {
+                sidebar.show();
             }
         });
     },
@@ -661,6 +632,8 @@ let footer = {
         global.get('footerVisible', function (result) {
             if (result.footerVisible === false) {
                 footer.hide();
+            } else {
+                footer.show();
             }
         });
     },
@@ -691,7 +664,9 @@ let maximise = {
         }
     },
     show: function () {
-        elements.maximise.show();
+        header.setVisibility();
+        sidebar.setVisibility();
+        footer.setVisibility();
         maximise.visible = true;
         store.study('maximiseCase', undefined);
     },
@@ -756,15 +731,7 @@ let navigate = {
         }
     },
     back: function () {
-        global.set('backAction', true);
-        global.get('history', function (result) {
-            let history = result.history;
-            if (Array.isArray(history) && history.slice(-2)[0]) {
-                window.location.href = history.slice(-2)[0];
-            } else {
-                navigate.previous();
-            }
-        });
+        window.history.back();
     },
     orange: function () {
         if (isSlide) {
