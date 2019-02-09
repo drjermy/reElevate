@@ -117,7 +117,7 @@ let playlist = {
                 playlistId: pathArray[4],
                 entryId: pathArray[6],
                 caseId: pathArray[8],
-                studyId: pathArray[10]
+                studyId: pathArray[10].split('#')[0]
             };
         }
     },
