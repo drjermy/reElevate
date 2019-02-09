@@ -724,7 +724,6 @@ let navigate = {
     },
     back: function () {
         window.history.back();
-        window.history.back();
     },
     orange: function () {
         if (isSlide) {
