@@ -9,6 +9,7 @@ function init() {
 
     getPageVariables();
     getPlaylistVarsFromURL();
+    saveHistory();
     elementVisibility();
     initVisibility();
     setFirstSlice();
@@ -163,6 +164,28 @@ function initVisibility()
         footer.setVisibility();
         maximise.setVisibility();
     }
+}
+
+
+function saveHistory() {
+    let currentURL = window.location.href;
+    global.get('history', function (result) {
+        let history = result.history;
+
+        if (Array.isArray(history)) {
+            if (history.slice(-1)[0] !== currentURL) {
+                // Only add the URL if it's not the same as the last one.
+                history.push(currentURL);
+            }
+        } else {
+            history = [currentURL];
+        }
+        if (history.length > 20) {
+            history.splice(0, history.length - 20);
+        }
+
+        global.set('history', history);
+    });
 }
 
 
@@ -556,6 +579,7 @@ let global = {
                 result[gContext] = {};
             }
             result[gContext][name] = value;
+            console.log(result)
             chrome.storage.local.set(result, function () {});
         });
     },
@@ -585,25 +609,26 @@ let header = {
     toggle: function () {
         if (maximise.hidden === true) {
             if (header.visible === true) {
-                elements.header.hide();
-                header.visible = false;
+                header.hide();
             } else {
-                elements.header.show();
-                header.visible = true;
+                header.show();
             }
         } else {
-            if (header.visible === true) header.hide();
-            else header.show();
+            if (header.visible === true) {
+                header.hide();
+                global.set('headerVisible', false);
+            } else {
+                header.show();
+                global.set('headerVisible', true);
+            }
         }
     },
     show: function () {
         elements.header.show();
         header.visible = true;
-        global.set('headerVisible', true);
     },
     hide: function () {
         elements.header.hide();
-        global.set('headerVisible', false);
         header.visible = false;
     }
 };
@@ -623,25 +648,26 @@ let sidebar = {
     toggle: function () {
         if (maximise.hidden === true) {
             if (sidebar.visible === true) {
-                elements.sidebar.hide();
-                sidebar.visible = false;
+                sidebar.hide();
             } else {
-                elements.sidebar.show();
-                sidebar.visible = true;
+                sidebar.show();
             }
         } else {
-            if (sidebar.visible === true) sidebar.hide();
-            else sidebar.show();
+            if (sidebar.visible === true) {
+                sidebar.hide();
+                global.set('sidebarVisible', false);
+            } else {
+                sidebar.show();
+                global.set('sidebarVisible', true);
+            }
         }
     },
     show: function () {
         elements.sidebar.show();
-        global.set('sidebarVisible', true);
         sidebar.visible = true;
     },
     hide: function () {
         elements.sidebar.hide();
-        global.set('sidebarVisible', false);
         sidebar.visible = false;
     }
 };
@@ -661,25 +687,26 @@ let footer = {
     toggle: function () {
         if (maximise.hidden === true) {
             if (footer.visible === true) {
-                elements.footer.hide();
-                footer.visible = false;
+                footer.hide();
             } else {
-                elements.footer.show();
-                footer.visible = true;
+                footer.show();
             }
         } else {
-            if (footer.visible === true) footer.hide();
-            else footer.show();
+            if (footer.visible === true) {
+                footer.hide();
+                global.set('footerVisible', false);
+            } else {
+                footer.show();
+                global.set('footerVisible', true);
+            }
         }
     },
     show: function () {
         elements.footer.show();
-        global.set('footerVisible', true);
         footer.visible = true;
     },
     hide: function () {
         elements.footer.hide();
-        global.set('footerVisible', false);
         footer.visible = false;
     }
 };
@@ -700,8 +727,10 @@ let maximise = {
     toggle: function () {
         if (maximise.visible === false) {
             maximise.show();
+            store.study('maximiseCase', false);
         } else {
             maximise.hide();
+            store.study('maximiseCase', true);
         }
     },
     show: function () {
@@ -710,7 +739,6 @@ let maximise = {
         footer.setVisibility();
         maximise.visible = true;
         maximise.hidden = false;
-        store.study('maximiseCase', false);
     },
     hide: function () {
         maximise.visible = false;
@@ -719,7 +747,6 @@ let maximise = {
         sidebar.visible = false;
         footer.visible = false;
         elements.maximise.hide();
-        store.study('maximiseCase', true);
     },
     slideHide: function () {
         elements.header.hide();
@@ -777,7 +804,17 @@ let navigate = {
         }
     },
     back: function () {
-        window.history.back();
+        global.get('history', function (result) {
+            let history = result.history;
+            if (Array.isArray(history)) {
+                let currentURL = history.pop();
+                let previousURL = history.pop();
+                global.set('history', history);
+                window.location.href = previousURL;
+            } else {
+                window.history.back();
+            }
+        });
     },
     orange: function () {
         if (isSlide) {
