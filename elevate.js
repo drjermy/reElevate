@@ -1,4 +1,4 @@
-let wrapper, wrapperPaddingTop, wrapperPaddingBottom, largeImageMarginLeft, isSlide, stackedImages, offlineMode, playlistVars, jumpURL;
+let wrapper, wrapperPaddingTop, wrapperPaddingBottom, largeImageMarginLeft, isSlide, stackedImages, offlineMode, playlistVars, jumpURL, context;
 
 function init() {
     wrapper = $('#wrapper');
@@ -7,13 +7,13 @@ function init() {
     largeImageMarginLeft = $('#largeImage').css('margin-left');
     if ($('.slide').length > 0) isSlide = true;
 
-    canvasSetup();
     getPageVariables();
     getPlaylistVarsFromURL();
     saveHistory();
     elementVisibility();
     initVisibility();
     setFirstSlice();
+    canvasSetup();
 }
 
 
@@ -26,26 +26,34 @@ function fadeIn()
 elements = {
     header: {
         hide: () => {
-            $('#headerWrapper').hide();
-            $('#wrapper').css('padding-top', '32px');
-            setImageWrapperSize();
+            if (header.visible === true) {
+                $('#headerWrapper').hide();
+                $('#wrapper').css('padding-top', '32px');
+                setImageWrapperSize();
+            }
         },
         show: () => {
-            $('#headerWrapper').show();
-            $('#wrapper').css('padding-top', wrapperPaddingTop);
-            setImageWrapperSize();
+            if (header.visible === false) {
+                $('#headerWrapper').show();
+                $('#wrapper').css('padding-top', wrapperPaddingTop);
+                setImageWrapperSize();
+            }
         }
     },
     sidebar: {
         hide: () => {
-            $('#navTab').hide();
-            $('#largeImage').css('margin-left', 0);
-            setImageWrapperSize();
+            if (sidebar.visible === true) {
+                $('#navTab').hide();
+                $('#largeImage').css('margin-left', 0);
+                setImageWrapperSize();
+            }
         },
         show: () => {
-            $('#largeImage').css('margin-left', largeImageMarginLeft);
-            $('#navTab').show();
-            setImageWrapperSize();
+            if (sidebar.visible === false) {
+                $('#largeImage').css('margin-left', largeImageMarginLeft);
+                $('#navTab').show();
+                setImageWrapperSize();
+            }
         },
         tabs: {
             hide: () => {
@@ -56,14 +64,18 @@ elements = {
     },
     footer: {
         hide: () => {
-            $('#footer').hide();
-            $('#wrapper').css('padding-bottom', '32px');
-            setImageWrapperSize();
+            if (footer.visible === true) {
+                $('#footer').hide();
+                $('#wrapper').css('padding-bottom', '32px');
+                setImageWrapperSize();
+            }
         },
         show: () => {
-            $('#footer').show();
-            $('#wrapper').css('padding-bottom', wrapperPaddingBottom);
-            setImageWrapperSize();
+            if (footer.visible === false) {
+                $('#footer').show();
+                $('#wrapper').css('padding-bottom', wrapperPaddingBottom);
+                setImageWrapperSize();
+            }
         }
     },
     maximise: {
@@ -190,52 +202,77 @@ function saveHistory() {
 }
 
 
+/**
+ *
+ * @type {{image: HTMLImageElement, setup: canvas.setup, load: canvas.load, resize: canvas.resize}}
+ */
+let canvas = {
+
+    image: new Image(),
+    setup: function () {
+        $('.offline-workflow-outer-wrapper').prepend('<canvas id="imageCanvas"></canvas>');
+        $('.offline-workflow-control-wrapper').hide();
+        $(".scrollbar").appendTo(".offline-workflow-outer-wrapper");
+        context = document.getElementById('imageCanvas').getContext("2d");
+        context.canvas.width = $('#largeImage').width()-16-$('.scrollbar').width();
+        context.canvas.height = $('#largeImage').height();
+
+    },
+    load: function () {
+        if (isSlide) return;
+        canvas.setup();
+        canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+
+        $('#largeImage img').on('load', function (e) {
+            canvas.image.src = $('#largeImage img').attr('src');
+        });
+    },
+    resize: function () {
+        if (isSlide) return;
+        context.canvas.width = $('#largeImage').width()-16-$('.scrollbar').width();
+        context.canvas.height = $('#largeImage').height();
+        canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+    }
+
+};
+
+
+/**
+ *
+ */
+canvas.image.onload = function () {
+
+    let canvasHeight, canvasWidth, canvasRatio;
+    canvasHeight = context.canvas.height;
+    canvasWidth = context.canvas.width;
+    canvasRatio = canvasHeight/canvasWidth;
+
+    let baseImageHeight, baseImageWidth, imageRatio;
+    baseImageHeight = canvas.image.height;
+    baseImageWidth = canvas.image.width;
+    imageRatio = baseImageHeight/baseImageWidth;
+
+    let imageHeight, imageWidth, imageOffsetTop, imageOffsetLeft;
+    if (imageRatio > canvasRatio) {
+        imageHeight = canvasHeight;
+        imageWidth = canvasHeight / imageRatio;
+        imageOffsetTop = 0;
+        imageOffsetLeft = (canvasWidth - imageWidth)/2;
+    } else {
+        imageWidth = canvasWidth;
+        imageHeight = canvasWidth * imageRatio;
+        imageOffsetTop = (canvasHeight - imageHeight)/2;
+        imageOffsetLeft = 0;
+    }
+
+    context.drawImage(canvas.image, imageOffsetLeft, imageOffsetTop, imageWidth, imageHeight);
+};
+
+
 let canvasSetup = function () {
-    if (isSlide) return;
 
-    let wrapper = $('.offline-workflow-image-wrapper');
-    wrapper.append('<canvas id="imageCanvas" style="margin 0px auto"></canvas>');
-    $('#offline-workflow-study-large-image').hide();
-    context = document.getElementById('imageCanvas').getContext("2d");
+    canvas.load();
 
-    // If the height/width is any closer to the parent, we end up with scrollbars.
-    context.canvas.width = $('.offline-workflow-image-wrapper').width()-5;
-    context.canvas.height = $('.offline-workflow-image-wrapper').height()-5;
-
-    let imageObj = new Image();
-    imageObj.onload = function () {
-
-        let canvasHeight, canvasWidth, canvasRatio;
-        canvasHeight = context.canvas.height;
-        canvasWidth = context.canvas.width;
-        canvasRatio = canvasHeight/canvasWidth;
-
-        let baseImageHeight, baseImageWidth, imageRatio;
-        baseImageHeight = imageObj.height;
-        baseImageWidth = imageObj.width;
-        imageRatio = baseImageHeight/baseImageWidth;
-
-        let imageHeight, imageWidth, imageOffsetTop, imageOffsetLeft;
-        if (imageRatio > canvasRatio) {
-            imageHeight = canvasHeight;
-            imageWidth = canvasHeight / imageRatio;
-            imageOffsetTop = 0;
-            imageOffsetLeft = (canvasWidth - imageWidth)/2;
-        } else {
-            imageWidth = canvasWidth;
-            imageHeight = canvasWidth * imageRatio;
-            imageOffsetTop = (canvasHeight - imageHeight)/2;
-            imageOffsetLeft = 0;
-        }
-
-        context.drawImage(imageObj, imageOffsetLeft, imageOffsetTop, imageWidth, imageHeight);
-    };
-    imageObj.src = $('#offline-workflow-study-large-image').attr('src');
-
-    $('#largeImage img').on('load', function (e) {
-        imageObj.src = $('#largeImage img').attr('src');
-        $('#offline-workflow-study-large-image').hide();
-    });
 };
 
 
@@ -382,47 +419,9 @@ let findIndex = function (key, val, arr) {
 };
 
 
-/**
- * Breaks on mobile/iPad.
- * @returns {{height: string, width: string, top: string, left: number}}
- */
-function calculateImageWrapperSize()
-{
-    let imageWrapper = $('.offline-workflow-image-wrapper');
-    let imageAspectRatio = imageWrapper.height()/imageWrapper.width();
-
-    let wrapper = $('.offline-workflow-outer-wrapper');
-    let wrapperWidth = wrapper.width();
-    let wrapperHeight = wrapper.height();
-    let wrapperAspectRatio = wrapperHeight/wrapperWidth;
-
-    let imageHeight, imageWidth, imageOffsetTop;
-
-    if (imageAspectRatio > wrapperAspectRatio) {
-        imageHeight = wrapperHeight;
-        imageWidth = wrapperHeight / imageAspectRatio;
-        imageOffsetTop = 0;
-    } else {
-        imageWidth = wrapperWidth;
-        imageHeight = wrapperWidth * imageAspectRatio;
-        imageOffsetTop = (wrapperHeight - imageHeight)/2;
-    }
-
-    return {
-        height: imageHeight + 'px',
-        width: imageWidth + 'px',
-        top: imageOffsetTop + 'px',
-        left: 0
-    }
-}
-
-
 function setImageWrapperSize()
 {
-    let imageWrapperSize = calculateImageWrapperSize();
-    $('.offline-workflow-image-wrapper').css(imageWrapperSize);
-    $('#offline-workflow-study-large-image').css({width: imageWrapperSize.width, height: imageWrapperSize.height});
-    $('#imageCanvas').css({width: imageWrapperSize.width, height: imageWrapperSize.height});
+    canvas.resize();
 }
 
 
