@@ -27,3 +27,7 @@ a.online-link.disabled {
 canvas {
     background-color: black;
 }
+
+#navTab .container .questions {
+    height: 95% !important;
+}

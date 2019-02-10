@@ -187,8 +187,7 @@ let json = {
         response = playlistDetails;
         chrome.storage.local.get([response.playlist], function (result) {
             let json = result[response.playlist];
-            if (json.backAction) delete json.backAction;
-            if (json.history) delete json.history;
+            //if (json.history) delete json.history;
             let jsonOutput = JSON.stringify(json, null, 2);
             $('#jsonContent').val(jsonOutput);
         });
