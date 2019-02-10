@@ -161,6 +161,7 @@ function initVisibility()
         header.setVisibility();
         sidebar.setVisibility();
         footer.setVisibility();
+        maximise.setVisibility();
     }
 }
 
@@ -656,6 +657,15 @@ let footer = {
 
 let maximise = {
     visible: true,
+    setVisibility: function () {
+        store.get('maximiseCase', function (result) {
+            if (result.maximiseCase === true) {
+                maximise.hide();
+            } else {
+                maximise.show();
+            }
+        });
+    },
     toggle: function () {
         if (maximise.visible === false) {
             maximise.show();
@@ -668,7 +678,7 @@ let maximise = {
         sidebar.setVisibility();
         footer.setVisibility();
         maximise.visible = true;
-        store.study('maximiseCase', undefined);
+        store.study('maximiseCase', false);
     },
     hide: function () {
         maximise.visible = false;
