@@ -23,3 +23,7 @@ a.online-link.disabled {
     font-weight: bold !important;
     color: white;
 }
+
+#navTab .container .questions {
+    height: 95% !important;
+}
