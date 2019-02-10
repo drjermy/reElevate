@@ -191,6 +191,8 @@ function saveHistory() {
 
 
 let canvasSetup = function () {
+    if (isSlide) return;
+
     let wrapper = $('.offline-workflow-image-wrapper');
     wrapper.append('<canvas id="imageCanvas" style="margin 0px auto"></canvas>');
     $('#offline-workflow-study-large-image').hide();
@@ -225,7 +227,6 @@ let canvasSetup = function () {
             imageOffsetTop = (canvasHeight - imageHeight)/2;
             imageOffsetLeft = 0;
         }
-
 
         context.drawImage(imageObj, imageOffsetLeft, imageOffsetTop, imageWidth, imageHeight);
     };
