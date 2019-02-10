@@ -162,6 +162,7 @@ function initVisibility()
         header.setVisibility();
         sidebar.setVisibility();
         footer.setVisibility();
+        maximise.setVisibility();
     }
 }
 
@@ -664,8 +665,18 @@ let header = {
         });
     },
     toggle: function () {
-        if (header.visible === true) header.hide();
-        else header.show();
+        if (maximise.hidden === true) {
+            if (header.visible === true) {
+                elements.header.hide();
+                header.visible = false;
+            } else {
+                elements.header.show();
+                header.visible = true;
+            }
+        } else {
+            if (header.visible === true) header.hide();
+            else header.show();
+        }
     },
     show: function () {
         elements.header.show();
@@ -692,8 +703,18 @@ let sidebar = {
         });
     },
     toggle: function () {
-        if (sidebar.visible === true) sidebar.hide();
-        else sidebar.show();
+        if (maximise.hidden === true) {
+            if (sidebar.visible === true) {
+                elements.sidebar.hide();
+                sidebar.visible = false;
+            } else {
+                elements.sidebar.show();
+                sidebar.visible = true;
+            }
+        } else {
+            if (sidebar.visible === true) sidebar.hide();
+            else sidebar.show();
+        }
     },
     show: function () {
         elements.sidebar.show();
@@ -720,8 +741,18 @@ let footer = {
         });
     },
     toggle: function () {
-        if (footer.visible === true) footer.hide();
-        else footer.show();
+        if (maximise.hidden === true) {
+            if (footer.visible === true) {
+                elements.footer.hide();
+                footer.visible = false;
+            } else {
+                elements.footer.show();
+                footer.visible = true;
+            }
+        } else {
+            if (footer.visible === true) footer.hide();
+            else footer.show();
+        }
     },
     show: function () {
         elements.footer.show();
@@ -737,7 +768,17 @@ let footer = {
 
 
 let maximise = {
+    hidden: false,
     visible: true,
+    setVisibility: function () {
+        store.get('maximiseCase', function (result) {
+            if (result.maximiseCase === true) {
+                maximise.hide();
+            } else {
+                maximise.show();
+            }
+        });
+    },
     toggle: function () {
         if (maximise.visible === false) {
             maximise.show();
@@ -750,10 +791,15 @@ let maximise = {
         sidebar.setVisibility();
         footer.setVisibility();
         maximise.visible = true;
-        store.study('maximiseCase', undefined);
+        maximise.hidden = false;
+        store.study('maximiseCase', false);
     },
     hide: function () {
         maximise.visible = false;
+        maximise.hidden = true;
+        header.visible = false;
+        sidebar.visible = false;
+        footer.visible = false;
         elements.maximise.hide();
         store.study('maximiseCase', true);
     },
