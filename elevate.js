@@ -13,7 +13,9 @@ function init() {
     elementVisibility();
     initVisibility();
     setFirstSlice();
-    canvas.load();
+    if (!isSlide) {
+        canvas.setup();
+    }
 }
 
 
@@ -207,7 +209,6 @@ function saveHistory() {
  * @type {{image: HTMLImageElement, setup: canvas.setup, load: canvas.load, resize: canvas.resize}}
  */
 let canvas = {
-
     settings: {
         zoom: 1
     },
@@ -218,15 +219,6 @@ let canvas = {
         }
     },
     image: new Image(),
-    load: function () {
-        if (isSlide) return;
-        canvas.setup();
-        canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
-
-        $('#largeImage img').on('load', function (e) {
-            canvas.image.src = $('#largeImage img').attr('src');
-        });
-    },
     set: {
         context: function () {
             context = document.getElementById('imageCanvas').getContext("2d");
@@ -242,6 +234,27 @@ let canvas = {
             context.canvas.height = $('#largeImage').height();
         }
     },
+    value: {
+        zoom: function () {
+            return Number(canvas.settings.zoom).toFixed(1);
+        }
+    },
+    load: {
+        all: function () {
+            canvas.load.zoom();
+        },
+        zoom: function () {
+            let currentSeries = getCurrentSeriesNumber();
+            let zoom = $('#offline-workflow-thumb-' + currentSeries).attr('data-last-zoom');
+            canvas.settings.zoom = (zoom ? zoom : 1);
+        }
+    },
+    save: {
+        zoom: function () {
+            let currentSeries = getCurrentSeriesNumber();
+            $('#offline-workflow-thumb-' + currentSeries).attr('data-last-zoom', canvas.value.zoom);
+        }
+    },
     setup: function () {
         $('.offline-workflow-outer-wrapper').prepend('<canvas id="imageCanvas"></canvas>');
         $('.offline-workflow-control-wrapper').hide();
@@ -249,6 +262,15 @@ let canvas = {
         canvas.set.context();
         canvas.set.width();
         canvas.set.height();
+
+        canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+
+        $('#largeImage img').on('load', function (e) {
+            canvas.image.src = $('#largeImage img').attr('src');
+        });
+        $('.thumb').on('click', function () {
+            canvas.load.all();
+        });
     },
     resize: function () {
         if (isSlide) return;
@@ -261,16 +283,17 @@ let canvas = {
             if (canvas.settings.zoom < canvas.limits.zoom.in) {
                 canvas.settings.zoom += 0.1;
                 canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+                canvas.save.zoom();
             }
         },
         out: function () {
             if (canvas.settings.zoom > canvas.limits.zoom.out) {
                 canvas.settings.zoom -= 0.1;
                 canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+                canvas.save.zoom();
             }
         }
     }
-
 };
 
 
@@ -1006,7 +1029,8 @@ $(document).ready(function() {
                 if (typeof request.getData !== "undefined") {
                     sendResponse({
                         series: current.series(),
-                        slice: current.slice()
+                        slice: current.slice(),
+                        zoom: canvas.value.zoom
                     });
                     break;
                 }
@@ -1030,14 +1054,19 @@ $(document).ready(function() {
                     series[n].default = stackedImages[n].images[0].position;
                 }
 
-                sendResponse({
+                let response = {
                     study: store.name(),
                     case: store.case_id(),
                     playlist: global.name(),
                     series: series,
                     currentSeries: getCurrentSeriesNumber(),
-                    isSlide: isSlide
-                });
+                    isSlide: isSlide,
+                    zoom: canvas.value.zoom()
+                };
+
+                console.log(response);
+
+                sendResponse(response);
 
             }
 
