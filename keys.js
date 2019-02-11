@@ -82,6 +82,15 @@ $(document).ready(function() {
         navigate.jumpTo();
     });
 
+    $(document).bind('keydown', '=', function () {
+        canvas.zoom.in();
+    });
+
+    $(document).bind('keydown', '-', function () {
+        canvas.zoom.out();
+    });
+
+
 
     $('#offline-workflow-page-links li').each(function (n, value) {
         let key = n+1;

@@ -13,7 +13,7 @@ function init() {
     elementVisibility();
     initVisibility();
     setFirstSlice();
-    canvasSetup();
+    canvas.load();
 }
 
 
@@ -208,16 +208,16 @@ function saveHistory() {
  */
 let canvas = {
 
-    image: new Image(),
-    setup: function () {
-        $('.offline-workflow-outer-wrapper').prepend('<canvas id="imageCanvas"></canvas>');
-        $('.offline-workflow-control-wrapper').hide();
-        $(".scrollbar").appendTo(".offline-workflow-outer-wrapper");
-        context = document.getElementById('imageCanvas').getContext("2d");
-        context.canvas.width = $('#largeImage').width()-16-$('.scrollbar').width();
-        context.canvas.height = $('#largeImage').height();
-
+    settings: {
+        zoom: 1
     },
+    limits: {
+        zoom: {
+            in: 3,
+            out: 0.5
+        }
+    },
+    image: new Image(),
     load: function () {
         if (isSlide) return;
         canvas.setup();
@@ -227,11 +227,48 @@ let canvas = {
             canvas.image.src = $('#largeImage img').attr('src');
         });
     },
+    set: {
+        context: function () {
+            context = document.getElementById('imageCanvas').getContext("2d");
+        },
+        width: function () {
+            if ($('.scrollbar').is(':visible')) {
+                context.canvas.width = $('#largeImage').width()-16-$('.scrollbar').width();
+            } else {
+                context.canvas.width = $('#largeImage').width();
+            }
+        },
+        height: function () {
+            context.canvas.height = $('#largeImage').height();
+        }
+    },
+    setup: function () {
+        $('.offline-workflow-outer-wrapper').prepend('<canvas id="imageCanvas"></canvas>');
+        $('.offline-workflow-control-wrapper').hide();
+        $(".scrollbar").appendTo(".offline-workflow-outer-wrapper");
+        canvas.set.context();
+        canvas.set.width();
+        canvas.set.height();
+    },
     resize: function () {
         if (isSlide) return;
-        context.canvas.width = $('#largeImage').width()-16-$('.scrollbar').width();
-        context.canvas.height = $('#largeImage').height();
+        canvas.set.width();
+        canvas.set.height();
         canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+    },
+    zoom: {
+        in: function () {
+            if (canvas.settings.zoom < canvas.limits.zoom.in) {
+                canvas.settings.zoom += 0.1;
+                canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+            }
+        },
+        out: function () {
+            if (canvas.settings.zoom > canvas.limits.zoom.out) {
+                canvas.settings.zoom -= 0.1;
+                canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+            }
+        }
     }
 
 };
@@ -252,27 +289,25 @@ canvas.image.onload = function () {
     baseImageWidth = canvas.image.width;
     imageRatio = baseImageHeight/baseImageWidth;
 
-    let imageHeight, imageWidth, imageOffsetTop, imageOffsetLeft;
+    let zoomImageHeight, zoomImageWidth, imageHeight, imageWidth, imageOffsetTop, imageOffsetLeft;
+
+    // Work out the image height based on current zoom level and orientation of image and canvas.
     if (imageRatio > canvasRatio) {
-        imageHeight = canvasHeight;
-        imageWidth = canvasHeight / imageRatio;
-        imageOffsetTop = 0;
-        imageOffsetLeft = (canvasWidth - imageWidth)/2;
+        zoomImageHeight = canvasHeight * canvas.settings.zoom;
+        imageHeight = zoomImageHeight;
+        imageWidth = (zoomImageHeight / imageRatio);
     } else {
-        imageWidth = canvasWidth;
-        imageHeight = canvasWidth * imageRatio;
-        imageOffsetTop = (canvasHeight - imageHeight)/2;
-        imageOffsetLeft = 0;
+        zoomImageWidth = canvasWidth * canvas.settings.zoom;
+        imageWidth = zoomImageWidth;
+        imageHeight = (zoomImageWidth * imageRatio);
     }
 
+    // Calculate the image offset.
+    imageOffsetTop = (canvasHeight-imageHeight)/2;
+    imageOffsetLeft = (canvasWidth - imageWidth)/2;
+
+    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
     context.drawImage(canvas.image, imageOffsetLeft, imageOffsetTop, imageWidth, imageHeight);
-};
-
-
-let canvasSetup = function () {
-
-    canvas.load();
-
 };
 
 
