@@ -28,7 +28,7 @@ elements = {
         hide: () => {
             if (header.visible === true) {
                 $('#headerWrapper').hide();
-                $('#wrapper').css('padding-top', '32px');
+                $('#wrapper').css('padding-top', '16px');
                 setImageWrapperSize();
             }
         },
@@ -66,7 +66,7 @@ elements = {
         hide: () => {
             if (footer.visible === true) {
                 $('#footer').hide();
-                $('#wrapper').css('padding-bottom', '32px');
+                $('#wrapper').css('padding-bottom', '16px');
                 setImageWrapperSize();
             }
         },
