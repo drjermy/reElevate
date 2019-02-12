@@ -441,7 +441,7 @@ let canvas = {
         let lastPositions = {};
         $('.thumb').each(function () {
             let id = $(this).attr('id').split('offline-workflow-thumb-')[1];
-            lastPositions[id] = canvas.getSettings(id);
+            lastPositions[id] = canvas.getSeriesSettings(id);
         });
         return lastPositions;
     },
@@ -1052,6 +1052,12 @@ $(document).ready(function() {
                         break;
                     case 'down':
                         navigate.down(1);
+                        break;
+                    case 'zoom':
+                        canvas.zoom.in();
+                        break;
+                    case 'unzoom':
+                        canvas.zoom.out();
                         break;
                 }
 

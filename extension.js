@@ -443,6 +443,9 @@ loadForm = () => {
 
 
             $(document).on('click', '#saveStudyState', function () {
+                let currentSeries = $('.selectSeries.active').attr('data-series');
+                $('.selectDefaultSeries[data-series="' + currentSeries + '"]').click().focus();
+
                 let request = {lastPositions: true};
                 chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
                     chrome.tabs.sendMessage(tabs[0].id, request, function (response) {
@@ -599,7 +602,6 @@ loadForm = () => {
 
                     // Perform study actions - default, hide, save state and reset
                     if (keyCode === 65) { // a
-                        $('.selectDefaultSeries[data-series="' + currentSeries + '"]').click().focus();
                         $('#saveStudyState').click().focus();
                     }
                     if (keyCode === 68) { // d
@@ -613,6 +615,11 @@ loadForm = () => {
                     }
                     if (keyCode === 82 && !shifted) { // r
                         $('.resetSlice[data-series="' + currentSeries + '"]').click().focus();
+                    }
+
+                    if (keyCode === 90) { // z
+                        if (!shifted) tabAction('zoom');
+                        else tabAction('unzoom');
                     }
                 }
             });
