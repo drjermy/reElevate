@@ -421,11 +421,13 @@ loadForm = () => {
                     );
                 }
 
+                /**
                 seriesEditor.append(
                     '<div class="form-group mt-4 mx-2">' +
                     '<label>Zoom</label><input class="form-control" id="zoom' + n + '" value="' + response.zoom + '" disabled>' +
                     '</div>'
                 );
+                 */
 
             }
 

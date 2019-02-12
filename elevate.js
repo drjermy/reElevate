@@ -397,7 +397,9 @@ function fadeIn()
  */
 let canvas = {
     defaults: {
-        zoom: 1
+        zoom: 1,
+        left: 0,
+        top: 0
     },
     settings: {},
     limits: {
@@ -518,6 +520,24 @@ let canvas = {
                 canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
             }
         }
+    },
+    move: {
+        left: function () {
+            canvas.settings[getCurrentSeriesNumber()].left -= 10;
+            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+        },
+        right: function () {
+            canvas.settings[getCurrentSeriesNumber()].left += 10;
+            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+        },
+        up: function () {
+            canvas.settings[getCurrentSeriesNumber()].top -= 10;
+            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+        },
+        down: function () {
+            canvas.settings[getCurrentSeriesNumber()].top += 10;
+            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+        }
     }
 };
 
@@ -555,6 +575,10 @@ canvas.image.onload = function () {
     // Calculate the image offset.
     imageOffsetTop = (canvasHeight-imageHeight)/2;
     imageOffsetLeft = (canvasWidth - imageWidth)/2;
+
+    // Alter base position of top, left.
+    imageOffsetLeft = Number(imageOffsetLeft) + Number(seriesCanvasSettings.left);
+    imageOffsetTop = Number(imageOffsetTop) + Number(seriesCanvasSettings.top);
 
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
     context.drawImage(canvas.image, imageOffsetLeft, imageOffsetTop, imageWidth, imageHeight);
