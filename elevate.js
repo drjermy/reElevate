@@ -11,7 +11,6 @@ function init() {
     getPlaylistVarsFromURL();
     saveHistory();
     elementVisibility();
-    initVisibility();
     setFirstSlice();
     if (!isSlide) {
         canvas.setup();
@@ -19,9 +18,223 @@ function init() {
 }
 
 
-function fadeIn()
+function getPageVariables()
 {
-    wrapper.css({'opacity': 1, 'transition': 'opacity .2s ease-out'});
+    let pageVariables = retrieveWindowVariables(["stackedImages", "caseIDs", "currentCaseID", "studies", "components", "offlineMode"]);
+
+    stackedImages = pageVariables['stackedImages'];
+    offlineMode = pageVariables['offlineMode'];
+}
+
+
+// https://stackoverflow.com/questions/3955803/page-variables-in-content-script
+function retrieveWindowVariables(variables) {
+    let ret = {};
+
+    let scriptContent = "";
+    for (let i = 0; i < variables.length; i++) {
+        let currVariable = variables[i];
+        scriptContent += "if (typeof " + currVariable + " !== 'undefined') $('body').attr('tmp_" + currVariable + "', JSON.stringify(" + currVariable + "));\n"
+    }
+
+    let script = document.createElement('script');
+    script.id = 'tmpScript';
+    script.appendChild(document.createTextNode(scriptContent));
+    (document.body || document.head || document.documentElement).appendChild(script);
+
+    for (let i = 0; i < variables.length; i++) {
+        let currVariable = variables[i];
+        let current = $("body").attr("tmp_" + currVariable);
+        if (current) {
+            ret[currVariable] = $.parseJSON(current);
+        }
+        $("body").removeAttr("tmp_" + currVariable);
+    }
+
+    $("#tmpScript").remove();
+
+    return ret;
+}
+
+
+function getPlaylistVarsFromURL()
+{
+    let playlistIds = {};
+
+    let pathArray = window.location.pathname.split('/');
+    if (offlineMode === true) {
+        let lastPart = pathArray.pop();
+        let partsArray = lastPart.split('.html')[0].split('_');
+        playlistIds = {
+            playlistId: partsArray[1],
+            entryId: partsArray[3],
+            caseId: partsArray[5],
+            studyId: partsArray[7]
+        };
+    } else {
+        playlistIds = {
+            playlistId: pathArray[2],
+            entryId: pathArray[4],
+            caseId: pathArray[6],
+            studyId: pathArray[8]
+        };
+    }
+
+    playlistVars = playlistIds;
+}
+
+
+function saveHistory() {
+    let currentURL = window.location.href;
+    global.get('history', function (result) {
+        let history = result.history;
+
+        if (Array.isArray(history)) {
+            if (history.slice(-1)[0] !== currentURL) {
+                // Only add the URL if it's not the same as the last one.
+                history.push(currentURL);
+            }
+        } else {
+            history = [currentURL];
+        }
+        if (history.length > 20) {
+            history.splice(0, history.length - 20);
+        }
+
+        global.set('history', history);
+    });
+}
+
+
+let global = {
+    name: () => {
+        return 'radiopaedia' + '-' + playlistVars.playlistId;
+    },
+    set: (name, value) => {
+        let gContext = global.name();
+        chrome.storage.local.get([gContext], function(result) {
+            if (typeof result[gContext] === "undefined") {
+                result[gContext] = {};
+            }
+            result[gContext][name] = value;
+            chrome.storage.local.set(result, function () {});
+        });
+    },
+    get: (name, callback) => {
+        let gContext = global.name();
+        chrome.storage.local.get([gContext], function(result) {
+            if (typeof result[gContext] === "undefined") {
+                result[gContext] = {};
+            }
+            callback(result[gContext]);
+        });
+    },
+    all: function (callback) {
+        let playlistContext = global.name();
+        chrome.storage.local.get([playlistContext], function(result) {
+            if (typeof result[playlistContext] === "undefined") {
+                result[playlistContext] = {};
+            }
+            callback(result[playlistContext]);
+        });
+    }
+};
+
+
+let store = {
+    playlist_id: () => {
+        return 'radiopaedia' + '-' + playlistVars.playlistId;
+    },
+    case_id: () => {
+        return 'radiopaedia' + '-' + playlistVars.playlistId + '-' + playlistVars.entryId + '-' + playlistVars.caseId;
+    },
+    name: () => {
+        return 'radiopaedia' + '-' + playlistVars.playlistId + '-' + playlistVars.entryId + '-' + playlistVars.caseId + '-' + playlistVars.studyId;
+    },
+    get: (name, callback) => {
+        let playlist_id = store.playlist_id();
+        let study_id = store.name();
+        chrome.storage.local.get([playlist_id], function(result) {
+            if (typeof result[playlist_id] === "undefined") {
+                result[playlist_id] = {};
+            }
+            if (typeof result[playlist_id][study_id] === "undefined") {
+                result[playlist_id][study_id] = {};
+            }
+            callback(result[playlist_id][study_id]);
+        });
+    },
+    study: function (varName, value) {
+        let gContext = global.name();
+        chrome.storage.local.get([gContext], function(result) {
+            if (typeof result[gContext] === "undefined") {
+                result[gContext] = {};
+            }
+            let studyContext = store.name();
+            if (typeof result[gContext][studyContext] === "undefined") {
+                result[gContext][studyContext] = {};
+            }
+            result[gContext][studyContext][varName] = value;
+            chrome.storage.local.set(result, function () {});
+        });
+    }
+};
+
+
+function elementVisibility() {
+    elements.presentingDefaults();
+    global.all(function (global) {
+
+        let caseEntry = global[store.case_id()];
+        let study = global[store.name()];
+
+        jumpURL = global.jumpURL;
+        caseEntry = (typeof caseEntry !== "undefined" ? caseEntry : {});
+        study = (typeof study !== "undefined" ? study : {});
+
+        if (global.hideTabs === true) {
+            elements.sidebar.tabs.hide();
+        }
+
+        if ((global.hideFindings === true && caseEntry.showFindings !== true) || (global.hideFindings !== true && caseEntry.hideFindings === true)) {
+            elements.findingsTab.disable();
+            elements.rid.hide();
+        }
+
+        if (global.showPresentation === true || caseEntry.showPresentation === true) {
+            presentation.init(caseEntry);
+        }
+
+        if (study.maximiseCase === true) {
+            elements.maximise.hide();
+            maximise.visible = false;
+        }
+
+        // We save the starting Series as if they started from 1, but the thumbs are 0-indexed.
+        if (typeof study.startingSeries !== "undefined") {
+            let n = Number(study.startingSeries) - 1;
+            navigate.series(n);
+        }
+
+        $('#offline-workflow-thumbnails-pane .thumb').each(function () {
+            let id = $(this).attr('id').split('offline-workflow-thumb-')[1];
+            if (study['hideSeries' + id] === true) {
+                $(this).hide();
+            }
+            $('#offline-workflow-thumbnails-pane .thumb').removeClass('clear-left');
+            $('#offline-workflow-thumbnails-pane .thumb:visible:even').addClass('clear-left');
+        });
+
+        // Set maximise, and hide header, sidebar and footer if required.
+        if (isSlide === true) {
+            maximise.slideHide();
+        } else {
+            header.setVisibility();
+            sidebar.setVisibility();
+            footer.setVisibility();
+            maximise.setVisibility();
+        }
+    });
 }
 
 
@@ -121,86 +334,45 @@ elements = {
 };
 
 
-function elementVisibility() {
-    elements.presentingDefaults();
-    global.get('hideFindings', function (global) {
-
-        let caseEntry = global[store.case_id()];
-        let study = global[store.name()];
-
-        jumpURL = global.jumpURL;
-        caseEntry = (typeof caseEntry !== "undefined" ? caseEntry : {});
-        study = (typeof study !== "undefined" ? study : {});
-
-        if (global.hideTabs === true) {
-            elements.sidebar.tabs.hide();
-        }
-
-        if ((global.hideFindings === true && caseEntry.showFindings !== true) || (global.hideFindings !== true && caseEntry.hideFindings === true)) {
-            elements.findingsTab.disable();
-            elements.rid.hide();
-        }
-
-        if (global.showPresentation === true || caseEntry.showPresentation === true) {
-            presentation.init(caseEntry);
-        }
-
-        if (study.maximiseCase === true) {
-            elements.maximise.hide();
-            maximise.visible = false;
-        }
-
-        // We save the starting Series as if they started from 1, but the thumbs are 0-indexed.
-        if (typeof study.startingSeries !== "undefined") {
-            let n = Number(study.startingSeries) - 1;
-            navigate.series(n);
-        }
-
-        $('#offline-workflow-thumbnails-pane .thumb').each(function () {
-            let id = $(this).attr('id').split('offline-workflow-thumb-')[1];
-            if (study['hideSeries' + id] === true) {
-                $(this).hide();
-            }
-            $('#offline-workflow-thumbnails-pane .thumb').removeClass('clear-left');
-            $('#offline-workflow-thumbnails-pane .thumb:visible:even').addClass('clear-left');
-        });
-
-    });
-}
-
-
-function initVisibility()
+/**
+ * Determine which is the first slice that should be shown and select it.
+ */
+function setFirstSlice()
 {
-    if (isSlide === true) {
-        maximise.slideHide();
+    if (!isSlide) {
+        global.get('defaultToTopImage', function (result) {
+            let globalDefaultToTopImage = result.defaultToTopImage;
+            store.get('defaultToTopImage', function (result) {
+                let pageDefaultToTopImage = result.defaultToTopImage;
+                let pageDefaultSlice = result.defaultSlice;
+
+                let isRead = thumbs.isCurrentRead();
+                if (typeof isRead === "undefined") {
+                    if ((globalDefaultToTopImage === true && pageDefaultSlice !== true) || (globalDefaultToTopImage !== true && pageDefaultToTopImage === true)) {
+                        navigate.top();
+                    } else {
+                        let startingSlice = result['series' + getCurrentSeriesNumber()]['startingSlice'];
+                        if (startingSlice) {
+                            navigate.to(startingSlice - 1);
+                        }
+                    }
+                }
+
+                fadeIn();
+                $('#largeImage').css({'opacity': 1, 'transition': 'opacity .2s ease-out'});
+
+                thumbs.markCurrentRead();
+            });
+        });
     } else {
-        header.setVisibility();
-        sidebar.setVisibility();
-        footer.setVisibility();
-        maximise.setVisibility();
+        fadeIn();
     }
 }
 
 
-function saveHistory() {
-    let currentURL = window.location.href;
-    global.get('history', function (result) {
-        let history = result.history;
-
-        if (Array.isArray(history)) {
-            if (history.slice(-1)[0] !== currentURL) {
-                // Only add the URL if it's not the same as the last one.
-                history.push(currentURL);
-            }
-        } else {
-            history = [currentURL];
-        }
-        if (history.length > 20) {
-            history.splice(0, history.length - 20);
-        }
-
-        global.set('history', history);
-    });
+function fadeIn()
+{
+    wrapper.css({'opacity': 1, 'transition': 'opacity .2s ease-out'});
 }
 
 
@@ -349,42 +521,6 @@ canvas.image.onload = function () {
 };
 
 
-function getPageVariables()
-{
-    let pageVariables = retrieveWindowVariables(["stackedImages", "caseIDs", "currentCaseID", "studies", "components", "offlineMode"]);
-
-    stackedImages = pageVariables['stackedImages'];
-    offlineMode = pageVariables['offlineMode'];
-}
-
-
-function getPlaylistVarsFromURL()
-{
-    let playlistIds = {};
-
-    let pathArray = window.location.pathname.split('/');
-    if (offlineMode === true) {
-        let lastPart = pathArray.pop();
-        let partsArray = lastPart.split('.html')[0].split('_');
-        playlistIds = {
-            playlistId: partsArray[1],
-            entryId: partsArray[3],
-            caseId: partsArray[5],
-            studyId: partsArray[7]
-        };
-    } else {
-        playlistIds = {
-            playlistId: pathArray[2],
-            entryId: pathArray[4],
-            caseId: pathArray[6],
-            studyId: pathArray[8]
-        };
-    }
-
-     playlistVars = playlistIds;
-}
-
-
 let getCurrentSeriesNumber = () => {
     if (isSlide) return false;
     let currentTab = $('#navTab .thumbnails .active').parent('.thumb').attr('id');
@@ -411,72 +547,6 @@ let thumbs = {
         return $('#offline-workflow-thumb-' + currentSeriesNumber).attr('data-read');
     }
 };
-
-
-/**
- * Determine which is the first slice that should be shown and select it.
- */
-function setFirstSlice()
-{
-    if (!isSlide) {
-        global.get('defaultToTopImage', function (result) {
-            let globalDefaultToTopImage = result.defaultToTopImage;
-            store.get('defaultToTopImage', function (result) {
-                let pageDefaultToTopImage = result.defaultToTopImage;
-                let pageDefaultSlice = result.defaultSlice;
-
-                let isRead = thumbs.isCurrentRead();
-                if (typeof isRead === "undefined") {
-                    if ((globalDefaultToTopImage === true && pageDefaultSlice !== true) || (globalDefaultToTopImage !== true && pageDefaultToTopImage === true)) {
-                        navigate.top();
-                    } else {
-                        let startingSlice = result['series' + getCurrentSeriesNumber()]['startingSlice'];
-                        if (startingSlice) {
-                            navigate.to(startingSlice - 1);
-                        }
-                    }
-                }
-
-                fadeIn();
-                $('#largeImage').css({'opacity': 1, 'transition': 'opacity .2s ease-out'});
-
-                thumbs.markCurrentRead();
-            });
-        });
-    } else {
-        fadeIn();
-    }
-}
-
-
-// https://stackoverflow.com/questions/3955803/page-variables-in-content-script
-function retrieveWindowVariables(variables) {
-    let ret = {};
-
-    let scriptContent = "";
-    for (let i = 0; i < variables.length; i++) {
-        let currVariable = variables[i];
-        scriptContent += "if (typeof " + currVariable + " !== 'undefined') $('body').attr('tmp_" + currVariable + "', JSON.stringify(" + currVariable + "));\n"
-    }
-
-    let script = document.createElement('script');
-    script.id = 'tmpScript';
-    script.appendChild(document.createTextNode(scriptContent));
-    (document.body || document.head || document.documentElement).appendChild(script);
-
-    for (let i = 0; i < variables.length; i++) {
-        let currVariable = variables[i];
-        let current = $("body").attr("tmp_" + currVariable);
-        if (current) {
-            ret[currVariable] = $.parseJSON(current);
-        }
-        $("body").removeAttr("tmp_" + currVariable);
-    }
-
-    $("#tmpScript").remove();
-
-    return ret;
-}
 
 
 let findIndex = function (key, val, arr) {
@@ -650,72 +720,6 @@ presentation = {
         } else {
             navigate.questionsTab();
         }
-    }
-};
-
-
-let store = {
-    playlist_id: () => {
-        return 'radiopaedia' + '-' + playlistVars.playlistId;
-    },
-    case_id: () => {
-        return 'radiopaedia' + '-' + playlistVars.playlistId + '-' + playlistVars.entryId + '-' + playlistVars.caseId;
-    },
-    name: () => {
-        return 'radiopaedia' + '-' + playlistVars.playlistId + '-' + playlistVars.entryId + '-' + playlistVars.caseId + '-' + playlistVars.studyId;
-    },
-    get: (name, callback) => {
-        let playlist_id = store.playlist_id();
-        let study_id = store.name();
-        chrome.storage.local.get([playlist_id], function(result) {
-            if (typeof result[playlist_id] === "undefined") {
-                result[playlist_id] = {};
-            }
-            if (typeof result[playlist_id][study_id] === "undefined") {
-                result[playlist_id][study_id] = {};
-            }
-            callback(result[playlist_id][study_id]);
-        });
-    },
-    study: function (varName, value) {
-        let gContext = global.name();
-        chrome.storage.local.get([gContext], function(result) {
-            if (typeof result[gContext] === "undefined") {
-                result[gContext] = {};
-            }
-            let studyContext = store.name();
-            if (typeof result[gContext][studyContext] === "undefined") {
-                result[gContext][studyContext] = {};
-            }
-            result[gContext][studyContext][varName] = value;
-            chrome.storage.local.set(result, function () {});
-        });
-    }
-};
-
-
-let global = {
-    name: () => {
-        return 'radiopaedia' + '-' + playlistVars.playlistId;
-    },
-    set: (name, value) => {
-        let gContext = global.name();
-        chrome.storage.local.get([gContext], function(result) {
-            if (typeof result[gContext] === "undefined") {
-                result[gContext] = {};
-            }
-            result[gContext][name] = value;
-            chrome.storage.local.set(result, function () {});
-        });
-    },
-    get: (name, callback) => {
-        let gContext = global.name();
-        chrome.storage.local.get([gContext], function(result) {
-            if (typeof result[gContext] === "undefined") {
-                result[gContext] = {};
-            }
-            callback(result[gContext]);
-        });
     }
 };
 
