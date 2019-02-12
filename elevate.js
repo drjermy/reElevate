@@ -271,6 +271,21 @@ let canvas = {
         $('.thumb').on('click', function () {
             canvas.load.all();
         });
+
+        canvas.postLoad();
+    },
+    postLoad: function () {
+        store.get('defaultToTopImage', function (result) {
+            $.each(result, function (seriesName, stateObject) {
+                let n = Number(seriesName.split('series')[1]);
+                $('#offline-workflow-thumb-' + n).attr('data-last-zoom', stateObject.zoom);
+                if (current.series() === n) {
+                    canvas.settings.zoom = stateObject.zoom;
+                }
+            });
+            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+            canvas.load.all();
+        });
     },
     resize: function () {
         if (isSlide) return;
@@ -409,15 +424,15 @@ function setFirstSlice()
             store.get('defaultToTopImage', function (result) {
                 let pageDefaultToTopImage = result.defaultToTopImage;
                 let pageDefaultSlice = result.defaultSlice;
-                let studySliceName = 'startingSlice' + getCurrentSeriesNumber();
 
                 let isRead = thumbs.isCurrentRead();
                 if (typeof isRead === "undefined") {
                     if ((globalDefaultToTopImage === true && pageDefaultSlice !== true) || (globalDefaultToTopImage !== true && pageDefaultToTopImage === true)) {
                         navigate.top();
                     } else {
-                        if (result[studySliceName]) {
-                            navigate.to(result[studySliceName] - 1);
+                        let startingSlice = result['series' + getCurrentSeriesNumber()]['startingSlice'];
+                        if (startingSlice) {
+                            navigate.to(startingSlice - 1);
                         }
                     }
                 }
@@ -520,7 +535,10 @@ function getLastImagePositions()
     let lastPositions = {};
     $('.thumb').each(function () {
         let id = $(this).attr('id').split('offline-workflow-thumb-')[1];
-        lastPositions[id] = $(this).attr('data-last-image');
+        lastPositions[id] = {
+            startingSlice: $(this).attr('data-last-image'),
+            zoom: $(this).attr('data-last-zoom')
+        };
     });
     return lastPositions;
 }
@@ -1029,8 +1047,10 @@ $(document).ready(function() {
                 if (typeof request.getData !== "undefined") {
                     sendResponse({
                         series: current.series(),
-                        slice: current.slice(),
-                        zoom: canvas.value.zoom
+                        state: {
+                            startingSlice: current.slice(),
+                            zoom: canvas.value.zoom()
+                        }
                     });
                     break;
                 }

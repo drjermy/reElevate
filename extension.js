@@ -420,6 +420,13 @@ loadForm = () => {
                         '</div>'
                     );
                 }
+
+                seriesEditor.append(
+                    '<div class="form-group mt-4 mx-2">' +
+                    '<label>Zoom</label><input class="form-control" id="zoom' + n + '" value="' + response.zoom + '" disabled>' +
+                    '</div>'
+                );
+
             }
 
 
@@ -440,10 +447,14 @@ loadForm = () => {
                 chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
                     chrome.tabs.sendMessage(tabs[0].id, request, function (response) {
                         let storeObject = {};
-                        $.each(response, function (seriesNumber, lastPosition) {
-                            let id = 'startingSlice' + seriesNumber;
-                            storeObject[id] = lastPosition;
-                            $('#' + id).val(lastPosition);
+                        $.each(response, function (seriesNumber, stateObject) {
+                            // Store the received state object.
+                            storeObject['series' + seriesNumber] = stateObject;
+
+                            // Update the values in the form fields.
+                            $.each(stateObject, function (varName, varValue) {
+                                $('#' + varName + seriesNumber).val(varValue);
+                            });
                         });
                         playlist.storeStudy(storeObject);
                     });
@@ -474,13 +485,19 @@ loadForm = () => {
             // Create a trigger to get the current values for the selected series and save them.
             $(document).on('click', '.getSeriesData', function () {
                 let n = $(this).attr('data-series');
-                let request = {getData: n};
                 chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
-                    chrome.tabs.sendMessage(tabs[0].id, request, function (response) {
+                    chrome.tabs.sendMessage(tabs[0].id, { getData: n }, function (response) {
+                        let storeObject = {};
                         if (typeof response.series !== "undefined") {
-                            let id = 'startingSlice' + response.series;
-                            $('#' + id).val(response.slice);
-                            playlist.store(id, response.slice);
+                            let stateObject = response.state;
+                            storeObject['series' + response.series] = stateObject;
+                            playlist.storeStudy(storeObject);
+
+                            // Update the values in the form fields.
+                            $.each(stateObject, function (varName, varValue) {
+                                $('#' + varName + response.series).val(varValue);
+                            });
+
                         }
                     });
                 });
@@ -489,10 +506,17 @@ loadForm = () => {
 
             // Create a trigger for the deselect button - set back to default and remove storage item.
             $(document).on('click', '.deselectSlice', function () {
+
+                // TODO need to reset all the slice state information, not just the startingSlice
                 let n = Number($(this).attr('data-series')) - 1;
                 let id = 'startingSlice' + n;
+                let storeObject = {};
+                storeObject['series' + n] = undefined;
+
+                console.log(storeObject);
+                playlist.storeStudy(storeObject);
+
                 let defaultValue = Number($(this).attr('data-default'));
-                playlist.store(id, undefined);
                 $('#' + id).val(defaultValue);
             });
 
@@ -502,6 +526,9 @@ loadForm = () => {
                 let that = $(this);
                 let n = Number(that.attr('data-series'));
                 let int = n - 1;
+
+                // TODO this should be updated to sit within the new sliceState object in the JSON.
+
                 if (that.text() === 'Hide') {
                     that.text('Unhide');
                     $('.selectSeries[data-series="' + n + '"]').addClass('hiddenSlice');
