@@ -1,4 +1,4 @@
-let wrapper, wrapperPaddingTop, wrapperPaddingBottom, largeImageMarginLeft, isSlide, stackedImages, offlineMode, playlistVars, jumpURL;
+let wrapper, wrapperPaddingTop, wrapperPaddingBottom, largeImageMarginLeft, isSlide, stackedImages, offlineMode, playlistVars, jumpURL, context;
 
 function init() {
     wrapper = $('#wrapper');
@@ -11,40 +11,277 @@ function init() {
     getPlaylistVarsFromURL();
     saveHistory();
     elementVisibility();
-    initVisibility();
     setFirstSlice();
+    if (!isSlide) {
+        canvas.setup();
+    }
 }
 
 
-function fadeIn()
+function getPageVariables()
 {
-    wrapper.css({'opacity': 1, 'transition': 'opacity .2s ease-out'});
+    let pageVariables = retrieveWindowVariables(["stackedImages", "caseIDs", "currentCaseID", "studies", "components", "offlineMode"]);
+
+    stackedImages = pageVariables['stackedImages'];
+    offlineMode = pageVariables['offlineMode'];
+}
+
+
+// https://stackoverflow.com/questions/3955803/page-variables-in-content-script
+function retrieveWindowVariables(variables) {
+    let ret = {};
+
+    let scriptContent = "";
+    for (let i = 0; i < variables.length; i++) {
+        let currVariable = variables[i];
+        scriptContent += "if (typeof " + currVariable + " !== 'undefined') $('body').attr('tmp_" + currVariable + "', JSON.stringify(" + currVariable + "));\n"
+    }
+
+    let script = document.createElement('script');
+    script.id = 'tmpScript';
+    script.appendChild(document.createTextNode(scriptContent));
+    (document.body || document.head || document.documentElement).appendChild(script);
+
+    for (let i = 0; i < variables.length; i++) {
+        let currVariable = variables[i];
+        let current = $("body").attr("tmp_" + currVariable);
+        if (current) {
+            ret[currVariable] = $.parseJSON(current);
+        }
+        $("body").removeAttr("tmp_" + currVariable);
+    }
+
+    $("#tmpScript").remove();
+
+    return ret;
+}
+
+
+function getPlaylistVarsFromURL()
+{
+    let playlistIds = {};
+
+    let pathArray = window.location.pathname.split('/');
+    if (offlineMode === true) {
+        let lastPart = pathArray.pop();
+        let partsArray = lastPart.split('.html')[0].split('_');
+        playlistIds = {
+            playlistId: partsArray[1],
+            entryId: partsArray[3],
+            caseId: partsArray[5],
+            studyId: partsArray[7]
+        };
+    } else {
+        playlistIds = {
+            playlistId: pathArray[2],
+            entryId: pathArray[4],
+            caseId: pathArray[6],
+            studyId: pathArray[8]
+        };
+    }
+
+    playlistVars = playlistIds;
+}
+
+
+function saveHistory() {
+    let currentURL = window.location.href;
+    global.get('history', function (result) {
+        let history = result.history;
+
+        if (Array.isArray(history)) {
+            if (history.slice(-1)[0] !== currentURL) {
+                // Only add the URL if it's not the same as the last one.
+                history.push(currentURL);
+            }
+        } else {
+            history = [currentURL];
+        }
+        if (history.length > 20) {
+            history.splice(0, history.length - 20);
+        }
+
+        global.set('history', history);
+    });
+}
+
+
+let global = {
+    name: () => {
+        return 'radiopaedia' + '-' + playlistVars.playlistId;
+    },
+    set: (name, value) => {
+        let gContext = global.name();
+        chrome.storage.local.get([gContext], function(result) {
+            if (typeof result[gContext] === "undefined") {
+                result[gContext] = {};
+            }
+            result[gContext][name] = value;
+            chrome.storage.local.set(result, function () {});
+        });
+    },
+    get: (name, callback) => {
+        let gContext = global.name();
+        chrome.storage.local.get([gContext], function(result) {
+            if (typeof result[gContext] === "undefined") {
+                result[gContext] = {};
+            }
+            callback(result[gContext]);
+        });
+    },
+    all: function (callback) {
+        let playlistContext = global.name();
+        chrome.storage.local.get([playlistContext], function(result) {
+            if (typeof result[playlistContext] === "undefined") {
+                result[playlistContext] = {};
+            }
+            callback(result[playlistContext]);
+        });
+    }
+};
+
+
+let store = {
+    playlist_id: () => {
+        return 'radiopaedia' + '-' + playlistVars.playlistId;
+    },
+    case_id: () => {
+        return 'radiopaedia' + '-' + playlistVars.playlistId + '-' + playlistVars.entryId + '-' + playlistVars.caseId;
+    },
+    name: () => {
+        return 'radiopaedia' + '-' + playlistVars.playlistId + '-' + playlistVars.entryId + '-' + playlistVars.caseId + '-' + playlistVars.studyId;
+    },
+    get: (name, callback) => {
+        let playlist_id = store.playlist_id();
+        let study_id = store.name();
+        chrome.storage.local.get([playlist_id], function(result) {
+            if (typeof result[playlist_id] === "undefined") {
+                result[playlist_id] = {};
+            }
+            if (typeof result[playlist_id][study_id] === "undefined") {
+                result[playlist_id][study_id] = {};
+            }
+            callback(result[playlist_id][study_id]);
+        });
+    },
+    all: function (callback) {
+        let playlist_id = store.playlist_id();
+        let study_id = store.name();
+        chrome.storage.local.get([playlist_id], function(result) {
+            if (typeof result[playlist_id] === "undefined") {
+                result[playlist_id] = {};
+            }
+            if (typeof result[playlist_id][study_id] === "undefined") {
+                result[playlist_id][study_id] = {};
+            }
+            callback(result[playlist_id][study_id]);
+        });
+    },
+    study: function (varName, value) {
+        let gContext = global.name();
+        chrome.storage.local.get([gContext], function(result) {
+            if (typeof result[gContext] === "undefined") {
+                result[gContext] = {};
+            }
+            let studyContext = store.name();
+            if (typeof result[gContext][studyContext] === "undefined") {
+                result[gContext][studyContext] = {};
+            }
+            result[gContext][studyContext][varName] = value;
+            chrome.storage.local.set(result, function () {});
+        });
+    }
+};
+
+
+function elementVisibility() {
+    elements.presentingDefaults();
+    global.all(function (global) {
+
+        let caseEntry = global[store.case_id()];
+        let study = global[store.name()];
+
+        jumpURL = global.jumpURL;
+        caseEntry = (typeof caseEntry !== "undefined" ? caseEntry : {});
+        study = (typeof study !== "undefined" ? study : {});
+
+        if (global.hideTabs === true) {
+            elements.sidebar.tabs.hide();
+        }
+
+        if ((global.hideFindings === true && caseEntry.showFindings !== true) || (global.hideFindings !== true && caseEntry.hideFindings === true)) {
+            elements.findingsTab.disable();
+            elements.rid.hide();
+        }
+
+        if (global.showPresentation === true || caseEntry.showPresentation === true) {
+            presentation.init(caseEntry);
+        }
+
+        if (study.maximiseCase === true) {
+            elements.maximise.hide();
+            maximise.visible = false;
+        }
+
+        // We save the starting Series as if they started from 1, but the thumbs are 0-indexed.
+        if (typeof study.startingSeries !== "undefined") {
+            let n = Number(study.startingSeries) - 1;
+            navigate.series(n);
+        }
+
+        $('#offline-workflow-thumbnails-pane .thumb').each(function () {
+            let id = $(this).attr('id').split('offline-workflow-thumb-')[1];
+            if (study['hideSeries' + id] === true) {
+                $(this).hide();
+            }
+            $('#offline-workflow-thumbnails-pane .thumb').removeClass('clear-left');
+            $('#offline-workflow-thumbnails-pane .thumb:visible:even').addClass('clear-left');
+        });
+
+        // Set maximise, and hide header, sidebar and footer if required.
+        if (isSlide === true) {
+            maximise.slideHide();
+        } else {
+            header.setVisibility();
+            sidebar.setVisibility();
+            footer.setVisibility();
+            maximise.setVisibility();
+        }
+    });
 }
 
 
 elements = {
     header: {
         hide: () => {
-            $('#headerWrapper').hide();
-            $('#wrapper').css('padding-top', '32px');
-            setImageWrapperSize();
+            if (header.visible === true) {
+                $('#headerWrapper').hide();
+                $('#wrapper').css('padding-top', '16px');
+                setImageWrapperSize();
+            }
         },
         show: () => {
-            $('#headerWrapper').show();
-            $('#wrapper').css('padding-top', wrapperPaddingTop);
-            setImageWrapperSize();
+            if (header.visible === false) {
+                $('#headerWrapper').show();
+                $('#wrapper').css('padding-top', wrapperPaddingTop);
+                setImageWrapperSize();
+            }
         }
     },
     sidebar: {
         hide: () => {
-            $('#navTab').hide();
-            $('#largeImage').css('margin-left', 0);
-            setImageWrapperSize();
+            if (sidebar.visible === true) {
+                $('#navTab').hide();
+                $('#largeImage').css('margin-left', 0);
+                setImageWrapperSize();
+            }
         },
         show: () => {
-            $('#largeImage').css('margin-left', largeImageMarginLeft);
-            $('#navTab').show();
-            setImageWrapperSize();
+            if (sidebar.visible === false) {
+                $('#largeImage').css('margin-left', largeImageMarginLeft);
+                $('#navTab').show();
+                setImageWrapperSize();
+            }
         },
         tabs: {
             hide: () => {
@@ -55,14 +292,18 @@ elements = {
     },
     footer: {
         hide: () => {
-            $('#footer').hide();
-            $('#wrapper').css('padding-bottom', '32px');
-            setImageWrapperSize();
+            if (footer.visible === true) {
+                $('#footer').hide();
+                $('#wrapper').css('padding-bottom', '16px');
+                setImageWrapperSize();
+            }
         },
         show: () => {
-            $('#footer').show();
-            $('#wrapper').css('padding-bottom', wrapperPaddingBottom);
-            setImageWrapperSize();
+            if (footer.visible === false) {
+                $('#footer').show();
+                $('#wrapper').css('padding-bottom', wrapperPaddingBottom);
+                setImageWrapperSize();
+            }
         }
     },
     maximise: {
@@ -106,123 +347,242 @@ elements = {
 };
 
 
-function elementVisibility() {
-    elements.presentingDefaults();
-    global.get('hideFindings', function (global) {
+/**
+ * Determine which is the first slice that should be shown and select it.
+ */
+function setFirstSlice()
+{
+    if (!isSlide) {
+        global.get('defaultToTopImage', function (result) {
+            let globalDefaultToTopImage = result.defaultToTopImage;
+            store.get('defaultToTopImage', function (result) {
+                let pageDefaultToTopImage = result.defaultToTopImage;
+                let pageDefaultSlice = result.defaultSlice;
 
-        let caseEntry = global[store.case_id()];
-        let study = global[store.name()];
+                let isRead = thumbs.isCurrentRead();
+                if (typeof isRead === "undefined") {
+                    if ((globalDefaultToTopImage === true && pageDefaultSlice !== true) || (globalDefaultToTopImage !== true && pageDefaultToTopImage === true)) {
+                        navigate.top();
+                    } else {
+                        if (typeof result['series' + getCurrentSeriesNumber()] !== "undefined") {
+                            let startingSlice = result['series' + getCurrentSeriesNumber()]['startingSlice'];
+                            if (startingSlice) {
+                                navigate.to(startingSlice - 1);
+                            }
+                        }
+                    }
+                }
 
-        jumpURL = global.jumpURL;
-        caseEntry = (typeof caseEntry !== "undefined" ? caseEntry : {});
-        study = (typeof study !== "undefined" ? study : {});
+                fadeIn();
+                $('#largeImage').css({'opacity': 1, 'transition': 'opacity .2s ease-out'});
 
-        if (global.hideTabs === true) {
-            elements.sidebar.tabs.hide();
+                thumbs.markCurrentRead();
+            });
+        });
+    } else {
+        fadeIn();
+    }
+}
+
+
+function fadeIn()
+{
+    wrapper.css({'opacity': 1, 'transition': 'opacity .2s ease-out'});
+}
+
+
+/**
+ *
+ * @type {{image: HTMLImageElement, setup: canvas.setup, load: canvas.load, resize: canvas.resize}}
+ */
+let canvas = {
+    defaults: {
+        zoom: 1,
+        left: 0,
+        top: 0
+    },
+    settings: {},
+    limits: {
+        zoom: {
+            in: 3,
+            out: 0.5
+        }
+    },
+    rounding: {
+        zoom: 2
+    },
+    image: new Image(),
+    getSeriesSettings: function (currentSeries) {
+
+        if (typeof currentSeries === "undefined") {
+            currentSeries = getCurrentSeriesNumber();
         }
 
-        if ((global.hideFindings === true && caseEntry.showFindings !== true) || (global.hideFindings !== true && caseEntry.hideFindings === true)) {
-            elements.findingsTab.disable();
-            elements.rid.hide();
+        if (typeof canvas.settings[currentSeries] === "undefined") {
+            canvas.settings[currentSeries] = {};
         }
 
-        if (global.showPresentation === true || caseEntry.showPresentation === true) {
-            presentation.init(caseEntry);
-        }
-
-        if (study.maximiseCase === true) {
-            elements.maximise.hide();
-            maximise.visible = false;
-        }
-
-        // We save the starting Series as if they started from 1, but the thumbs are 0-indexed.
-        if (typeof study.startingSeries !== "undefined") {
-            let n = Number(study.startingSeries) - 1;
-            navigate.series(n);
-        }
-
-        $('#offline-workflow-thumbnails-pane .thumb').each(function () {
-            let id = $(this).attr('id').split('offline-workflow-thumb-')[1];
-            if (study['hideSeries' + id] === true) {
-                $(this).hide();
+        $.each(canvas.defaults, function (varName, varValue) {
+            if (typeof canvas.settings[currentSeries][varName] === "undefined") {
+                canvas.settings[currentSeries][varName] = varValue;
             }
-            $('#offline-workflow-thumbnails-pane .thumb').removeClass('clear-left');
-            $('#offline-workflow-thumbnails-pane .thumb:visible:even').addClass('clear-left');
         });
 
-    });
-}
-
-
-function initVisibility()
-{
-    if (isSlide === true) {
-        maximise.slideHide();
-    } else {
-        header.setVisibility();
-        sidebar.setVisibility();
-        footer.setVisibility();
-        maximise.setVisibility();
-    }
-}
-
-
-function saveHistory() {
-    let currentURL = window.location.href;
-    global.get('history', function (result) {
-        let history = result.history;
-
-        if (Array.isArray(history)) {
-            if (history.slice(-1)[0] !== currentURL) {
-                // Only add the URL if it's not the same as the last one.
-                history.push(currentURL);
+        let response = {};
+        $.each(canvas.settings[currentSeries], function (varName, varValue) {
+            if (typeof canvas.rounding[varName] !== "undefined") {
+                response[varName] = Number(varValue).toFixed(canvas.rounding[varName]);
+            } else {
+                response[varName] = Number(varValue).toFixed(0);
             }
-        } else {
-            history = [currentURL];
+        });
+
+        return response;
+    },
+    getStudySettings: function () {
+        let lastPositions = {};
+        $('.thumb').each(function () {
+            let id = $(this).attr('id').split('offline-workflow-thumb-')[1];
+            lastPositions[id] = canvas.getSeriesSettings(id);
+        });
+        return lastPositions;
+    },
+    saveSlicePosition: function () {
+        let currentSeries = getCurrentSeriesNumber();
+        let slice = findIndex('fullscreen_filename', $('#largeImage img').attr('src'), stackedImages[currentSeries]['images']);
+        if (typeof stackedImages[currentSeries]['images'][slice] !== "undefined") {
+            let sliceNumber = stackedImages[currentSeries]['images'][slice].position;
+            if (typeof canvas.settings[currentSeries] === "undefined") canvas.settings[currentSeries] = {};
+            canvas.settings[currentSeries].startingSlice = sliceNumber;
         }
-        if (history.length > 20) {
-            history.splice(0, history.length - 20);
+    },
+    set: {
+        context: function () {
+            context = document.getElementById('imageCanvas').getContext("2d");
+        },
+        width: function () {
+            if ($('.scrollbar').is(':visible')) {
+                context.canvas.width = $('#largeImage').width()-16-$('.scrollbar').width();
+            } else {
+                context.canvas.width = $('#largeImage').width();
+            }
+        },
+        height: function () {
+            context.canvas.height = $('#largeImage').height();
         }
+    },
+    setup: function () {
+        $('.offline-workflow-outer-wrapper').prepend('<canvas id="imageCanvas"></canvas>');
+        $('.offline-workflow-control-wrapper').hide();
+        $(".scrollbar").appendTo(".offline-workflow-outer-wrapper");
+        canvas.set.context();
+        canvas.set.width();
+        canvas.set.height();
 
-        global.set('history', history);
-    });
-}
+        canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+
+        $('#largeImage img').on('load', function (e) {
+            canvas.image.src = $('#largeImage img').attr('src');
+        });
+
+        canvas.postLoad();
+    },
+    postLoad: function () {
+        store.all(function (result) {
+            $.each(result, function (seriesName, stateObject) {
+                if (seriesName.includes('series')) {
+                    let n = Number(seriesName.split('series')[1]);
+                    if (typeof canvas.settings[n] === "undefined") canvas.settings[n] = {};
+                    $.each(stateObject, function (varName, varValue) {
+                        canvas.settings[n][varName] = Number(varValue);
+                    });
+                }
+            });
+            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+        });
+    },
+    resize: function () {
+        if (isSlide) return;
+        canvas.set.width();
+        canvas.set.height();
+        canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+    },
+    zoom: {
+        in: function () {
+            if (canvas.settings[getCurrentSeriesNumber()].zoom < canvas.limits.zoom.in) {
+                canvas.settings[getCurrentSeriesNumber()].zoom += 0.1;
+                canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+            }
+        },
+        out: function () {
+            if (canvas.settings[getCurrentSeriesNumber()].zoom > canvas.limits.zoom.out) {
+                canvas.settings[getCurrentSeriesNumber()].zoom -= 0.1;
+                canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+            }
+        }
+    },
+    move: {
+        left: function () {
+            canvas.settings[getCurrentSeriesNumber()].left -= 10;
+            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+        },
+        right: function () {
+            canvas.settings[getCurrentSeriesNumber()].left += 10;
+            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+        },
+        up: function () {
+            canvas.settings[getCurrentSeriesNumber()].top -= 10;
+            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+        },
+        down: function () {
+            canvas.settings[getCurrentSeriesNumber()].top += 10;
+            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+        }
+    }
+};
 
 
-function getPageVariables()
-{
-    let pageVariables = retrieveWindowVariables(["stackedImages", "caseIDs", "currentCaseID", "studies", "components", "offlineMode"]);
+/**
+ *
+ */
+canvas.image.onload = function () {
 
-    stackedImages = pageVariables['stackedImages'];
-    offlineMode = pageVariables['offlineMode'];
-}
+    let canvasHeight, canvasWidth, canvasRatio;
+    canvasHeight = context.canvas.height;
+    canvasWidth = context.canvas.width;
+    canvasRatio = canvasHeight/canvasWidth;
 
+    let baseImageHeight, baseImageWidth, imageRatio;
+    baseImageHeight = canvas.image.height;
+    baseImageWidth = canvas.image.width;
+    imageRatio = baseImageHeight/baseImageWidth;
 
-function getPlaylistVarsFromURL()
-{
-    let playlistIds = {};
+    let zoomImageHeight, zoomImageWidth, imageHeight, imageWidth, imageOffsetTop, imageOffsetLeft;
 
-    let pathArray = window.location.pathname.split('/');
-    if (offlineMode === true) {
-        let lastPart = pathArray.pop();
-        let partsArray = lastPart.split('.html')[0].split('_');
-        playlistIds = {
-            playlistId: partsArray[1],
-            entryId: partsArray[3],
-            caseId: partsArray[5],
-            studyId: partsArray[7]
-        };
+    let seriesCanvasSettings = canvas.getSeriesSettings();
+
+    // Work out the image height based on current zoom level and orientation of image and canvas.
+    if (imageRatio > canvasRatio) {
+        zoomImageHeight = canvasHeight * seriesCanvasSettings.zoom;
+        imageHeight = zoomImageHeight;
+        imageWidth = (zoomImageHeight / imageRatio);
     } else {
-        playlistIds = {
-            playlistId: pathArray[2],
-            entryId: pathArray[4],
-            caseId: pathArray[6],
-            studyId: pathArray[8]
-        };
+        zoomImageWidth = canvasWidth * seriesCanvasSettings.zoom;
+        imageWidth = zoomImageWidth;
+        imageHeight = (zoomImageWidth * imageRatio);
     }
 
-     playlistVars = playlistIds;
-}
+    // Calculate the image offset.
+    imageOffsetTop = (canvasHeight-imageHeight)/2;
+    imageOffsetLeft = (canvasWidth - imageWidth)/2;
+
+    // Alter base position of top, left.
+    imageOffsetLeft = Number(imageOffsetLeft) + Number(seriesCanvasSettings.left);
+    imageOffsetTop = Number(imageOffsetTop) + Number(seriesCanvasSettings.top);
+
+    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+    context.drawImage(canvas.image, imageOffsetLeft, imageOffsetTop, imageWidth, imageHeight);
+};
 
 
 let getCurrentSeriesNumber = () => {
@@ -253,72 +613,6 @@ let thumbs = {
 };
 
 
-/**
- * Determine which is the first slice that should be shown and select it.
- */
-function setFirstSlice()
-{
-    if (!isSlide) {
-        global.get('defaultToTopImage', function (result) {
-            let globalDefaultToTopImage = result.defaultToTopImage;
-            store.get('defaultToTopImage', function (result) {
-                let pageDefaultToTopImage = result.defaultToTopImage;
-                let pageDefaultSlice = result.defaultSlice;
-                let studySliceName = 'startingSlice' + getCurrentSeriesNumber();
-
-                let isRead = thumbs.isCurrentRead();
-                if (typeof isRead === "undefined") {
-                    if ((globalDefaultToTopImage === true && pageDefaultSlice !== true) || (globalDefaultToTopImage !== true && pageDefaultToTopImage === true)) {
-                        navigate.top();
-                    } else {
-                        if (result[studySliceName]) {
-                            navigate.to(result[studySliceName] - 1);
-                        }
-                    }
-                }
-
-                fadeIn();
-                $('#largeImage').css({'opacity': 1, 'transition': 'opacity .2s ease-out'});
-
-                thumbs.markCurrentRead();
-            });
-        });
-    } else {
-        fadeIn();
-    }
-}
-
-
-// https://stackoverflow.com/questions/3955803/page-variables-in-content-script
-function retrieveWindowVariables(variables) {
-    let ret = {};
-
-    let scriptContent = "";
-    for (let i = 0; i < variables.length; i++) {
-        let currVariable = variables[i];
-        scriptContent += "if (typeof " + currVariable + " !== 'undefined') $('body').attr('tmp_" + currVariable + "', JSON.stringify(" + currVariable + "));\n"
-    }
-
-    let script = document.createElement('script');
-    script.id = 'tmpScript';
-    script.appendChild(document.createTextNode(scriptContent));
-    (document.body || document.head || document.documentElement).appendChild(script);
-
-    for (let i = 0; i < variables.length; i++) {
-        let currVariable = variables[i];
-        let current = $("body").attr("tmp_" + currVariable);
-        if (current) {
-            ret[currVariable] = $.parseJSON(current);
-        }
-        $("body").removeAttr("tmp_" + currVariable);
-    }
-
-    $("#tmpScript").remove();
-
-    return ret;
-}
-
-
 let findIndex = function (key, val, arr) {
     if (Array.isArray(arr)) {
         for (let i = 0, j = arr.length; i < j; i++) {
@@ -332,46 +626,9 @@ let findIndex = function (key, val, arr) {
 };
 
 
-/**
- * Breaks on mobile/iPad.
- * @returns {{height: string, width: string, top: string, left: number}}
- */
-function calculateImageWrapperSize()
-{
-    let imageWrapper = $('.offline-workflow-image-wrapper');
-    let imageAspectRatio = imageWrapper.height()/imageWrapper.width();
-
-    let wrapper = $('.offline-workflow-outer-wrapper');
-    let wrapperWidth = wrapper.width();
-    let wrapperHeight = wrapper.height();
-    let wrapperAspectRatio = wrapperHeight/wrapperWidth;
-
-    let imageHeight, imageWidth, imageOffsetTop;
-
-    if (imageAspectRatio > wrapperAspectRatio) {
-        imageHeight = wrapperHeight;
-        imageWidth = wrapperHeight / imageAspectRatio;
-        imageOffsetTop = 0;
-    } else {
-        imageWidth = wrapperWidth;
-        imageHeight = wrapperWidth * imageAspectRatio;
-        imageOffsetTop = (wrapperHeight - imageHeight)/2;
-    }
-
-    return {
-        height: imageHeight + 'px',
-        width: imageWidth + 'px',
-        top: imageOffsetTop + 'px',
-        left: 0
-    }
-}
-
-
 function setImageWrapperSize()
 {
-    let imageWrapperSize = calculateImageWrapperSize();
-    $('.offline-workflow-image-wrapper').css(imageWrapperSize);
-    $('#offline-workflow-study-large-image').css({width: imageWrapperSize.width, height: imageWrapperSize.height});
+    canvas.resize();
 }
 
 
@@ -401,20 +658,6 @@ function lastStudyImage()
     if (firstImageIndex >= 0) {
         return images[lastImageIndex]['public_filename'];
     }
-}
-
-
-/**
- * Get an object that records the last positions of the images in each series.
- */
-function getLastImagePositions()
-{
-    let lastPositions = {};
-    $('.thumb').each(function () {
-        let id = $(this).attr('id').split('offline-workflow-thumb-')[1];
-        lastPositions[id] = $(this).attr('data-last-image');
-    });
-    return lastPositions;
 }
 
 
@@ -524,73 +767,6 @@ presentation = {
         } else {
             navigate.questionsTab();
         }
-    }
-};
-
-
-let store = {
-    playlist_id: () => {
-        return 'radiopaedia' + '-' + playlistVars.playlistId;
-    },
-    case_id: () => {
-        return 'radiopaedia' + '-' + playlistVars.playlistId + '-' + playlistVars.entryId + '-' + playlistVars.caseId;
-    },
-    name: () => {
-        return 'radiopaedia' + '-' + playlistVars.playlistId + '-' + playlistVars.entryId + '-' + playlistVars.caseId + '-' + playlistVars.studyId;
-    },
-    get: (name, callback) => {
-        let playlist_id = store.playlist_id();
-        let study_id = store.name();
-        chrome.storage.local.get([playlist_id], function(result) {
-            if (typeof result[playlist_id] === "undefined") {
-                result[playlist_id] = {};
-            }
-            if (typeof result[playlist_id][study_id] === "undefined") {
-                result[playlist_id][study_id] = {};
-            }
-            callback(result[playlist_id][study_id]);
-        });
-    },
-    study: function (varName, value) {
-        let gContext = global.name();
-        chrome.storage.local.get([gContext], function(result) {
-            if (typeof result[gContext] === "undefined") {
-                result[gContext] = {};
-            }
-            let studyContext = store.name();
-            if (typeof result[gContext][studyContext] === "undefined") {
-                result[gContext][studyContext] = {};
-            }
-            result[gContext][studyContext][varName] = value;
-            chrome.storage.local.set(result, function () {});
-        });
-    }
-};
-
-
-let global = {
-    name: () => {
-        return 'radiopaedia' + '-' + playlistVars.playlistId;
-    },
-    set: (name, value) => {
-        let gContext = global.name();
-        chrome.storage.local.get([gContext], function(result) {
-            if (typeof result[gContext] === "undefined") {
-                result[gContext] = {};
-            }
-            result[gContext][name] = value;
-            console.log(result)
-            chrome.storage.local.set(result, function () {});
-        });
-    },
-    get: (name, callback) => {
-        let gContext = global.name();
-        chrome.storage.local.get([gContext], function(result) {
-            if (typeof result[gContext] === "undefined") {
-                result[gContext] = {};
-            }
-            callback(result[gContext]);
-        });
     }
 };
 
@@ -860,6 +1036,10 @@ let navigate = {
 $(document).ready(function() {
     init();
 
+    $( window ).resize(function() {
+        setImageWrapperSize();
+    });
+
     /**
      * When we click a thumb (with the mouse or triggered via js, select the first slice.
      */
@@ -873,9 +1053,7 @@ $(document).ready(function() {
      * Save the position of the last viewed image to the div.
      */
     $('#largeImage img').on('load', function (e) {
-        let currentSeries = getCurrentSeriesNumber();
-        let slice = findIndex('fullscreen_filename', $(this).attr('src'), stackedImages[currentSeries]['images']);
-        $('#offline-workflow-thumb-' + currentSeries).attr('data-last-image', stackedImages[currentSeries]['images'][slice].position);
+        canvas.saveSlicePosition();
     });
 
 
@@ -899,6 +1077,12 @@ $(document).ready(function() {
                     case 'down':
                         navigate.down(1);
                         break;
+                    case 'zoom':
+                        canvas.zoom.in();
+                        break;
+                    case 'unzoom':
+                        canvas.zoom.out();
+                        break;
                 }
 
                 // Need to refresh the internal variables defined by current case.
@@ -911,14 +1095,14 @@ $(document).ready(function() {
             } else {
 
                 if (typeof request.lastPositions !== "undefined") {
-                    sendResponse(getLastImagePositions());
+                    sendResponse(canvas.getStudySettings());
                     break;
                 }
 
                 if (typeof request.getData !== "undefined") {
                     sendResponse({
                         series: current.series(),
-                        slice: current.slice()
+                        state: canvas.getSeriesSettings()
                     });
                     break;
                 }
@@ -942,14 +1126,16 @@ $(document).ready(function() {
                     series[n].default = stackedImages[n].images[0].position;
                 }
 
-                sendResponse({
+                let response = {
                     study: store.name(),
                     case: store.case_id(),
                     playlist: global.name(),
                     series: series,
                     currentSeries: getCurrentSeriesNumber(),
                     isSlide: isSlide
-                });
+                };
+
+                sendResponse(response);
 
             }
 

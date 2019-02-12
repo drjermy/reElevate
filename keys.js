@@ -82,6 +82,30 @@ $(document).ready(function() {
         navigate.jumpTo();
     });
 
+    $(document).bind('keydown', '=', function () {
+        canvas.zoom.in();
+    });
+
+    $(document).bind('keydown', '-', function () {
+        canvas.zoom.out();
+    });
+
+    $(document).bind('keydown', ',', function () {
+        canvas.move.left();
+    });
+
+    $(document).bind('keydown', '.', function () {
+        canvas.move.right();
+    });
+
+    $(document).bind('keydown', 'l', function () {
+        canvas.move.up();
+    });
+
+    $(document).bind('keydown', 'm', function () {
+        canvas.move.down();
+    });
+
 
     $('#offline-workflow-page-links li').each(function (n, value) {
         let key = n+1;
