@@ -164,6 +164,19 @@ let store = {
             callback(result[playlist_id][study_id]);
         });
     },
+    all: function (callback) {
+        let playlist_id = store.playlist_id();
+        let study_id = store.name();
+        chrome.storage.local.get([playlist_id], function(result) {
+            if (typeof result[playlist_id] === "undefined") {
+                result[playlist_id] = {};
+            }
+            if (typeof result[playlist_id][study_id] === "undefined") {
+                result[playlist_id][study_id] = {};
+            }
+            callback(result[playlist_id][study_id]);
+        });
+    },
     study: function (varName, value) {
         let gContext = global.name();
         chrome.storage.local.get([gContext], function(result) {
@@ -351,9 +364,11 @@ function setFirstSlice()
                     if ((globalDefaultToTopImage === true && pageDefaultSlice !== true) || (globalDefaultToTopImage !== true && pageDefaultToTopImage === true)) {
                         navigate.top();
                     } else {
-                        let startingSlice = result['series' + getCurrentSeriesNumber()]['startingSlice'];
-                        if (startingSlice) {
-                            navigate.to(startingSlice - 1);
+                        if (typeof result['series' + getCurrentSeriesNumber()] !== "undefined") {
+                            let startingSlice = result['series' + getCurrentSeriesNumber()]['startingSlice'];
+                            if (startingSlice) {
+                                navigate.to(startingSlice - 1);
+                            }
                         }
                     }
                 }
@@ -381,16 +396,64 @@ function fadeIn()
  * @type {{image: HTMLImageElement, setup: canvas.setup, load: canvas.load, resize: canvas.resize}}
  */
 let canvas = {
-    settings: {
+    defaults: {
         zoom: 1
     },
+    settings: {},
     limits: {
         zoom: {
             in: 3,
             out: 0.5
         }
     },
+    rounding: {
+        zoom: 2
+    },
     image: new Image(),
+    getSeriesSettings: function (currentSeries) {
+
+        if (typeof currentSeries === "undefined") {
+            currentSeries = getCurrentSeriesNumber();
+        }
+
+        if (typeof canvas.settings[currentSeries] === "undefined") {
+            canvas.settings[currentSeries] = {};
+        }
+
+        $.each(canvas.defaults, function (varName, varValue) {
+            if (typeof canvas.settings[currentSeries][varName] === "undefined") {
+                canvas.settings[currentSeries][varName] = varValue;
+            }
+        });
+
+        let response = {};
+        $.each(canvas.settings[currentSeries], function (varName, varValue) {
+            if (typeof canvas.rounding[varName] !== "undefined") {
+                response[varName] = Number(varValue).toFixed(canvas.rounding[varName]);
+            } else {
+                response[varName] = Number(varValue).toFixed(0);
+            }
+        });
+
+        return response;
+    },
+    getStudySettings: function () {
+        let lastPositions = {};
+        $('.thumb').each(function () {
+            let id = $(this).attr('id').split('offline-workflow-thumb-')[1];
+            lastPositions[id] = canvas.getSettings(id);
+        });
+        return lastPositions;
+    },
+    saveSlicePosition: function () {
+        let currentSeries = getCurrentSeriesNumber();
+        let slice = findIndex('fullscreen_filename', $('#largeImage img').attr('src'), stackedImages[currentSeries]['images']);
+        if (typeof stackedImages[currentSeries]['images'][slice] !== "undefined") {
+            let sliceNumber = stackedImages[currentSeries]['images'][slice].position;
+            if (typeof canvas.settings[currentSeries] === "undefined") canvas.settings[currentSeries] = {};
+            canvas.settings[currentSeries].startingSlice = sliceNumber;
+        }
+    },
     set: {
         context: function () {
             context = document.getElementById('imageCanvas').getContext("2d");
@@ -406,27 +469,6 @@ let canvas = {
             context.canvas.height = $('#largeImage').height();
         }
     },
-    value: {
-        zoom: function () {
-            return Number(canvas.settings.zoom).toFixed(1);
-        }
-    },
-    load: {
-        all: function () {
-            canvas.load.zoom();
-        },
-        zoom: function () {
-            let currentSeries = getCurrentSeriesNumber();
-            let zoom = $('#offline-workflow-thumb-' + currentSeries).attr('data-last-zoom');
-            canvas.settings.zoom = (zoom ? zoom : 1);
-        }
-    },
-    save: {
-        zoom: function () {
-            let currentSeries = getCurrentSeriesNumber();
-            $('#offline-workflow-thumb-' + currentSeries).attr('data-last-zoom', canvas.value.zoom);
-        }
-    },
     setup: function () {
         $('.offline-workflow-outer-wrapper').prepend('<canvas id="imageCanvas"></canvas>');
         $('.offline-workflow-control-wrapper').hide();
@@ -440,23 +482,21 @@ let canvas = {
         $('#largeImage img').on('load', function (e) {
             canvas.image.src = $('#largeImage img').attr('src');
         });
-        $('.thumb').on('click', function () {
-            canvas.load.all();
-        });
 
         canvas.postLoad();
     },
     postLoad: function () {
-        store.get('defaultToTopImage', function (result) {
+        store.all(function (result) {
             $.each(result, function (seriesName, stateObject) {
-                let n = Number(seriesName.split('series')[1]);
-                $('#offline-workflow-thumb-' + n).attr('data-last-zoom', stateObject.zoom);
-                if (current.series() === n) {
-                    canvas.settings.zoom = stateObject.zoom;
+                if (seriesName.includes('series')) {
+                    let n = Number(seriesName.split('series')[1]);
+                    if (typeof canvas.settings[n] === "undefined") canvas.settings[n] = {};
+                    $.each(stateObject, function (varName, varValue) {
+                        canvas.settings[n][varName] = Number(varValue);
+                    });
                 }
             });
             canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
-            canvas.load.all();
         });
     },
     resize: function () {
@@ -467,17 +507,15 @@ let canvas = {
     },
     zoom: {
         in: function () {
-            if (canvas.settings.zoom < canvas.limits.zoom.in) {
-                canvas.settings.zoom += 0.1;
+            if (canvas.settings[getCurrentSeriesNumber()].zoom < canvas.limits.zoom.in) {
+                canvas.settings[getCurrentSeriesNumber()].zoom += 0.1;
                 canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
-                canvas.save.zoom();
             }
         },
         out: function () {
-            if (canvas.settings.zoom > canvas.limits.zoom.out) {
-                canvas.settings.zoom -= 0.1;
+            if (canvas.settings[getCurrentSeriesNumber()].zoom > canvas.limits.zoom.out) {
+                canvas.settings[getCurrentSeriesNumber()].zoom -= 0.1;
                 canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
-                canvas.save.zoom();
             }
         }
     }
@@ -501,13 +539,15 @@ canvas.image.onload = function () {
 
     let zoomImageHeight, zoomImageWidth, imageHeight, imageWidth, imageOffsetTop, imageOffsetLeft;
 
+    let seriesCanvasSettings = canvas.getSeriesSettings();
+
     // Work out the image height based on current zoom level and orientation of image and canvas.
     if (imageRatio > canvasRatio) {
-        zoomImageHeight = canvasHeight * canvas.settings.zoom;
+        zoomImageHeight = canvasHeight * seriesCanvasSettings.zoom;
         imageHeight = zoomImageHeight;
         imageWidth = (zoomImageHeight / imageRatio);
     } else {
-        zoomImageWidth = canvasWidth * canvas.settings.zoom;
+        zoomImageWidth = canvasWidth * seriesCanvasSettings.zoom;
         imageWidth = zoomImageWidth;
         imageHeight = (zoomImageWidth * imageRatio);
     }
@@ -594,23 +634,6 @@ function lastStudyImage()
     if (firstImageIndex >= 0) {
         return images[lastImageIndex]['public_filename'];
     }
-}
-
-
-/**
- * Get an object that records the last positions of the images in each series.
- */
-function getLastImagePositions()
-{
-    let lastPositions = {};
-    $('.thumb').each(function () {
-        let id = $(this).attr('id').split('offline-workflow-thumb-')[1];
-        lastPositions[id] = {
-            startingSlice: $(this).attr('data-last-image'),
-            zoom: $(this).attr('data-last-zoom')
-        };
-    });
-    return lastPositions;
 }
 
 
@@ -1006,9 +1029,7 @@ $(document).ready(function() {
      * Save the position of the last viewed image to the div.
      */
     $('#largeImage img').on('load', function (e) {
-        let currentSeries = getCurrentSeriesNumber();
-        let slice = findIndex('fullscreen_filename', $(this).attr('src'), stackedImages[currentSeries]['images']);
-        $('#offline-workflow-thumb-' + currentSeries).attr('data-last-image', stackedImages[currentSeries]['images'][slice].position);
+        canvas.saveSlicePosition();
     });
 
 
@@ -1044,17 +1065,14 @@ $(document).ready(function() {
             } else {
 
                 if (typeof request.lastPositions !== "undefined") {
-                    sendResponse(getLastImagePositions());
+                    sendResponse(canvas.getStudySettings());
                     break;
                 }
 
                 if (typeof request.getData !== "undefined") {
                     sendResponse({
                         series: current.series(),
-                        state: {
-                            startingSlice: current.slice(),
-                            zoom: canvas.value.zoom()
-                        }
+                        state: canvas.getSeriesSettings()
                     });
                     break;
                 }
@@ -1084,11 +1102,8 @@ $(document).ready(function() {
                     playlist: global.name(),
                     series: series,
                     currentSeries: getCurrentSeriesNumber(),
-                    isSlide: isSlide,
-                    zoom: canvas.value.zoom()
+                    isSlide: isSlide
                 };
-
-                console.log(response);
 
                 sendResponse(response);
 

@@ -406,7 +406,7 @@ loadForm = () => {
                 seriesEditor.append(
                     '<div class="mt-2">' +
                     '<button class="ml-2 btn-sm getSeriesData" data-series="' + int + '"><strong>S</strong>ave series state</button>' +
-                    '<button class="ml-2 btn-sm deselectSlice" data-series="' + int + '"><strong>R</strong>eset</button>' +
+                    '<button class="ml-2 btn-sm resetSlice" data-series="' + int + '"><strong>R</strong>eset</button>' +
                     '</div>'
                 );
 
@@ -505,19 +505,23 @@ loadForm = () => {
 
 
             // Create a trigger for the deselect button - set back to default and remove storage item.
-            $(document).on('click', '.deselectSlice', function () {
+            $(document).on('click', '.resetSlice', function () {
 
-                // TODO need to reset all the slice state information, not just the startingSlice
                 let n = Number($(this).attr('data-series')) - 1;
-                let id = 'startingSlice' + n;
-                let storeObject = {};
-                storeObject['series' + n] = undefined;
 
-                console.log(storeObject);
-                playlist.storeStudy(storeObject);
+                let playlist_id = playlist.playlist_id();
+                let study_id = playlist.study_id();
 
-                let defaultValue = Number($(this).attr('data-default'));
-                $('#' + id).val(defaultValue);
+                chrome.storage.local.get([playlist_id], function (result) {
+                    if (!result[playlist_id]) result[playlist_id] = {};
+                    if (!result[playlist_id][study_id]) result[playlist_id][study_id] = {};
+
+                    if (typeof result[playlist_id][study_id]['series' + n]) {
+                        delete result[playlist_id][study_id]['series' + n];
+                    }
+
+                    chrome.storage.local.set(result, function () {});
+                });
             });
 
 
@@ -607,8 +611,8 @@ loadForm = () => {
                     if (keyCode === 83) { // s
                         $('.getSeriesData[data-series="' + currentSeries + '"]').click().focus();
                     }
-                    if (keyCode === 82) { // r
-                        $('.deselectSlice[data-series="' + currentSeries + '"]').click().focus();
+                    if (keyCode === 82 && !shifted) { // r
+                        $('.resetSlice[data-series="' + currentSeries + '"]').click().focus();
                     }
                 }
             });
