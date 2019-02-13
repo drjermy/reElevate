@@ -74,6 +74,9 @@ $(document).ready(function() {
         navigate.jumpTo();
     });
 
+
+    // ZOOM
+
     $(document).bind('keydown', '=', function () {
         canvas.zoom.in();
     });
@@ -81,6 +84,9 @@ $(document).ready(function() {
     $(document).bind('keydown', '-', function () {
         canvas.zoom.out();
     });
+
+
+    // PAN
 
     $(document).bind('keydown', ',', function () {
         canvas.move.left();
@@ -90,7 +96,7 @@ $(document).ready(function() {
         canvas.move.right();
     });
 
-    $(document).bind('keydown', 'l', function () {
+    $(document).bind('keydown', ';', function () {
         canvas.move.up();
     });
 
@@ -98,46 +104,54 @@ $(document).ready(function() {
         canvas.move.down();
     });
 
-    $(document).bind('keydown', ';', function () {
+
+    // CROP
+
+    $(document).bind('keydown', '[', function () {
         canvas.crop.in('crop_left');
     });
 
-    $(document).bind('keydown', 'shift+;', function () {
+    $(document).bind('keydown', 'shift+[', function () {
         canvas.crop.out('crop_left');
     });
 
-    $(document).bind('keydown', '\\', function () {
+    $(document).bind('keydown', ']', function () {
         canvas.crop.in('crop_right');
     });
 
-    $(document).bind('keydown', 'shift+\\', function () {
+    $(document).bind('keydown', 'shift+]', function () {
         canvas.crop.out('crop_right');
     });
 
-    $(document).bind('keydown', '[', function () {
+    $(document).bind('keydown', 'o', function () {
         canvas.crop.in('crop_top');
     });
 
-    $(document).bind('keydown', 'shift+[', function () {
+    $(document).bind('keydown', 'shift+o', function () {
         canvas.crop.out('crop_top');
     });
 
-    $(document).bind('keydown', '\'', function () {
+    $(document).bind('keydown', 'k', function () {
         canvas.crop.in('crop_bottom');
     });
 
-    $(document).bind('keydown', 'shift+\'', function () {
+    $(document).bind('keydown', 'shift+k', function () {
         canvas.crop.out('crop_bottom');
     });
 
-    $(document).bind('keydown', ']', function () {
+
+    // ROTATE
+
+    $(document).bind('keydown', '\\', function () {
         canvas.rotate.clockwise();
     });
 
-    $(document).bind('keydown', 'shift+]', function () {
+    $(document).bind('keydown', 'shift+\\', function () {
         canvas.rotate.counter();
     });
 
+
+    // RESET
 
     $(document).bind('keydown', 'r', function () {
         canvas.series.reset();
