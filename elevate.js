@@ -641,18 +641,23 @@ canvas.image.onload = function () {
     dX = Number(dX) + Number(seriesCanvasSettings.left);
     dY = Number(dY) + Number(seriesCanvasSettings.top);
 
+    // Create a black rectangle behind a rotated image.
     let rotateDeg = seriesCanvasSettings.rotate * Math.PI/180;
     let rectWidth = Math.abs((imageHeight * Math.sin(rotateDeg))) + Math.abs((imageWidth * Math.cos(rotateDeg)));
     let rectHeight = Math.abs((imageWidth * Math.sin(rotateDeg))) + Math.abs((imageHeight * Math.cos(rotateDeg)));
     let rX = context.canvas.width/2 - rectWidth/2;
     let rY = context.canvas.height/2 - rectHeight/2;
 
+    // Clear the canvas.
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+
+    // Create a rectangle behind the rotated image.
     context.fillRect(rX, rY, rectWidth, rectHeight);
     context.save();
     context.translate(context.canvas.width/2, context.canvas.height/2);
     context.rotate(rotateDeg);
 
+    // Draw the image.
     context.drawImage(canvas.image, sX, sY, sWidth, sHeight, dX - context.canvas.width/2, dY - context.canvas.height/2, imageWidth, imageHeight);
     context.restore();
 
