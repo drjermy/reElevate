@@ -239,8 +239,12 @@ function elementVisibility() {
                 if (study['hideSeries' + id] === true) {
                     $(this).hide();
                 }
-                $('#offline-workflow-thumbnails-pane .thumb').removeClass('clear-left');
-                $('#offline-workflow-thumbnails-pane .thumb:visible:even').addClass('clear-left');
+
+                if (global.narrowSidebar) {
+                    elements.sidebar.narrow();
+                } else {
+                    elements.sidebar.reflow();
+                }
             });
 
             // Set maximise, and hide header, sidebar and footer if required.
@@ -291,6 +295,16 @@ elements = {
                 $('.offline-workflow-tabs').hide();
                 $('.offline-workflow-tabs-content-container').css('top', '0');
             }
+        },
+        narrow: () => {
+            $('#offline-workflow-thumbnails-pane .thumb').addClass('clear-left');
+            $('.thumb span').hide();
+            $('#navTab .container').css('width', '96px');
+            $('#largeImage').css('margin-left', '140px');
+        },
+        reflow: () => {
+            $('#offline-workflow-thumbnails-pane .thumb').removeClass('clear-left');
+            $('#offline-workflow-thumbnails-pane .thumb:visible:even').addClass('clear-left');
         }
     },
     footer: {
@@ -375,6 +389,13 @@ function setFirstSlice()
                         }
                     }
                 }
+
+                if (Number(stackedImages[getCurrentSeriesNumber()].images.length) === 1) {
+                    $('.scrollbar').hide();
+                } else {
+                    $('.scrollbar').show();
+                }
+                canvas.resize();
 
                 fadeIn();
                 canvas.visibility.fadeIn();
@@ -510,6 +531,9 @@ let canvas = {
 
         canvas.postLoad();
     },
+    reload: function () {
+        canvas.image.src = $('#largeImage img').attr('src');
+    },
     postLoad: function () {
         store.all(function (result) {
             $.each(result, function (seriesName, stateObject) {
@@ -521,19 +545,19 @@ let canvas = {
                     });
                 }
             });
-            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+            canvas.reload();
         });
     },
     resize: function () {
         if (isSlide) return;
         canvas.set.width();
         canvas.set.height();
-        canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+        canvas.reload();
     },
     series: {
         reset: function () {
             canvas.settings[getCurrentSeriesNumber()] = JSON.parse(JSON.stringify(canvas.defaults));
-            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+            canvas.reload();
         }
     },
     zoom: {
@@ -544,7 +568,7 @@ let canvas = {
                 } else {
                     canvas.settings[getCurrentSeriesNumber()].zoom += canvas.increments.zoom;
                 }
-                canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+                canvas.reload();
             }
         },
         out: function () {
@@ -554,26 +578,26 @@ let canvas = {
                 } else {
                     canvas.settings[getCurrentSeriesNumber()].zoom -= canvas.increments.zoom;
                 }
-                canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+                canvas.reload();
             }
         }
     },
     move: {
         left: function () {
             canvas.settings[getCurrentSeriesNumber()].left -= canvas.increments.left;
-            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+            canvas.reload();
         },
         right: function () {
             canvas.settings[getCurrentSeriesNumber()].left += canvas.increments.left;
-            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+            canvas.reload();
         },
         up: function () {
             canvas.settings[getCurrentSeriesNumber()].top -= canvas.increments.top;
-            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+            canvas.reload();
         },
         down: function () {
             canvas.settings[getCurrentSeriesNumber()].top += canvas.increments.top;
-            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+            canvas.reload();
         }
     },
     crop: {
@@ -581,23 +605,23 @@ let canvas = {
             if (typeof direction !== "undefined") {
                 canvas.settings[getCurrentSeriesNumber()][direction] += canvas.increments.crop;
             }
-            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+            canvas.reload();
         },
         out: function (direction) {
             if (typeof direction !== "undefined") {
                 canvas.settings[getCurrentSeriesNumber()][direction] -= canvas.increments.crop;
             }
-            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+            canvas.reload();
         }
     },
     rotate: {
         clockwise: function () {
             canvas.settings[getCurrentSeriesNumber()].rotate += canvas.increments.rotate;
-            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+            canvas.reload();
         },
         counter: function () {
             canvas.settings[getCurrentSeriesNumber()].rotate -= canvas.increments.rotate;
-            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+            canvas.reload();
         }
     }
 };
