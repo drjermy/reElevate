@@ -411,23 +411,24 @@ loadForm = () => {
                 );
 
 
-                // If we have more than 1 slice in a series, add the slider.
-                if (series.count > 1) {
-                    seriesEditor.append(
-                        '<div class="form-group mt-4 mx-2">' +
-                        '<label>Slice position</label>' +
-                        '<input type="range" min="1" max="' + series.count + '" value="' + sliceValue + '" class="form-control-range slider" id="startingSlice' + n + '" data-studyNumber="' + n + '" data-default="' + defaultValue + '"  data-series="' + int + '" disabled>' +
-                        '</div>'
-                    );
-                }
+                // Create a set of selector buttons to clone state.
+                if (numberOfSeries > 1) {
+                    seriesEditor.append('<hr/><p>Clone state from:</p>');
+                    for (let cloneN in response.series) {
+                        let cloneInt = Number(cloneN) + 1;
 
-                /**
-                seriesEditor.append(
-                    '<div class="form-group mt-4 mx-2">' +
-                    '<label>Zoom</label><input class="form-control" id="zoom' + n + '" value="' + response.zoom + '" disabled>' +
-                    '</div>'
-                );
-                 */
+                        if (int === cloneInt) {
+                            seriesEditor.append(
+                                '<button class="ml-2 btn-sm cloneState" disabled>' + cloneInt + '</button>'
+                            );
+                        } else {
+                            seriesEditor.append(
+                                '<button class="ml-2 btn-sm cloneState" data-series="' + n + '" data-clone="' + cloneN + '">' + cloneInt + '</button>'
+                            );
+                        }
+                    }
+
+                }
 
             }
 
@@ -547,6 +548,32 @@ loadForm = () => {
                     $('.selectSeries[data-series="' + n + '"]').removeClass('hiddenSlice');
                     playlist.store('hideSeries' + int, undefined);
                 }
+            });
+
+
+            $(document).on('click', '.cloneState', function() {
+                let seriesId = $(this).attr('data-series');
+                let cloneId = $(this).attr('data-clone');
+
+                let playlist_id = playlist.playlist_id();
+                let study_id = playlist.study_id();
+
+                chrome.storage.local.get([playlist_id], function (result) {
+                    if (!result[playlist_id]) result[playlist_id] = {};
+                    if (!result[playlist_id][study_id]) result[playlist_id][study_id] = {};
+
+                    let seriesState = result[playlist_id][study_id]['series' + seriesId];
+                    let cloneState = result[playlist_id][study_id]['series' + cloneId];
+
+                    if (typeof cloneState !== "undefined") {
+                        if (typeof seriesState !== "undefined") {
+                            delete result[playlist_id][study_id]['series' + seriesId];
+                        }
+                        result[playlist_id][study_id]['series' + seriesId] = cloneState;
+                    }
+
+                    chrome.storage.local.set(result, function () {});
+                });
             });
 
 
