@@ -518,13 +518,21 @@ let canvas = {
     zoom: {
         in: function () {
             if (canvas.settings[getCurrentSeriesNumber()].zoom < canvas.limits.zoom.in) {
-                canvas.settings[getCurrentSeriesNumber()].zoom += canvas.increments.zoom;
+                if (canvas.settings[getCurrentSeriesNumber()].zoom.toFixed(2) == 1.00) {
+                    canvas.settings[getCurrentSeriesNumber()].zoom = 1.01;
+                } else {
+                    canvas.settings[getCurrentSeriesNumber()].zoom += canvas.increments.zoom;
+                }
                 canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
             }
         },
         out: function () {
             if (canvas.settings[getCurrentSeriesNumber()].zoom > canvas.limits.zoom.out) {
-                canvas.settings[getCurrentSeriesNumber()].zoom -= canvas.increments.zoom;
+                if (canvas.settings[getCurrentSeriesNumber()].zoom.toFixed(2) == 1.01) {
+                    canvas.settings[getCurrentSeriesNumber()].zoom = 1;
+                } else {
+                    canvas.settings[getCurrentSeriesNumber()].zoom -= canvas.increments.zoom;
+                }
                 canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
             }
         }
