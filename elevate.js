@@ -411,6 +411,11 @@ let canvas = {
             out: 0.5
         }
     },
+    increments: {
+        zoom: 0.05,
+        left: 10,
+        top: 10
+    },
     rounding: {
         zoom: 2
     },
@@ -513,32 +518,32 @@ let canvas = {
     zoom: {
         in: function () {
             if (canvas.settings[getCurrentSeriesNumber()].zoom < canvas.limits.zoom.in) {
-                canvas.settings[getCurrentSeriesNumber()].zoom += 0.1;
+                canvas.settings[getCurrentSeriesNumber()].zoom += canvas.increments.zoom;
                 canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
             }
         },
         out: function () {
             if (canvas.settings[getCurrentSeriesNumber()].zoom > canvas.limits.zoom.out) {
-                canvas.settings[getCurrentSeriesNumber()].zoom -= 0.1;
+                canvas.settings[getCurrentSeriesNumber()].zoom -= canvas.increments.zoom;
                 canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
             }
         }
     },
     move: {
         left: function () {
-            canvas.settings[getCurrentSeriesNumber()].left -= 10;
+            canvas.settings[getCurrentSeriesNumber()].left -= canvas.increments.left;
             canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
         },
         right: function () {
-            canvas.settings[getCurrentSeriesNumber()].left += 10;
+            canvas.settings[getCurrentSeriesNumber()].left += canvas.increments.left;
             canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
         },
         up: function () {
-            canvas.settings[getCurrentSeriesNumber()].top -= 10;
+            canvas.settings[getCurrentSeriesNumber()].top -= canvas.increments.top;
             canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
         },
         down: function () {
-            canvas.settings[getCurrentSeriesNumber()].top += 10;
+            canvas.settings[getCurrentSeriesNumber()].top += canvas.increments.top;
             canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
         }
     }
