@@ -301,6 +301,7 @@ elements = {
             $('.thumb span').hide();
             $('#navTab .container').css('width', '96px');
             $('#largeImage').css('margin-left', '140px');
+            largeImageMarginLeft = $('#largeImage').css('margin-left');
         },
         reflow: () => {
             $('#offline-workflow-thumbnails-pane .thumb').removeClass('clear-left');
