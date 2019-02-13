@@ -130,6 +130,14 @@ $(document).ready(function() {
         canvas.crop.out('crop_bottom');
     });
 
+    $(document).bind('keydown', ']', function () {
+        canvas.rotate.clockwise();
+    });
+
+    $(document).bind('keydown', 'shift+]', function () {
+        canvas.rotate.counter();
+    });
+
 
     $(document).bind('keydown', 'r', function () {
         canvas.series.reset();

@@ -407,6 +407,7 @@ let canvas = {
         crop_right: 0,
         crop_bottom: 0,
         crop_left: 0,
+        rotate: 0
     },
     settings: {},
     limits: {
@@ -419,7 +420,8 @@ let canvas = {
         zoom: 0.05,
         left: 10,
         top: 10,
-        crop: 10
+        crop: 10,
+        rotate: 3
     },
     rounding: {
         zoom: 2
@@ -579,6 +581,16 @@ let canvas = {
             }
             canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
         }
+    },
+    rotate: {
+        clockwise: function () {
+            canvas.settings[getCurrentSeriesNumber()].rotate += canvas.increments.rotate;
+            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+        },
+        counter: function () {
+            canvas.settings[getCurrentSeriesNumber()].rotate -= canvas.increments.rotate;
+            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+        }
     }
 };
 
@@ -629,17 +641,21 @@ canvas.image.onload = function () {
     dX = Number(dX) + Number(seriesCanvasSettings.left);
     dY = Number(dY) + Number(seriesCanvasSettings.top);
 
-    let imageParams = {
-        sx: sX,
-        sy: sY,
-        sWidht: sWidth,
-        sHeight: sHeight
-    };
-
-    console.log(imageParams);
+    let rotateDeg = seriesCanvasSettings.rotate * Math.PI/180;
+    let rectWidth = Math.abs((imageHeight * Math.sin(rotateDeg))) + Math.abs((imageWidth * Math.cos(rotateDeg)));
+    let rectHeight = Math.abs((imageWidth * Math.sin(rotateDeg))) + Math.abs((imageHeight * Math.cos(rotateDeg)));
+    let rX = context.canvas.width/2 - rectWidth/2;
+    let rY = context.canvas.height/2 - rectHeight/2;
 
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-    context.drawImage(canvas.image, sX, sY, sWidth, sHeight, dX, dY, imageWidth, imageHeight);
+    context.fillRect(rX, rY, rectWidth, rectHeight);
+    context.save();
+    context.translate(context.canvas.width/2, context.canvas.height/2);
+    context.rotate(rotateDeg);
+
+    context.drawImage(canvas.image, sX, sY, sWidth, sHeight, dX - context.canvas.width/2, dY - context.canvas.height/2, imageWidth, imageHeight);
+    context.restore();
+
 };
 
 
