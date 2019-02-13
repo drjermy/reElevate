@@ -377,7 +377,7 @@ function setFirstSlice()
                 }
 
                 fadeIn();
-                $('#largeImage').css({'opacity': 1, 'transition': 'opacity .2s ease-out'});
+                canvas.visibility.fadeIn();
 
                 thumbs.markCurrentRead();
             });
@@ -427,6 +427,14 @@ let canvas = {
         zoom: 2
     },
     image: new Image(),
+    visibility: {
+        hide: function () {
+            $('#largeImage').hide();
+        },
+        fadeIn: function () {
+            $('#largeImage').fadeIn(250);
+        }
+    },
     getSeriesSettings: function (currentSeries) {
 
         if (typeof currentSeries === "undefined") {
@@ -1123,7 +1131,7 @@ $(document).ready(function() {
      * When we click a thumb (with the mouse or triggered via js, select the first slice.
      */
     $('.thumb a').click(function() {
-        $('#largeImage').css({'opacity': 0});
+        canvas.visibility.hide();
         setFirstSlice();
     });
 
