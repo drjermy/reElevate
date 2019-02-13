@@ -98,6 +98,10 @@ $(document).ready(function() {
         canvas.move.down();
     });
 
+    $(document).bind('keydown', 'r', function () {
+        canvas.series.reset();
+    });
+
 
     $('#offline-workflow-page-links li').each(function (n, value) {
         let key = n+1;

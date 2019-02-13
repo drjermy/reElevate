@@ -515,6 +515,12 @@ let canvas = {
         canvas.set.height();
         canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
     },
+    series: {
+        reset: function () {
+            canvas.settings[getCurrentSeriesNumber()] = JSON.parse(JSON.stringify(canvas.defaults));
+            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+        }
+    },
     zoom: {
         in: function () {
             if (canvas.settings[getCurrentSeriesNumber()].zoom < canvas.limits.zoom.in) {
