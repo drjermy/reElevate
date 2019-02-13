@@ -98,6 +98,39 @@ $(document).ready(function() {
         canvas.move.down();
     });
 
+    $(document).bind('keydown', ';', function () {
+        canvas.crop.in('crop_left');
+    });
+
+    $(document).bind('keydown', 'shift+;', function () {
+        canvas.crop.out('crop_left');
+    });
+
+    $(document).bind('keydown', '\\', function () {
+        canvas.crop.in('crop_right');
+    });
+
+    $(document).bind('keydown', 'shift+\\', function () {
+        canvas.crop.out('crop_right');
+    });
+
+    $(document).bind('keydown', '[', function () {
+        canvas.crop.in('crop_top');
+    });
+
+    $(document).bind('keydown', 'shift+[', function () {
+        canvas.crop.out('crop_top');
+    });
+
+    $(document).bind('keydown', '\'', function () {
+        canvas.crop.in('crop_bottom');
+    });
+
+    $(document).bind('keydown', 'shift+\'', function () {
+        canvas.crop.out('crop_bottom');
+    });
+
+
     $(document).bind('keydown', 'r', function () {
         canvas.series.reset();
     });

@@ -402,7 +402,11 @@ let canvas = {
     defaults: {
         zoom: 1,
         left: 0,
-        top: 0
+        top: 0,
+        crop_top: 0,
+        crop_right: 0,
+        crop_bottom: 0,
+        crop_left: 0,
     },
     settings: {},
     limits: {
@@ -414,7 +418,8 @@ let canvas = {
     increments: {
         zoom: 0.05,
         left: 10,
-        top: 10
+        top: 10,
+        crop: 10
     },
     rounding: {
         zoom: 2
@@ -560,6 +565,20 @@ let canvas = {
             canvas.settings[getCurrentSeriesNumber()].top += canvas.increments.top;
             canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
         }
+    },
+    crop: {
+        in: function (direction) {
+            if (typeof direction !== "undefined") {
+                canvas.settings[getCurrentSeriesNumber()][direction] += canvas.increments.crop;
+            }
+            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+        },
+        out: function (direction) {
+            if (typeof direction !== "undefined") {
+                canvas.settings[getCurrentSeriesNumber()][direction] -= canvas.increments.crop;
+            }
+            canvas.image.src = $('#offline-workflow-study-large-image').attr('src');
+        }
     }
 };
 
@@ -569,6 +588,8 @@ let canvas = {
  */
 canvas.image.onload = function () {
 
+    let seriesCanvasSettings = canvas.getSeriesSettings();
+
     let canvasHeight, canvasWidth, canvasRatio;
     canvasHeight = context.canvas.height;
     canvasWidth = context.canvas.width;
@@ -577,11 +598,17 @@ canvas.image.onload = function () {
     let baseImageHeight, baseImageWidth, imageRatio;
     baseImageHeight = canvas.image.height;
     baseImageWidth = canvas.image.width;
-    imageRatio = baseImageHeight/baseImageWidth;
 
-    let zoomImageHeight, zoomImageWidth, imageHeight, imageWidth, imageOffsetTop, imageOffsetLeft;
+    let sX, sY, sWidth, sHeight;
 
-    let seriesCanvasSettings = canvas.getSeriesSettings();
+    sX = seriesCanvasSettings.crop_left;
+    sY = seriesCanvasSettings.crop_top;
+    sWidth = baseImageWidth - seriesCanvasSettings.crop_left - seriesCanvasSettings.crop_right;
+    sHeight = baseImageHeight - seriesCanvasSettings.crop_top - seriesCanvasSettings.crop_bottom;
+
+    imageRatio = sHeight/sWidth;
+
+    let zoomImageHeight, zoomImageWidth, imageHeight, imageWidth, dX, dY;
 
     // Work out the image height based on current zoom level and orientation of image and canvas.
     if (imageRatio > canvasRatio) {
@@ -595,15 +622,24 @@ canvas.image.onload = function () {
     }
 
     // Calculate the image offset.
-    imageOffsetTop = (canvasHeight-imageHeight)/2;
-    imageOffsetLeft = (canvasWidth - imageWidth)/2;
+    dY = (canvasHeight-imageHeight)/2;
+    dX = (canvasWidth - imageWidth)/2;
 
     // Alter base position of top, left.
-    imageOffsetLeft = Number(imageOffsetLeft) + Number(seriesCanvasSettings.left);
-    imageOffsetTop = Number(imageOffsetTop) + Number(seriesCanvasSettings.top);
+    dX = Number(dX) + Number(seriesCanvasSettings.left);
+    dY = Number(dY) + Number(seriesCanvasSettings.top);
+
+    let imageParams = {
+        sx: sX,
+        sy: sY,
+        sWidht: sWidth,
+        sHeight: sHeight
+    };
+
+    console.log(imageParams);
 
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-    context.drawImage(canvas.image, imageOffsetLeft, imageOffsetTop, imageWidth, imageHeight);
+    context.drawImage(canvas.image, sX, sY, sWidth, sHeight, dX, dY, imageWidth, imageHeight);
 };
 
 
