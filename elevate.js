@@ -439,7 +439,7 @@ let canvas = {
         }
     },
     increments: {
-        zoom: 0.05,
+        zoom: 0.02,
         left: 10,
         top: 10,
         crop: 10,
