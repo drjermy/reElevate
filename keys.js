@@ -16,14 +16,6 @@ $(document).ready(function() {
         maximise.toggle();
     });
 
-    $(document).bind('keyup', 'n', function () {
-        maximise.show();
-    });
-
-    $(document).bind('keyup', 'shift+m', function () {
-        maximise.show();
-    });
-
     $(document).bind('keyup', 'shift+left', function () {
         navigate.previous();
     });
@@ -94,7 +86,7 @@ $(document).ready(function() {
         canvas.move.left();
     });
 
-    $(document).bind('keydown', '.', function () {
+    $(document).bind('keydown', '/', function () {
         canvas.move.right();
     });
 
@@ -102,7 +94,7 @@ $(document).ready(function() {
         canvas.move.up();
     });
 
-    $(document).bind('keydown', 'm', function () {
+    $(document).bind('keydown', '.', function () {
         canvas.move.down();
     });
 
