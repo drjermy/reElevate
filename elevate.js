@@ -441,10 +441,10 @@ let canvas = {
     },
     increments: {
         zoom: 0.02,
-        left: 10,
-        top: 10,
-        crop: 10,
-        rotate: 3
+        left: 5,
+        top: 5,
+        crop: 5,
+        rotate: 2
     },
     rounding: {
         zoom: 2
