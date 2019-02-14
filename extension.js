@@ -362,9 +362,17 @@ loadForm = () => {
             // Create a set of selector buttons for each of the series.
             for (let n in response.series) {
                 let int = Number(n) + 1;
+
+                let buttonCSS = 'btn-sm';
+                if (response.series[n].state === 'unsaved') {
+                    buttonCSS += ' btn-outline-danger';
+                }
+
                 $('#seriesSelectorWrapper').append(
-                    '<button class="ml-2 btn-sm selectSeries" data-series="' + int + '">' + int + '</button>'
+                    '<button class="ml-2 selectSeries ' + buttonCSS + '" data-series="' + int + '">' + int + '</button>'
                 );
+
+                // Create a show/hide pane for the controls for this series.
                 $('#seriesEditorWrapper').append(
                     '<div class="form-group seriesSelector" data-series="' + int + '"></div>'
                 );
@@ -463,6 +471,7 @@ loadForm = () => {
                             });
                         });
                         playlist.storeStudy(storeObject);
+                        $('.selectSeries').removeClass('btn-outline-danger');
                     });
                 });
             });
@@ -498,8 +507,11 @@ loadForm = () => {
                             let stateObject = response.state;
                             storeObject['series' + response.series] = stateObject;
                             playlist.storeStudy(storeObject);
+                            //alert('.selectSeries[data-series="' + (Number(response.series) + 1) + '"]');
+                            $('.selectSeries[data-series="' + (Number(response.series) + 1) + '"]').removeClass('btn-outline-danger');
 
                             // Update the values in the form fields.
+                            // TODO think that this is now irrelevant
                             $.each(stateObject, function (varName, varValue) {
                                 $('#' + varName + response.series).val(varValue);
                             });
@@ -573,6 +585,7 @@ loadForm = () => {
                     }
 
                     chrome.storage.local.set(result, function () {});
+                    //$('#reloadTab').click();
                 });
             });
 

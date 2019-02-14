@@ -242,6 +242,7 @@ function elementVisibility() {
 
                 if (global.narrowSidebar) {
                     elements.sidebar.narrow();
+                    elements.sidebar.tabs.hide();
                 } else {
                     elements.sidebar.reflow();
                 }
@@ -555,10 +556,22 @@ let canvas = {
         canvas.set.height();
         canvas.reload();
     },
+    study: {
+        destate: function () {
+            $('.thumb').removeAttr('data-state');
+        }
+    },
     series: {
         reset: function () {
             canvas.settings[getCurrentSeriesNumber()] = JSON.parse(JSON.stringify(canvas.defaults));
+            canvas.series.destate();
             canvas.reload();
+        },
+        unsaved: function () {
+            $('#navTab .thumbnails .active').parent('.thumb').attr('data-state', 'unsaved');
+        },
+        destate: function () {
+            $('#navTab .thumbnails .active').parent('.thumb').removeAttr('data-state');
         }
     },
     zoom: {
@@ -570,6 +583,7 @@ let canvas = {
                     canvas.settings[getCurrentSeriesNumber()].zoom += canvas.increments.zoom;
                 }
                 canvas.reload();
+                canvas.series.unsaved();
             }
         },
         out: function () {
@@ -580,24 +594,29 @@ let canvas = {
                     canvas.settings[getCurrentSeriesNumber()].zoom -= canvas.increments.zoom;
                 }
                 canvas.reload();
+                canvas.series.unsaved();
             }
         }
     },
     move: {
         left: function () {
             canvas.settings[getCurrentSeriesNumber()].left -= canvas.increments.left;
+            canvas.series.unsaved();
             canvas.reload();
         },
         right: function () {
             canvas.settings[getCurrentSeriesNumber()].left += canvas.increments.left;
+            canvas.series.unsaved();
             canvas.reload();
         },
         up: function () {
             canvas.settings[getCurrentSeriesNumber()].top -= canvas.increments.top;
+            canvas.series.unsaved();
             canvas.reload();
         },
         down: function () {
             canvas.settings[getCurrentSeriesNumber()].top += canvas.increments.top;
+            canvas.series.unsaved();
             canvas.reload();
         }
     },
@@ -606,22 +625,26 @@ let canvas = {
             if (typeof direction !== "undefined") {
                 canvas.settings[getCurrentSeriesNumber()][direction] += canvas.increments.crop;
             }
+            canvas.series.unsaved();
             canvas.reload();
         },
         out: function (direction) {
             if (typeof direction !== "undefined") {
                 canvas.settings[getCurrentSeriesNumber()][direction] -= canvas.increments.crop;
             }
+            canvas.series.unsaved();
             canvas.reload();
         }
     },
     rotate: {
         clockwise: function () {
             canvas.settings[getCurrentSeriesNumber()].rotate += canvas.increments.rotate;
+            canvas.series.unsaved();
             canvas.reload();
         },
         counter: function () {
             canvas.settings[getCurrentSeriesNumber()].rotate -= canvas.increments.rotate;
+            canvas.series.unsaved();
             canvas.reload();
         }
     }
@@ -1208,6 +1231,9 @@ $(document).ready(function() {
 
                 if (typeof request.lastPositions !== "undefined") {
                     sendResponse(canvas.getStudySettings());
+                    // We call this function to get all data to then save. Mark the study as not unsaved.
+                    // TODO In reality, this should probably occur once we have confirmed save.
+                    canvas.study.destate();
                     break;
                 }
 
@@ -1216,6 +1242,9 @@ $(document).ready(function() {
                         series: current.series(),
                         state: canvas.getSeriesSettings()
                     });
+                    // We call this function to get data for this series. Mark this series as not unsaved.
+                    // TODO In reality, this should probably occur once we have confirmed save.
+                    canvas.series.destate();
                     break;
                 }
 
@@ -1236,6 +1265,7 @@ $(document).ready(function() {
                     series[n] = {};
                     series[n].count = stackedImages[n].images.length;
                     series[n].default = stackedImages[n].images[0].position;
+                    series[n].state = $('#offline-workflow-thumb-' + n).attr('data-state');
                 }
 
                 let response = {
