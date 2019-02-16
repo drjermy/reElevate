@@ -1083,7 +1083,8 @@ let navigate = {
         let i = 0;
         do {
             $('#largeImage .scrollbar .up')[0].click();
-            if (i++ > 100) break;
+            if (i++ > 300) break;
+            console.log(firstImage === $('#largeImage img').attr('src'));
         }
         while (firstImage !== $('#largeImage img').attr('src'));
     },
