@@ -693,8 +693,13 @@ loadForm = () => {
                 $('#viewCasePane').prop('disabled', true).addClass('disabled');
                 $('#viewPlaylist').click().focus();
             } else {
-                // Click the viewStudy pane button and give it focus.
-                $('#viewStudy').click().focus();
+                if (response.hasImages !== true) {
+                    $('#viewStudy').prop('disabled', true).addClass('disabled');
+                    $('#viewCasePane').click().focus();
+                } else {
+                    // Click the viewStudy pane button and give it focus.
+                    $('#viewStudy').click().focus();
+                }
             }
 
         }
