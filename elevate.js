@@ -806,7 +806,7 @@ function firstStudyImage()
     let images = currentStudyImages();
     let firstImageIndex = findIndex('position', 1, images);
     if (firstImageIndex >= 0) {
-        return images[firstImageIndex]['public_filename'];
+        return images[firstImageIndex]['fullscreen_filename'];
     }
 }
 
