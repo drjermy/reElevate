@@ -18,10 +18,7 @@ function observe() {
     // Callback function to execute when mutations are observed
     let callback = function(mutationsList, observer) {
         for(let mutation of mutationsList) {
-            if (mutation.type === 'childList') {
-                //console.log('A child node has been added or removed.');
-            }
-            else if (mutation.type === 'attributes') {
+            if (mutation.type === 'attributes') {
                 if (mutation.attributeName !== "id" && mutation.attributeName !== "style"  && mutation.attributeName !== "src") {
                     console.log('The ' + mutation.attributeName + ' attribute was modified.');
                 }
