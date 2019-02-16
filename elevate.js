@@ -1306,8 +1306,12 @@ function bindKeyboardShortcuts() {
     });
 
 
-    $(document).bind('keyup', 'i', function () {
+    $(document).bind('keyup', 'shift+r', function () {
         init();
+    });
+
+    $(document).bind('keyup', 'shift+s', function () {
+        //canvas.save();
     });
 
 
