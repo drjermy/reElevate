@@ -1,13 +1,52 @@
 let wrapper, wrapperPaddingTop, wrapperPaddingBottom, largeImageMarginLeft, hasImages, isSlide, stackedImages, offlineMode, playlistVars, jumpURL, context;
 
+/**
+ * This is really just for the online version.
+ * In a case, we don't refresh the page, and therefore we need another way to trigger init(), e.g. not document.ready
+ * So, we are going to look for an attribute change to 'type' which seems to happen when we change study.
+ * This could break with any changes to the local codebase.
+ */
+function observe() {
+    if (offlineMode === true) return;
+
+    // Select the node that will be observed for mutations
+    let targetNode = document.getElementById('content');
+
+    // Options for the observer (which mutations to observe)
+    let config = { attributes: true, childList: true, subtree: true };
+
+    // Callback function to execute when mutations are observed
+    let callback = function(mutationsList, observer) {
+        for(let mutation of mutationsList) {
+            if (mutation.type === 'childList') {
+                //console.log('A child node has been added or removed.');
+            }
+            else if (mutation.type === 'attributes') {
+                if (mutation.attributeName !== "id" && mutation.attributeName !== "style"  && mutation.attributeName !== "src") {
+                    console.log('The ' + mutation.attributeName + ' attribute was modified.');
+                }
+                if (mutation.attributeName === 'type') {
+                    init();
+                }
+            }
+        }
+    };
+
+    // Create an observer instance linked to the callback function
+    let observer = new MutationObserver(callback);
+
+    // Start observing the target node for configured mutations
+    observer.observe(targetNode, config);
+}
+
 function init() {
     wrapper = $('#wrapper');
     wrapperPaddingTop = wrapper.css('padding-top');
     wrapperPaddingBottom = wrapper.css('padding-bottom');
     largeImageMarginLeft = $('#largeImage').css('margin-left');
-    isSlide = ($('.slide').length > 0 ? true : false);
-    hasImages = ($('#largeImage img').length > 0 ? true : false);
-    
+    isSlide = ($('.slide').length > 0);
+    hasImages = ($('#largeImage img').length > 0);
+
     bindKeyboardShortcuts();
     getPageVariables();
     getPlaylistVarsFromURL();
@@ -209,7 +248,6 @@ function elementVisibility() {
 
             if (hasImages !== true) {
 
-                console.log(global)
                 let caseEntry = global[store.case_id()];
 
                 if (typeof aseEntry.presentationPresentation !== "undefined") {
@@ -1109,7 +1147,6 @@ let navigate = {
         do {
             $('#largeImage .scrollbar .up')[0].click();
             if (i++ > 300) break;
-            console.log(firstImage === $('#largeImage img').attr('src'));
         }
         while (firstImage !== $('#largeImage img').attr('src'));
     },
@@ -1378,6 +1415,7 @@ function bindKeyboardShortcuts() {
 
 
 $(document).ready(function() {
+    observe();
     init();
 
     $( window ).resize(function() {
