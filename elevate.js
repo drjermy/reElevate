@@ -207,56 +207,77 @@ function elementVisibility() {
         elements.presentingDefaults();
         global.all(function (global) {
 
-            let caseEntry = global[store.case_id()];
-            let study = global[store.name()];
+            if (hasImages !== true) {
 
-            jumpURL = global.jumpURL;
-            caseEntry = (typeof caseEntry !== "undefined" ? caseEntry : {});
-            study = (typeof study !== "undefined" ? study : {});
+                console.log(global)
+                let caseEntry = global[store.case_id()];
 
-            if (global.hideTabs === true) {
-                elements.sidebar.tabs.hide();
-            }
-
-            if ((global.hideFindings === true && caseEntry.showFindings !== true) || (global.hideFindings !== true && caseEntry.hideFindings === true)) {
-                elements.findingsTab.disable();
-                elements.rid.hide();
-            }
-
-            if (global.showPresentation === true || caseEntry.showPresentation === true) {
-                presentation.init(caseEntry);
-            }
-
-            if (study.maximiseCase === true) {
-                elements.maximise.hide();
-                maximise.visible = false;
-            }
-
-            // We save the starting Series as if they started from 1, but the thumbs are 0-indexed.
-            if (typeof study.startingSeries !== "undefined") {
-                let n = Number(study.startingSeries) - 1;
-                navigate.series(n);
-            }
-
-            $('#offline-workflow-thumbnails-pane .thumb').each(function () {
-                let id = $(this).attr('id').split('offline-workflow-thumb-')[1];
-                if (study['hideSeries' + id] === true) {
-                    $(this).hide();
+                if (typeof aseEntry.presentationPresentation !== "undefined") {
+                    $('#offline-workflow-presentation-text').text(caseEntry.presentationPresentation);
                 }
 
-                if (global.narrowSidebar) {
-                    elements.sidebar.narrow();
+                if (typeof caseEntry.presentationAge !== "undefined") {
+                    $('#offline-workflow-age').parent('tr').find('td').text(caseEntry.presentationAge);
+                }
+
+                if (typeof caseEntry.presentationGender !== "undefined") {
+                    $('#offline-workflow-gender').parent('tr').find('td').text(caseEntry.presentationGender);
+                }
+
+            } else {
+
+                let caseEntry = global[store.case_id()];
+                let study = global[store.name()];
+
+                jumpURL = global.jumpURL;
+                caseEntry = (typeof caseEntry !== "undefined" ? caseEntry : {});
+                study = (typeof study !== "undefined" ? study : {});
+
+                if (global.hideTabs === true) {
                     elements.sidebar.tabs.hide();
-                } else {
-                    elements.sidebar.reflow();
                 }
-            });
 
-            // Set maximise, and hide header, sidebar and footer if required.
-            header.setVisibility();
-            sidebar.setVisibility();
-            footer.setVisibility();
-            maximise.setVisibility();
+                if ((global.hideFindings === true && caseEntry.showFindings !== true) || (global.hideFindings !== true && caseEntry.hideFindings === true)) {
+                    elements.findingsTab.disable();
+                    elements.rid.hide();
+                }
+
+                if (global.showPresentation === true || caseEntry.showPresentation === true) {
+                    presentation.init(caseEntry);
+                }
+
+                if (study.maximiseCase === true) {
+                    elements.maximise.hide();
+                    maximise.visible = false;
+                }
+
+                // We save the starting Series as if they started from 1, but the thumbs are 0-indexed.
+                if (typeof study.startingSeries !== "undefined") {
+                    let n = Number(study.startingSeries) - 1;
+                    navigate.series(n);
+                }
+
+                $('#offline-workflow-thumbnails-pane .thumb').each(function () {
+                    let id = $(this).attr('id').split('offline-workflow-thumb-')[1];
+                    if (study['hideSeries' + id] === true) {
+                        $(this).hide();
+                    }
+
+                    if (global.narrowSidebar) {
+                        elements.sidebar.narrow();
+                        elements.sidebar.tabs.hide();
+                    } else {
+                        elements.sidebar.reflow();
+                    }
+                });
+
+                // Set maximise, and hide header, sidebar and footer if required.
+                header.setVisibility();
+                sidebar.setVisibility();
+                footer.setVisibility();
+                maximise.setVisibility();
+
+            }
         });
 
     }
