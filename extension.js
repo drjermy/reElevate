@@ -113,11 +113,17 @@ let playlist = {
                 studyId: partsArray[7]
             };
         } else {
+            let studyId;
+            if (typeof pathArray[10] === "undefined") {
+                studyId = pathArray[9];
+            } else {
+                studyId = pathArray[10];
+            }
             playlist.vars = {
                 playlistId: pathArray[4],
                 entryId: pathArray[6],
                 caseId: pathArray[8],
-                studyId: pathArray[10].split('#')[0]
+                studyId: studyId.split('#')[0]
             };
         }
     },
