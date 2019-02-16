@@ -1466,6 +1466,9 @@ $(document).ready(function() {
                     case 'unzoom':
                         canvas.zoom.out();
                         break;
+                    case 'refresh':
+                        init();
+                        break;
                 }
 
                 // Need to refresh the internal variables defined by current case.
