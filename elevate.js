@@ -1,19 +1,23 @@
-let wrapper, wrapperPaddingTop, wrapperPaddingBottom, largeImageMarginLeft, isSlide, stackedImages, offlineMode, playlistVars, jumpURL, context;
+let wrapper, wrapperPaddingTop, wrapperPaddingBottom, largeImageMarginLeft, hasImages, isSlide, stackedImages, offlineMode, playlistVars, jumpURL, context;
 
 function init() {
     wrapper = $('#wrapper');
     wrapperPaddingTop = wrapper.css('padding-top');
     wrapperPaddingBottom = wrapper.css('padding-bottom');
     largeImageMarginLeft = $('#largeImage').css('margin-left');
-    if ($('.slide').length > 0) isSlide = true;
-
+    isSlide = ($('.slide').length > 0 ? true : false);
+    hasImages = ($('#largeImage img').length > 0 ? true : false);
+    
+    bindKeyboardShortcuts();
     getPageVariables();
     getPlaylistVarsFromURL();
     saveHistory();
     elementVisibility();
     setFirstSlice();
-    if (!isSlide) {
+    if (hasImages && !isSlide) {
         canvas.setup();
+    } else {
+        fadeIn();
     }
 }
 
@@ -1458,7 +1462,8 @@ $(document).ready(function() {
                     playlist: global.name(),
                     series: series,
                     currentSeries: getCurrentSeriesNumber(),
-                    isSlide: isSlide
+                    isSlide: isSlide,
+                    hasImages: hasImages
                 };
 
                 sendResponse(response);
