@@ -545,6 +545,7 @@ loadForm = () => {
                     }
 
                     chrome.storage.local.set(result, function () {});
+                    tabAction('refresh');
                 });
             });
 
@@ -616,7 +617,7 @@ loadForm = () => {
 
                     //alert(keyCode);
 
-                    if (keyCode >= 49 && keyCode <= 57) {
+                    if (keyCode >= 49 && keyCode <= 57) { // 1-9
                         let n = keyCode - 48;
                         $('.selectSeries[data-series="' + n + '"]').click().focus();
                     }
