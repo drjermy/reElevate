@@ -477,10 +477,10 @@ let canvas = {
     image: new Image(),
     visibility: {
         hide: function () {
-            $('#largeImage').hide();
+            $('#imageCanvas').hide();
         },
         fadeIn: function () {
-            $('#largeImage').fadeIn(250);
+            $('#imageCanvas').fadeIn(250);
         }
     },
     getSeriesSettings: function (currentSeries) {
