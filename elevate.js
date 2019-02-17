@@ -321,6 +321,11 @@ function elementVisibility() {
 
 elements = {
     header: {
+        maxHide: () => {
+            $('#headerWrapper').hide();
+            $('#wrapper').css('padding-top', '0px');
+            setImageWrapperSize();
+        },
         hide: () => {
             if (header.visible === true) {
                 $('#headerWrapper').hide();
@@ -370,6 +375,11 @@ elements = {
         }
     },
     footer: {
+        maxHide: () => {
+            $('#footer').hide();
+            $('#wrapper').css('padding-bottom', '0px');
+            setImageWrapperSize();
+        },
         hide: () => {
             if (footer.visible === true) {
                 $('#footer').hide();
@@ -1120,9 +1130,18 @@ let maximise = {
         elements.maximise.hide();
     },
     slideHide: function () {
-        elements.header.hide();
-        elements.sidebar.hide();
-        elements.footer.hide();
+        global.all(function (result) {
+            if (result.maximiseSlides) {
+                $('.slide img').css('height', '100%');
+                elements.header.maxHide();
+                elements.sidebar.hide();
+                elements.footer.maxHide();
+            } else {
+                elements.header.hide();
+                elements.sidebar.hide();
+                elements.footer.hide();
+            }
+        });
     }
 };
 
@@ -1416,8 +1435,9 @@ function bindKeyboardShortcuts() {
 
 
 $(document).ready(function() {
-    observe();
+
     init();
+    observe();
 
     $( window ).resize(function() {
         setImageWrapperSize();
