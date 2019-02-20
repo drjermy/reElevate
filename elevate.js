@@ -247,7 +247,7 @@ function elementVisibility() {
 
                 let caseEntry = global[store.case_id()];
 
-                if (typeof aseEntry.presentationPresentation !== "undefined") {
+                if (typeof caseEntry.presentationPresentation !== "undefined") {
                     $('#offline-workflow-presentation-text').text(caseEntry.presentationPresentation);
                 }
 
@@ -258,6 +258,12 @@ function elementVisibility() {
                 if (typeof caseEntry.presentationGender !== "undefined") {
                     $('#offline-workflow-gender').parent('tr').find('td').text(caseEntry.presentationGender);
                 }
+
+                // Set maximise, and hide header, sidebar and footer if required.
+                header.setVisibility();
+                sidebar.setVisibility();
+                footer.setVisibility();
+                maximise.setVisibility();
 
             } else {
 
@@ -317,6 +323,7 @@ function elementVisibility() {
                 maximise.setVisibility();
 
             }
+
         });
 
     }
@@ -583,6 +590,7 @@ let canvas = {
             context = document.getElementById('imageCanvas').getContext("2d");
         },
         width: function () {
+            if ($('#largeImage').length < 1) return;
             if ($('.scrollbar').is(':visible')) {
                 context.canvas.width = $('#largeImage').width()-16-$('.scrollbar').width();
             } else {
@@ -590,6 +598,7 @@ let canvas = {
             }
         },
         height: function () {
+            if ($('#largeImage').length < 1) return;
             context.canvas.height = $('#largeImage').height();
         }
     },
