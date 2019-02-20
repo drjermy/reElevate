@@ -306,6 +306,10 @@ function elementVisibility() {
                     }
                 });
 
+                if (global.reorderTabs === true) {
+                    $('.offline-workflow-tabs').prepend($('.offline-workflow-tab-questions'));
+                }
+
                 // Set maximise, and hide header, sidebar and footer if required.
                 header.setVisibility();
                 sidebar.setVisibility();
@@ -324,7 +328,6 @@ elements = {
         maxHide: () => {
             $('#headerWrapper').hide();
             $('#wrapper').css('padding-top', '0px');
-            setImageWrapperSize();
         },
         hide: () => {
             if (header.visible === true) {
@@ -342,6 +345,10 @@ elements = {
         }
     },
     sidebar: {
+        maxHide: () => {
+            $('#navTab').hide();
+            $('#largeImage').css('margin-left', 0);
+        },
         hide: () => {
             if (sidebar.visible === true) {
                 $('#navTab').hide();
@@ -378,7 +385,6 @@ elements = {
         maxHide: () => {
             $('#footer').hide();
             $('#wrapper').css('padding-bottom', '0px');
-            setImageWrapperSize();
         },
         hide: () => {
             if (footer.visible === true) {
@@ -1132,9 +1138,9 @@ let maximise = {
     slideHide: function () {
         global.all(function (result) {
             if (result.maximiseSlides) {
-                $('.slide img').css('height', '100%');
+                $('.slide img').css('height', $('#wrapper').height());
                 elements.header.maxHide();
-                elements.sidebar.hide();
+                elements.sidebar.maxHide();
                 elements.footer.maxHide();
             } else {
                 elements.header.hide();
