@@ -247,16 +247,18 @@ function elementVisibility() {
 
                 let caseEntry = global[store.case_id()];
 
-                if (typeof caseEntry.presentationPresentation !== "undefined") {
-                    $('#offline-workflow-presentation-text').text(caseEntry.presentationPresentation);
-                }
+                if (typeof caseEntry !== "undefined") {
+                    if (typeof caseEntry.presentationPresentation !== "undefined") {
+                        $('#offline-workflow-presentation-text').text(caseEntry.presentationPresentation);
+                    }
 
-                if (typeof caseEntry.presentationAge !== "undefined") {
-                    $('#offline-workflow-age').parent('tr').find('td').text(caseEntry.presentationAge);
-                }
+                    if (typeof caseEntry.presentationAge !== "undefined") {
+                        $('#offline-workflow-age').parent('tr').find('td').text(caseEntry.presentationAge);
+                    }
 
-                if (typeof caseEntry.presentationGender !== "undefined") {
-                    $('#offline-workflow-gender').parent('tr').find('td').text(caseEntry.presentationGender);
+                    if (typeof caseEntry.presentationGender !== "undefined") {
+                        $('#offline-workflow-gender').parent('tr').find('td').text(caseEntry.presentationGender);
+                    }
                 }
 
                 // Set maximise, and hide header, sidebar and footer if required.
