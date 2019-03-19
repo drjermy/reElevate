@@ -1489,6 +1489,9 @@ $(document).ready(function() {
                     case 'next':
                         navigate.next();
                         break;
+                    case 'orange':
+                        navigate.orange();
+                        break;
                     case 'up':
                         navigate.up(1);
                         break;

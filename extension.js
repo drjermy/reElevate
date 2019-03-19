@@ -642,7 +642,7 @@ loadForm = () => {
                         tabAction('prev', true);
                     }
                     if (keyCode === 39) { // right
-                        tabAction('next', true);
+                        tabAction('orange', true);
                     }
                     if (keyCode === 38) { // up
                         tabAction('up');
