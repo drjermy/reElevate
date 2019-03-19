@@ -477,12 +477,14 @@ function setFirstSlice()
                     }
                 }
 
-                if (Number(stackedImages[getCurrentSeriesNumber()].images.length) === 1) {
-                    $('.scrollbar').hide();
-                } else {
-                    $('.scrollbar').show();
+                if (typeof stackedImages !== "undefined") {
+                    if (Number(stackedImages[getCurrentSeriesNumber()].images.length) === 1) {
+                        $('.scrollbar').hide();
+                    } else {
+                        $('.scrollbar').show();
+                    }
+                    canvas.resize();
                 }
-                canvas.resize();
 
                 fadeIn();
                 canvas.visibility.fadeIn();
