@@ -122,9 +122,11 @@ let playlist = {
             playlist.vars = {
                 playlistId: pathArray[4],
                 entryId: pathArray[6],
-                caseId: pathArray[8],
-                studyId: studyId.split('#')[0]
+                caseId: pathArray[8]
             };
+            if (typeof studyId !== 'undefined') {
+                playlist.vars.studyId = studyId.split('#')[0];
+            }
         }
     },
     playlist_id: () => { // Create the playlist id that is used as the location for playlist config.
