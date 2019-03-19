@@ -339,8 +339,8 @@ elements = {
             $('#headerWrapper').hide();
             $('#wrapper').css('padding-top', '0px');
         },
-        hide: () => {
-            if (header.visible === true) {
+        hide: (force = false) => {
+            if (force === true || header.visible === true) {
                 $('#headerWrapper').hide();
                 $('#wrapper').css('padding-top', '16px');
                 setImageWrapperSize();
@@ -359,8 +359,8 @@ elements = {
             $('#navTab').hide();
             $('#largeImage').css('margin-left', 0);
         },
-        hide: () => {
-            if (sidebar.visible === true) {
+        hide: (force = false) => {
+            if (force === true || sidebar.visible === true) {
                 $('#navTab').hide();
                 $('#largeImage').css('margin-left', 0);
                 setImageWrapperSize();
@@ -396,8 +396,8 @@ elements = {
             $('#footer').hide();
             $('#wrapper').css('padding-bottom', '0px');
         },
-        hide: () => {
-            if (footer.visible === true) {
+        hide: (force = false) => {
+            if (force === true || footer.visible === true) {
                 $('#footer').hide();
                 $('#wrapper').css('padding-bottom', '16px');
                 setImageWrapperSize();
@@ -413,9 +413,9 @@ elements = {
     },
     maximise: {
         hide: () => {
-            elements.header.hide();
-            elements.sidebar.hide();
-            elements.footer.hide();
+            elements.header.hide(true);
+            elements.sidebar.hide(true);
+            elements.footer.hide(true);
         },
         show: () => {
             elements.header.show();
