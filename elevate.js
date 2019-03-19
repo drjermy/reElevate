@@ -1151,10 +1151,10 @@ let maximise = {
     slideHide: function () {
         global.all(function (result) {
             if (result.maximiseSlides) {
-                $('.slide img').css('height', $('#wrapper').height());
                 elements.header.maxHide();
                 elements.sidebar.maxHide();
                 elements.footer.maxHide();
+                $('.slide img').css('height', $('#wrapper').height());
             } else {
                 elements.header.hide();
                 elements.sidebar.hide();
