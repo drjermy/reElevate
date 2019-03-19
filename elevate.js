@@ -1,4 +1,4 @@
-let wrapper, wrapperPaddingTop, wrapperPaddingBottom, largeImageMarginLeft, hasImages, isSlide, stackedImages, offlineMode, playlistVars, jumpURL, context;
+let wrapper, wrapperPaddingTop, wrapperPaddingBottom, largeImageMarginLeft, hasImages, hasVideo, isSlide, stackedImages, offlineMode, playlistVars, jumpURL, context;
 
 /**
  * This is really just for the online version.
@@ -43,6 +43,7 @@ function init() {
     largeImageMarginLeft = $('#largeImage').css('margin-left');
     isSlide = ($('.slide').length > 0);
     hasImages = ($('#largeImage img').length > 0);
+    hasVideo = ($('.video-js-box').length > 0);
 
     bindKeyboardShortcuts();
     getPageVariables();
@@ -50,7 +51,7 @@ function init() {
     saveHistory();
     elementVisibility();
     setFirstSlice();
-    if (hasImages && !isSlide) {
+    if (hasImages && !isSlide && !hasVideo) {
         canvas.setup();
     } else {
         fadeIn();
@@ -852,7 +853,16 @@ let findIndex = function (key, val, arr) {
 
 function setImageWrapperSize()
 {
-    canvas.resize();
+    if (hasVideo) {
+        if ($('#largeImage').length > 0) {
+            $('.video-js').height($('#largeImage').height());
+            $('.video-js').width($('#largeImage').width());
+        }
+    } else {
+        if (!isSlide) {
+            canvas.resize();
+        }
+    }
 }
 
 
