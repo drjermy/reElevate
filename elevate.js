@@ -1350,6 +1350,17 @@ function bindKeyboardShortcuts() {
         //canvas.save();
     });
 
+    $(document).bind('keyup', 'space', function (e) {
+        e.preventDefault();
+        if ($('.vjs-has-started').length > 0) {
+            $('.vjs-play-control').click();
+        } else {
+            if ($('.vjs-big-play-button').length > 0) {
+                $('.vjs-big-play-button').click();
+            }
+        }
+    });
+
 
     // ZOOM
 
