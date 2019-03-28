@@ -524,6 +524,7 @@ let clock = {
     duration: 60 * 2,
     hasStarted: false,
     isPaused: false,
+    timer: 0,
     init: () => {
         clock.set(60*1);
         clock.create();
@@ -544,6 +545,9 @@ let clock = {
         $(document).bind('keydown', 'space', function () {
             clock.playPause();
         });
+        $(document).bind('keydown', 'ctrl+r', function () {
+            clock.reset();
+        });
     },
     text: (timer = clock.duration) => {
         let minutes, seconds;
@@ -557,14 +561,15 @@ let clock = {
         return minutes + ":" + seconds;
     },
     start: () => {
+        let text;
         clock.hasStarted = true;
-        let timer = clock.duration-1, text;
+        clock.timer = clock.duration-1;
         setInterval(function () {
-            text = clock.text(timer);
-            $('#clock').html(text);
-
             if (clock.isPaused === false) {
-                if (--timer < 0) {
+                text = clock.text(clock.timer);
+                $('#clock').html(text);
+
+                if (--clock.timer < 0) {
                     // TODO we really should exit when we get to this state!
                     timer = 0;
                 }
@@ -591,7 +596,8 @@ let clock = {
         }
     },
     reset: () => {
-        // TODO reset the timer to the original state.
+        clock.timer = clock.duration;
+        clock.playPause();
     }
 };
 
