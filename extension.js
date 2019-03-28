@@ -711,7 +711,7 @@ loadForm = () => {
                 $('#viewCasePane').prop('disabled', true).addClass('disabled');
                 $('#viewPlaylist').click().focus();
             } else {
-                $('#engageClock').prop('disabled', true).addClass('disabled');
+                $('#engageShowClock').prop('disabled', true).addClass('disabled');
                 if (response.hasImages !== true) {
                     $('#viewStudy').prop('disabled', true).addClass('disabled');
                     $('#viewCasePane').click().focus();

@@ -31,3 +31,19 @@ canvas {
 #navTab .container .questions {
     height: 95% !important;
 }
+
+#clock {
+    font-size: 5rem;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 15rem;
+    height: 7rem;
+    text-align: center;
+    vertical-align: middle;
+    color: white;
+    background-color: transparent;
+    padding: 1rem;
+    margin-top: -3.5rem;
+    margin-left: -7.5rem;
+}

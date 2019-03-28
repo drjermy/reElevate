@@ -1,4 +1,4 @@
-let wrapper, wrapperPaddingTop, wrapperPaddingBottom, largeImageMarginLeft, hasImages, hasVideo, isSlide, stackedImages, offlineMode, playlistVars, jumpURL, context;
+let wrapper, wrapperPaddingTop, wrapperPaddingBottom, largeImageMarginLeft, hasImages, hasVideo, isSlide, stackedImages, offlineMode, playlistVars, jumpURL, context, globalSettings;
 
 /**
  * This is really just for the online version.
@@ -56,6 +56,7 @@ function init() {
     } else {
         fadeIn();
     }
+    engage();
 }
 
 
@@ -503,6 +504,61 @@ function fadeIn()
 {
     wrapper.css({'opacity': 1, 'transition': 'opacity .2s ease-out'});
 }
+
+
+function engage()
+{
+    if (isSlide) {
+        global.all(function (result) {
+            let id = store.case_id();
+            let showClock = result[id].showClock;
+
+            if (showClock) {
+                clock.show();
+            }
+        });
+    }
+}
+
+let clock = {
+    duration: 60 * 2,
+    show: () => {
+        clock.set(60*1);
+        clock.create();
+        clock.start();
+    },
+    set: (seconds) => {
+        clock.duration = seconds;
+    },
+    create: () => {
+        let text = clock.text();
+        $('#largeImage').append("<div id=\"clock\">" + text + "</div>");
+    },
+    text: (timer = clock.duration) => {
+        let minutes, seconds;
+
+        minutes = parseInt(timer / 60, 10)
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        return minutes + ":" + seconds;
+    },
+    start: () => {
+        let timer = clock.duration-1, text;
+        setInterval(function () {
+            text = clock.text(timer);
+
+            $('#clock').html(text);
+
+            if (--timer < 0) {
+                // TODO we really should exit when we get to this state!
+                timer = 0;
+            }
+        }, 1000);
+    }
+};
 
 
 /**
