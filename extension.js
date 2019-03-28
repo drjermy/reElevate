@@ -101,6 +101,9 @@ let playlist = {
     isOffline: () => { // Determine whether we are online or offline.
         playlist.offlineMode = (playlist.tab.url.split('://')[0] === 'file');
     },
+    hasStudyId: () => {
+        return typeof playlist.vars.studyId === 'undefined';
+    },
     varsFromUrl: () => { // Gather all the vars from the URL (different format for online and offline).
         let pathArray = playlist.tab.url.split('/');
         if (playlist.offlineMode === true) {
@@ -154,6 +157,16 @@ let playlist = {
             if (!result[playlist_id]) {
                 result[playlist_id] = {};
             }
+            if (scope === 'engage') {
+                // Slides don't have a study Id.
+                if (playlist.hasStudyId()) {
+                    if (!result[playlist_id][case_id]) result[playlist_id][case_id] = {};
+                    result[playlist_id][case_id][variableName] = variableValue;
+                } else {
+                    if (!result[playlist_id][study_id]) result[playlist_id][study_id] = {};
+                    result[playlist_id][study_id][variableName] = variableValue;
+                }
+            }
             if (scope === 'playlist') {
                 if (!result[playlist_id]) result[playlist_id] = {};
                 result[playlist_id][variableName] = variableValue;
@@ -166,6 +179,7 @@ let playlist = {
                 if (!result[playlist_id][study_id]) result[playlist_id][study_id] = {};
                 result[playlist_id][study_id][variableName] = variableValue;
             }
+            console.log(result);
             chrome.storage.local.set(result, function () {});
         });
     },
@@ -279,10 +293,13 @@ loadForm = () => {
             let scope = $(that).parents('.popper-wrapper').attr('data-scope');
 
             if (typeof scope !== "undefined") {
-
                 let settings = result[response.playlist];
                 if (scope !== 'playlist') {
-                    settings = settings[response[scope]];
+                    if (scope === 'engage') {
+                        settings = settings[response['case']];
+                    } else {
+                        settings = settings[response[scope]];
+                    }
                 }
                 if (typeof settings === "undefined") {
                     settings = {};
@@ -360,12 +377,10 @@ loadForm = () => {
 
         if (typeof response.series !== "undefined") {
 
-            let numberOfSeries = Object.keys(response.series).length;
-            if (numberOfSeries > 1) {
-                $('#seriesSelectorWrapper').append(
-                    '<div class="mb-4"><button id="saveStudyState" class="ml-2 btn-sm">Save state for <strong>a</strong>ll series</button></div>'
-                );
-            }
+            let numberOfSeries = Object.keys(response.series).length;//if (numberOfSeries > 1) {
+            $('#seriesSelectorWrapper').append(
+                '<div class="mb-4"><button id="saveStudyState" class="ml-2 btn-sm">Save state for <strong>a</strong>ll series</button></div>'
+            );
 
             // Create a set of selector buttons for each of the series.
             for (let n in response.series) {
@@ -696,6 +711,7 @@ loadForm = () => {
                 $('#viewCasePane').prop('disabled', true).addClass('disabled');
                 $('#viewPlaylist').click().focus();
             } else {
+                $('#engageClock').prop('disabled', true).addClass('disabled');
                 if (response.hasImages !== true) {
                     $('#viewStudy').prop('disabled', true).addClass('disabled');
                     $('#viewCasePane').click().focus();

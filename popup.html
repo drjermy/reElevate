@@ -49,12 +49,23 @@
     </div>
     <div id="navigation" class="container py-2">
         <nobr>
+            <button id="viewEngagePane" data-open="engagePane" class="openButton btn-sm">Engage</button>
             <button id="viewPlaylist" data-open="playlistPane" class="openButton btn-sm">Playlist</button>
             <button id="viewCasePane" data-open="casePane" class="openButton btn-sm">Case</button>
             <button id="viewStudy" data-open="studyPane" class="openButton btn-sm">Study</button>
             <button id="reloadTab" class="actionButton btn-sm" data-action="reload">&#8635;</button>
             <button id="viewHelp" data-open="helpPane" class="openButton btn-sm">?</button>
         </nobr>
+    </div>
+
+    <div id="engagePane" class="container pane py-2">
+        <h1>Engage</h1>
+        <div id="engageInput" class="popper-wrapper" data-scope="engage">
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input toggle popup-toggle" id="engageClock" data-variable="clock">
+                <label class="custom-control-label nobr" for="engageClock">Clock</label>
+            </div>
+        </div>
     </div>
 
     <div id="playlistPane" class="container pane py-2">
