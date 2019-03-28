@@ -32,7 +32,7 @@ canvas {
     height: 95% !important;
 }
 
-#clock {
+#clockWrapper {
     font-size: 5rem;
     position: absolute;
     left: 50%;
@@ -46,4 +46,8 @@ canvas {
     padding: 1rem;
     margin-top: -3.5rem;
     margin-left: -7.5rem;
+}
+
+#clock:hover{
+    cursor: pointer;
 }

@@ -514,7 +514,7 @@ function engage()
             let showClock = result[id].showClock;
 
             if (showClock) {
-                clock.show();
+                clock.init();
             }
         });
     }
@@ -522,17 +522,28 @@ function engage()
 
 let clock = {
     duration: 60 * 2,
-    show: () => {
+    hasStarted: false,
+    isPaused: false,
+    init: () => {
         clock.set(60*1);
         clock.create();
-        clock.start();
     },
     set: (seconds) => {
         clock.duration = seconds;
     },
     create: () => {
         let text = clock.text();
-        $('#largeImage').append("<div id=\"clock\">" + text + "</div>");
+        $('#largeImage').append(
+            '<div id="clockWrapper">' +
+            '<span id="clock">' + text + '</span>' +
+            '</div>'
+        );
+        $('#clock').on('click', function () {
+            clock.playPause();
+        });
+        $(document).bind('keydown', 'space', function () {
+            clock.playPause();
+        });
     },
     text: (timer = clock.duration) => {
         let minutes, seconds;
@@ -546,17 +557,41 @@ let clock = {
         return minutes + ":" + seconds;
     },
     start: () => {
+        clock.hasStarted = true;
         let timer = clock.duration-1, text;
         setInterval(function () {
             text = clock.text(timer);
-
             $('#clock').html(text);
 
-            if (--timer < 0) {
-                // TODO we really should exit when we get to this state!
-                timer = 0;
+            if (clock.isPaused === false) {
+                if (--timer < 0) {
+                    // TODO we really should exit when we get to this state!
+                    timer = 0;
+                }
             }
         }, 1000);
+    },
+    pause: () => {
+        $('#clock').css('opacity', '0.6');
+        clock.isPaused = true;
+    },
+    restart: () => {
+        $('#clock').css('opacity', '1');
+        clock.isPaused = false;
+    },
+    playPause: () => {
+        if (clock.hasStarted === false) {
+            clock.start();
+        } else {
+            if (clock.isPaused === false) {
+                clock.pause();
+            } else {
+                clock.restart();
+            }
+        }
+    },
+    reset: () => {
+        // TODO reset the timer to the original state.
     }
 };
 
