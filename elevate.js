@@ -525,10 +525,7 @@ let clock = {
     hasStarted: false,
     isPaused: false,
     timer: 0,
-    init: () => {
-        clock.set(60*2);
-        clock.create();
-    },
+    runningClock: null,
     set: (seconds) => {
         clock.duration = seconds;
     },
@@ -548,6 +545,17 @@ let clock = {
         $(document).bind('keydown', 'ctrl+r', function () {
             clock.reset();
         });
+        $(document).bind('keydown', 'ctrl+-', function () {
+            clock.subMinute();
+        });
+        $(document).bind('keydown', 'ctrl+=', function () {
+            clock.addMinute();
+        });
+    },
+    init: () => {
+        clock.set(60*2);
+        clock.timer = clock.duration;
+        clock.create();
     },
     text: (timer = clock.duration) => {
         let minutes, seconds;
@@ -560,28 +568,34 @@ let clock = {
 
         return minutes + ":" + seconds;
     },
-    start: () => {
+    refreshText: () => {
         let text;
+        text = clock.text(clock.timer);
+        $('#clock').html(text);
+    },
+    start: () => {
+        clock.timer -= 1;
         clock.hasStarted = true;
-        clock.timer = clock.duration-1;
-        let runningClock = setInterval(function () {
+        clock.runningClock = setInterval(function () {
             if (clock.isPaused === false) {
-                text = clock.text(clock.timer);
-                $('#clock').html(text);
-
+                clock.refreshText();
                 if (--clock.timer < 0) {
-                    clearInterval(runningClock);
+                    clearInterval(clock.runningClock);
                 }
             }
         }, 1000);
     },
     pause: () => {
-        $('#clock').css('opacity', '0.6');
-        clock.isPaused = true;
+        if (clock.runningClock) {
+            $('#clock').css('opacity', '0.6');
+            clock.isPaused = true;
+        }
     },
     restart: () => {
-        $('#clock').css('opacity', '1');
-        clock.isPaused = false;
+        if (clock.runningClock) {
+            $('#clock').css('opacity', '1');
+            clock.isPaused = false;
+        }
     },
     playPause: () => {
         if (clock.hasStarted === false) {
@@ -596,6 +610,17 @@ let clock = {
     },
     reset: () => {
         // TODO need to change the way we reset now that we are clearing the timer.
+    },
+    addMinute: () => {
+        clock.timer += 60;
+        clock.refreshText();
+    },
+    subMinute: () => {
+        clock.timer -= 60;
+        if (clock.timer < 0) {
+            clock.timer = 0;
+        }
+        clock.refreshText();
     }
 };
 
