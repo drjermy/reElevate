@@ -526,7 +526,7 @@ let clock = {
     isPaused: false,
     timer: 0,
     init: () => {
-        clock.set(60*1);
+        clock.set(60*2);
         clock.create();
     },
     set: (seconds) => {
@@ -564,14 +564,13 @@ let clock = {
         let text;
         clock.hasStarted = true;
         clock.timer = clock.duration-1;
-        setInterval(function () {
+        let runningClock = setInterval(function () {
             if (clock.isPaused === false) {
                 text = clock.text(clock.timer);
                 $('#clock').html(text);
 
                 if (--clock.timer < 0) {
-                    // TODO we really should exit when we get to this state!
-                    timer = 0;
+                    clearInterval(runningClock);
                 }
             }
         }, 1000);
@@ -596,8 +595,7 @@ let clock = {
         }
     },
     reset: () => {
-        clock.timer = clock.duration;
-        clock.playPause();
+        // TODO need to change the way we reset now that we are clearing the timer.
     }
 };
 
