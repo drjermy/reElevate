@@ -711,7 +711,7 @@ loadForm = () => {
                 $('#viewCasePane').prop('disabled', true).addClass('disabled');
                 $('#viewPlaylist').click().focus();
             } else {
-                $('#engageShowClock').prop('disabled', true).addClass('disabled');
+                $('.engageForSlides').hide();
                 if (response.hasImages !== true) {
                     $('#viewStudy').prop('disabled', true).addClass('disabled');
                     $('#viewCasePane').click().focus();
@@ -720,6 +720,19 @@ loadForm = () => {
                     $('#viewStudy').click().focus();
                 }
             }
+
+            // Show the correct engage elements.
+            if ($('#engageShowClock').prop("checked")) {
+                $('#engageClockSettings').show();
+            }
+
+            $('#engageShowClock').change(function() {
+                if ($('#engageShowClock').prop("checked")) {
+                    $('#engageClockSettings').show();
+                } else {
+                    $('#engageClockSettings').hide();
+                }
+            });
 
         }
 

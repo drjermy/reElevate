@@ -2,7 +2,7 @@
   "manifest_version": 2,
 
   "name": "reElevate",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Elevate Radiopaedia playlists",
   "permissions": [
     "storage",
