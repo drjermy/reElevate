@@ -20,6 +20,14 @@
             padding-bottom: 0.2rem;
             margin-bottom: 1rem;
         }
+        h2 {
+            font-size: 1rem;
+            border-top: solid gray 1px;
+            line-height: 1.5;
+            margin-top: 1rem;
+            padding-bottom: 0.2rem;
+            margin-bottom: 1rem;
+        }
         .toggle-alt {
             display: none;
         }
@@ -64,6 +72,25 @@
             <div class="custom-control custom-switch">
                 <input type="checkbox" class="custom-control-input toggle popup-toggle" id="engageShowClock" data-variable="showClock">
                 <label class="custom-control-label nobr" for="engageShowClock">Clock</label>
+            </div>
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input toggle popup-toggle" id="engageAutoClock" data-variable="autoClock">
+                <label class="custom-control-label nobr" for="engageAutoClock">Auto-start</label>
+            </div>
+            <div class="form-group mt-1">
+                <label for="engageClockDuration">Timer</label>
+                <div class="input-group">
+                    <input type="text" class="form-control popup-text" id="engageClockDuration" data-variable="engageClockDuration" placeholder="120">
+                    <div class="input-group-append">
+                        <span class="input-group-text" id="basic-addon2">secs</span>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Default clock settings</h2>
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input toggle popup-toggle" id="engageDefaultAutoClock" data-variable="defaultAutoClock">
+                <label class="custom-control-label nobr" for="engageDefaultAutoClock">Auto-start</label>
             </div>
         </div>
     </div>

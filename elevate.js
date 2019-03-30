@@ -511,10 +511,24 @@ function engage()
     if (isSlide) {
         global.all(function (result) {
             let id = store.case_id();
-            let showClock = result[id].showClock;
+            let slideVars = result[id];
+            let showClock = slideVars.showClock;
+
+            // Should the clock start automatically?
+            let autoClock = slideVars.defaultAutoClock;
+            if (slideVars.autoClock) {
+                autoClock = slideVars.autoClock;
+            }
+
+            // What should the clock duration be?
+            let clockDuration = slideVars.engageClockDuration;
+            if (!clockDuration) clockDuration = 120;
 
             if (showClock) {
-                clock.init();
+                clock.init({
+                    autoClock: autoClock,
+                    clockDuration: clockDuration
+                });
             }
         });
     }
@@ -526,6 +540,7 @@ let clock = {
     isPaused: false,
     timer: 0,
     runningClock: null,
+    end: "Time's up",
     set: (seconds) => {
         clock.duration = seconds;
     },
@@ -552,10 +567,17 @@ let clock = {
             clock.addMinute();
         });
     },
-    init: () => {
-        clock.set(60*2);
+    init: (init) => {
+        if (init.clockDuration) {
+            clock.set(init.clockDuration);
+        } else {
+            clock.set(60 * 2);
+        }
         clock.timer = clock.duration;
         clock.create();
+        if (init.autoClock === true) {
+            clock.start();
+        }
     },
     text: (timer = clock.duration) => {
         let minutes, seconds;
@@ -581,6 +603,7 @@ let clock = {
                 clock.refreshText();
                 if (--clock.timer < 0) {
                     clearInterval(clock.runningClock);
+                    $('#clock').html(clock.end);
                 }
             }
         }, 1000);
