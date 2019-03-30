@@ -524,10 +524,13 @@ function engage()
             let clockDuration = slideVars.engageClockDuration;
             if (!clockDuration) clockDuration = 120;
 
+            let clockFontSize = slideVars.engageClockFontSize;
+
             if (showClock) {
                 clock.init({
                     autoClock: autoClock,
-                    clockDuration: clockDuration
+                    clockDuration: clockDuration,
+                    clockFontSize: clockFontSize
                 });
             }
         });
@@ -577,6 +580,9 @@ let clock = {
         clock.create();
         if (init.autoClock === true) {
             clock.start();
+        }
+        if (init.clockFontSize) {
+            $('#clockWrapper').css('font-size', init.clockFontSize + 'rem');
         }
     },
     text: (timer = clock.duration) => {
