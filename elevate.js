@@ -609,7 +609,14 @@ let clock = {
         }
     },
     reset: () => {
-        // TODO need to change the way we reset now that we are clearing the timer.
+        if (clock.runningClock) {
+            clearInterval(clock.runningClock);
+        }
+        clock.timer = clock.duration;
+        clock.refreshText();
+        $('#clock').css('opacity', '1');
+        clock.hasStarted = false;
+        clock.isPaused = false;
     },
     addMinute: () => {
         clock.timer += 60;
