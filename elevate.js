@@ -516,20 +516,23 @@ function engage()
             let showClock = vars.showClock;
 
             // Should the clock start automatically?
-            let autoClock = vars.defaultAutoClock;
+            let autoClock = result.defaultAutoClock;
             if (vars.autoClock) {
                 autoClock = vars.autoClock;
             }
+
+            let clockMusic = result.defaultClockMusic;
 
             // What should the clock duration be?
             let clockDuration = vars.engageClockDuration;
             if (!clockDuration) clockDuration = 120;
 
-            let clockFontSize = vars.engageClockFontSize;
+            let clockFontSize = result.defaultClockFontSize;
 
             if (showClock) {
                 clock.init({
                     autoClock: autoClock,
+                    clockMusic: clockMusic,
                     clockDuration: clockDuration,
                     clockFontSize: clockFontSize
                 });
@@ -543,6 +546,7 @@ function engage()
     });
 }
 
+// MUSIC https://www.bensound.com/index.php?route=product/search&search=presentation
 let clock = {
     duration: 60 * 2,
     hasStarted: false,
@@ -552,6 +556,9 @@ let clock = {
     runningClock: null,
     audio: null,
     playPromise: null,
+    jogTime: 10,
+    end: "Time's up",
+    playMusic: false,
     musicFiles: [
         'bensound-beyondtheline',
         'bensound-creativeminds',
@@ -559,7 +566,6 @@ let clock = {
         'bensound-inspire',
         'bensound-perception'
     ],
-    end: "Time's up",
     set: (seconds) => {
         clock.duration = seconds;
     },
@@ -594,8 +600,12 @@ let clock = {
         }
         clock.timer = clock.duration;
         clock.create();
+
         if (init.autoClock === true) {
             clock.start();
+        }
+        if (init.clockMusic) {
+            clock.playMusic = init.clockMusic;
         }
         if (init.clockFontSize) {
             $('#clockWrapper').css('font-size', init.clockFontSize + 'rem');
@@ -633,7 +643,9 @@ let clock = {
                 }
             }
         }, 1000);
-        clock.playAudio();
+        if (clock.playMusic === true) {
+            clock.playAudio();
+        }
     },
     pause: () => {
         if (clock.runningClock && !clock.isEnded) {
@@ -675,14 +687,12 @@ let clock = {
         clock.isPaused = false;
     },
     addMinute: () => {
-        clock.timer += 60;
+        clock.timer += clock.jogTime;
         clock.refreshText();
     },
     subMinute: () => {
-        clock.timer -= 60;
-        if (clock.timer < 0) {
-            clock.timer = 0;
-        }
+        clock.timer -= clock.jogTime;
+        if (clock.timer < 0) clock.timer = 0;
         clock.refreshText();
     },
     playAudio: () => {
