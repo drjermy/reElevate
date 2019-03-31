@@ -36,13 +36,14 @@ canvas {
     font-size: 5rem;
     position: absolute;
     top: 50%;
-    width: 100%;
+    width: 90%;
     height: 7rem;
     text-align: center;
     vertical-align: middle;
     color: white;
     background-color: transparent;
     padding: 1rem;
+    margin-left: 4%;
     margin-top: -3.5rem;
 }
 
