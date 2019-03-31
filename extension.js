@@ -105,7 +105,8 @@ let playlist = {
         return typeof playlist.vars.studyId === 'undefined';
     },
     varsFromUrl: () => { // Gather all the vars from the URL (different format for online and offline).
-        let pathArray = playlist.tab.url.split('/');
+        let trimmedURL = playlist.tab.url.split('?')[0];
+        let pathArray = trimmedURL.split('/');
         if (playlist.offlineMode === true) {
             let lastPart = pathArray.pop();
             let partsArray = lastPart.split('.html')[0].split('_');
@@ -179,7 +180,6 @@ let playlist = {
                 if (!result[playlist_id][study_id]) result[playlist_id][study_id] = {};
                 result[playlist_id][study_id][variableName] = variableValue;
             }
-            console.log(result);
             chrome.storage.local.set(result, function () {});
         });
     },
