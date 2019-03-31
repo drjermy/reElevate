@@ -296,7 +296,11 @@ loadForm = () => {
                 let settings = result[response.playlist];
                 if (scope !== 'playlist') {
                     if (scope === 'engage') {
-                        settings = settings[response['case']];
+                        if (playlist.hasStudyId()) {
+                            settings = settings[response['case']];
+                        } else {
+                            settings = settings[response['study']];
+                        }
                     } else {
                         settings = settings[response[scope]];
                     }
@@ -707,17 +711,18 @@ loadForm = () => {
             }
 
             if (response.isSlide === true) {
+                $('.engageForSlides').show();
                 $('#viewStudy').prop('disabled', true).addClass('disabled');
                 $('#viewCasePane').prop('disabled', true).addClass('disabled');
                 $('#viewPlaylist').click().focus();
             } else {
-                $('.engageForSlides').hide();
                 if (response.hasImages !== true) {
                     $('#viewStudy').prop('disabled', true).addClass('disabled');
                     $('#viewCasePane').click().focus();
                 } else {
                     // Click the viewStudy pane button and give it focus.
                     $('#viewStudy').click().focus();
+                    $('.engageForCases').show();
                 }
             }
 

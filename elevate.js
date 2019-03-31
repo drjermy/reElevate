@@ -508,23 +508,24 @@ function fadeIn()
 
 function engage()
 {
-    if (isSlide) {
-        global.all(function (result) {
+    global.all(function (result) {
+
+        if (isSlide) {
             let id = store.case_id();
-            let slideVars = result[id];
-            let showClock = slideVars.showClock;
+            let vars = result[id];
+            let showClock = vars.showClock;
 
             // Should the clock start automatically?
-            let autoClock = slideVars.defaultAutoClock;
-            if (slideVars.autoClock) {
-                autoClock = slideVars.autoClock;
+            let autoClock = vars.defaultAutoClock;
+            if (vars.autoClock) {
+                autoClock = vars.autoClock;
             }
 
             // What should the clock duration be?
-            let clockDuration = slideVars.engageClockDuration;
+            let clockDuration = vars.engageClockDuration;
             if (!clockDuration) clockDuration = 120;
 
-            let clockFontSize = slideVars.engageClockFontSize;
+            let clockFontSize = vars.engageClockFontSize;
 
             if (showClock) {
                 clock.init({
@@ -533,8 +534,13 @@ function engage()
                     clockFontSize: clockFontSize
                 });
             }
-        });
-    }
+        } else {
+            let vars = result[store.name()];
+            if (vars.autoScroll) {
+                autoScroll.init({});
+            }
+        }
+    });
 }
 
 let clock = {
@@ -613,6 +619,7 @@ let clock = {
                 }
             }
         }, 1000);
+        clock.playAudio();
     },
     pause: () => {
         if (clock.runningClock) {
@@ -657,6 +664,35 @@ let clock = {
             clock.timer = 0;
         }
         clock.refreshText();
+    },
+    playAudio: () => {
+        let audio = new Audio('http://www.music.helsinki.fi/tmt/opetus/uusmedia/esim/a2002011001-e02.wav');
+        audio.type = 'audio/wav';
+
+        let playPromise = audio.play();
+
+        if (playPromise !== undefined) {
+            playPromise.then(function () {
+                console.log('Playing....');
+            }).catch(function (error) {
+                console.log('Failed to play....' + error);
+            });
+        }
+    }
+};
+
+
+let autoScroll = {
+    lastImage: null,
+    scrollTimer: null,
+    init: (init) => {
+        autoScroll.lastImage = lastStudyImage();
+        autoScroll.scrollTimer = setInterval(function () {
+            navigate.down();
+            if (autoScroll.lastImage === $('#largeImage img').attr('src')) {
+                clearInterval(autoScroll.scrollTimer);
+            }
+        }, 100);
     }
 };
 
@@ -1045,7 +1081,7 @@ function lastStudyImage()
 {
     let images = currentStudyImages();
     let lastImageIndex = findIndex('position', images.length, images);
-    if (firstImageIndex >= 0) {
+    if (lastImageIndex >= 0) {
         return images[lastImageIndex]['public_filename'];
     }
 }
@@ -1332,12 +1368,12 @@ let maximise = {
 
 
 let navigate = {
-    up: function (n) {
+    up: function (n=1) {
         for (let i = 0; i < n; i++) {
             $('#largeImage .scrollbar .up')[0].click();
         }
     },
-    down: function (n) {
+    down: function (n = 1) {
         for (let i = 0; i < n; i++) {
             $('#largeImage .scrollbar .down')[0].click();
         }

@@ -69,7 +69,7 @@
     <div id="engagePane" class="container pane py-2">
         <h1>Engage</h1>
         <div id="engageInput" class="popper-wrapper" data-scope="engage">
-            <div class="engageForSlides">
+            <div class="engageForSlides" style="display: none">
                 <div class="custom-control custom-switch">
                     <input type="checkbox" class="custom-control-input toggle popup-toggle" id="engageShowClock" data-variable="showClock">
                     <label class="custom-control-label nobr" for="engageShowClock">Clock</label>
@@ -90,7 +90,22 @@
                 </div>
             </div>
 
-            <div id="engageDefaultsSlides" class="engageForSlides">
+            <div class="engageForCases" style="display: none">
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input toggle popup-toggle" id="engageAutoScroll" data-variable="autoScroll">
+                    <label class="custom-control-label nobr" for="engageAutoScroll">Auto-scroll</label>
+                </div>
+                <div class="form-group mt-1">
+                    <div class="input-group">
+                        <input type="text" class="form-control popup-text" id="engageScrollN" data-variable="engageScrollN" placeholder="5">
+                        <div class="input-group-append">
+                            <span class="input-group-text">slices</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="engageDefaultsSlides" class="engageForSlides" style="display: none">
                 <h2>Default slide settings</h2>
                 <div class="custom-control custom-switch">
                     <input type="checkbox" class="custom-control-input toggle popup-toggle" id="engageDefaultAutoClock" data-variable="defaultAutoClock">
