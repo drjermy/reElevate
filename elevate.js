@@ -547,8 +547,18 @@ let clock = {
     duration: 60 * 2,
     hasStarted: false,
     isPaused: false,
+    isEnded: false,
     timer: 0,
     runningClock: null,
+    audio: null,
+    playPromise: null,
+    musicFiles: [
+        'bensound-beyondtheline',
+        'bensound-creativeminds',
+        'bensound-energy',
+        'bensound-inspire',
+        'bensound-perception'
+    ],
     end: "Time's up",
     set: (seconds) => {
         clock.duration = seconds;
@@ -614,7 +624,11 @@ let clock = {
             if (clock.isPaused === false) {
                 clock.refreshText();
                 if (--clock.timer < 0) {
+                    clock.isEnded = true;
                     clearInterval(clock.runningClock);
+                    if (clock.playPromise) {
+                        clock.audio.pause();
+                    }
                     $('#clock').html(clock.end);
                 }
             }
@@ -622,15 +636,21 @@ let clock = {
         clock.playAudio();
     },
     pause: () => {
-        if (clock.runningClock) {
+        if (clock.runningClock && !clock.isEnded) {
             $('#clock').css('opacity', '0.6');
             clock.isPaused = true;
+            if (clock.playPromise) {
+                clock.audio.pause();
+            }
         }
     },
     restart: () => {
-        if (clock.runningClock) {
+        if (clock.runningClock && !clock.isEnded) {
             $('#clock').css('opacity', '1');
             clock.isPaused = false;
+            if (clock.playPromise) {
+                clock.audio.play();
+            }
         }
     },
     playPause: () => {
@@ -666,18 +686,11 @@ let clock = {
         clock.refreshText();
     },
     playAudio: () => {
-        let audio = new Audio('http://www.music.helsinki.fi/tmt/opetus/uusmedia/esim/a2002011001-e02.wav');
-        audio.type = 'audio/wav';
-
-        let playPromise = audio.play();
-
-        if (playPromise !== undefined) {
-            playPromise.then(function () {
-                console.log('Playing....');
-            }).catch(function (error) {
-                console.log('Failed to play....' + error);
-            });
-        }
+        // TODO consider: https://github.com/goldfire/howler.js (fade etc).
+        let filename = clock.musicFiles[Math.floor(Math.random() * clock.musicFiles.length)];
+        clock.audio = new Audio(chrome.runtime.getURL('/music/' + filename + '.mp3'));
+        clock.audio.type = 'audio/wav';
+        clock.playPromise = clock.audio.play();
     }
 };
 
