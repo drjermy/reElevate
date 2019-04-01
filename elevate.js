@@ -583,18 +583,6 @@ let clock = {
         $('#clock').on('click', function () {
             clock.playPause();
         });
-        $(document).bind('keydown', 'space', function () {
-            clock.playPause();
-        });
-        $(document).bind('keydown', 'ctrl+r', function () {
-            clock.reset();
-        });
-        $(document).bind('keydown', 'ctrl+-', function () {
-            clock.subMinute();
-        });
-        $(document).bind('keydown', 'ctrl+=', function () {
-            clock.addMinute();
-        });
     },
     init: (init) => {
         if (init.clockDuration) {
@@ -614,6 +602,20 @@ let clock = {
         if (init.clockFontSize) {
             $('#clockWrapper').css('font-size', init.clockFontSize + 'rem');
         }
+
+        $(document).bind('keydown', 'space', function () {
+            clock.playPause();
+        });
+        $(document).bind('keydown', 'ctrl+r', function () {
+            clock.reset();
+        });
+        $(document).bind('keydown', 'ctrl+-', function () {
+            clock.subMinute();
+        });
+        $(document).bind('keydown', 'ctrl+=', function () {
+            clock.addMinute();
+        });
+
     },
     text: (timer = clock.duration) => {
         let minutes, seconds;
@@ -712,6 +714,7 @@ let clock = {
 let autoScroll = {
     lastImage: null,
     scrollTimer: null,
+    isPaused: false,
     scrollSpeed: 200,
     init: (init) => {
         if (init.scrollSpeed) {
@@ -720,12 +723,33 @@ let autoScroll = {
 
         autoScroll.lastImage = lastStudyImage();
         autoScroll.scrollTimer = setInterval(function () {
-            navigate.down();
-            if (autoScroll.lastImage === $('#largeImage img').attr('src')) {
-                clearInterval(autoScroll.scrollTimer);
+            if (autoScroll.isPaused === false) {
+                navigate.down();
+                if (autoScroll.lastImage === $('#largeImage img').attr('src')) {
+                    clearInterval(autoScroll.scrollTimer);
+                }
             }
         }, autoScroll.scrollSpeed);
+
+        $(document).bind('keydown', 'space', function () {
+            autoScroll.playPause();
+        });
+
+    },
+    playPause: () => {
+        if (autoScroll.isPaused === true) {
+            autoScroll.restart();
+        } else {
+            autoScroll.pause();
+        }
+    },
+    pause: () => {
+        autoScroll.isPaused = true;
+    },
+    restart: () => {
+        autoScroll.isPaused = false;
     }
+
 };
 
 
