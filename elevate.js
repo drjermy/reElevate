@@ -539,8 +539,12 @@ function engage()
             }
         } else {
             let vars = result[store.name()];
+            let scrollSpeed = vars.scrollSpeed;
+
             if (vars.autoScroll) {
-                autoScroll.init({});
+                autoScroll.init({
+                    scrollSpeed: scrollSpeed
+                });
             }
         }
     });
@@ -708,14 +712,19 @@ let clock = {
 let autoScroll = {
     lastImage: null,
     scrollTimer: null,
+    scrollSpeed: 200,
     init: (init) => {
+        if (init.scrollSpeed) {
+            autoScroll.scrollSpeed = init.scrollSpeed;
+        }
+
         autoScroll.lastImage = lastStudyImage();
         autoScroll.scrollTimer = setInterval(function () {
             navigate.down();
             if (autoScroll.lastImage === $('#largeImage img').attr('src')) {
                 clearInterval(autoScroll.scrollTimer);
             }
-        }, 100);
+        }, autoScroll.scrollSpeed);
     }
 };
 
