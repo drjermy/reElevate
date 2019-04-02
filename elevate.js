@@ -540,10 +540,12 @@ function engage()
         } else {
             let vars = result[store.name()];
             let scrollSpeed = vars.scrollSpeed;
+            let autoScrollAutoStart = vars.autoScrollAutoStart;
 
             if (vars.autoScroll) {
                 autoScroll.init({
-                    scrollSpeed: scrollSpeed
+                    scrollSpeed: scrollSpeed,
+                    autoScrollAutoStart: autoScrollAutoStart
                 });
             }
         }
@@ -713,31 +715,50 @@ let autoScroll = {
     scrollTimer: null,
     isPaused: false,
     scrollSpeed: 200,
+    autoStart: false,
+    hasStarted: false,
+    hasStopped: false,
     init: (init) => {
+        autoScroll.lastImage = lastStudyImage();
         if (init.scrollSpeed) {
             autoScroll.scrollSpeed = init.scrollSpeed;
+            autoScroll.autoStart = init.autoScrollAutoStart;
         }
 
-        autoScroll.lastImage = lastStudyImage();
-        autoScroll.scrollTimer = setInterval(function () {
-            if (autoScroll.isPaused === false) {
-                navigate.down();
-                if (autoScroll.lastImage === $('#largeImage img').attr('src')) {
-                    clearInterval(autoScroll.scrollTimer);
-                }
-            }
-        }, autoScroll.scrollSpeed);
+        if (autoScroll.autoStart === true) {
+            autoScroll.start();
+        }
 
         $(document).bind('keydown', 'space', function () {
             autoScroll.playPause();
         });
 
     },
+    start: () => {
+        autoScroll.hasStarted = true;
+        autoScroll.hasStopped = false;
+        autoScroll.scrollTimer = setInterval(function () {
+            if (autoScroll.isPaused === false) {
+                navigate.down();
+                if (autoScroll.lastImage === $('#largeImage img').attr('src')) {
+                    clearInterval(autoScroll.scrollTimer);
+                    autoScroll.hasStopped = true;
+                }
+            }
+        }, autoScroll.scrollSpeed);
+    },
     playPause: () => {
-        if (autoScroll.isPaused === true) {
-            autoScroll.restart();
+        if (!autoScroll.hasStarted || autoScroll.hasStopped) {
+            if (autoScroll.hasStopped === true) {
+                navigate.top();
+            }
+            autoScroll.start();
         } else {
-            autoScroll.pause();
+            if (autoScroll.isPaused === true) {
+                autoScroll.restart();
+            } else {
+                autoScroll.pause();
+            }
         }
     },
     pause: () => {
