@@ -606,10 +606,10 @@ let clock = {
         $(document).bind('keydown', 'ctrl+r', function () {
             clock.reset();
         });
-        $(document).bind('keydown', 'ctrl+-', function () {
+        $(document).bind('keydown', '-', function () {
             clock.subMinute();
         });
-        $(document).bind('keydown', 'ctrl+=', function () {
+        $(document).bind('keydown', '=', function () {
             clock.addMinute();
         });
 
