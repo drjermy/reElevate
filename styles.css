@@ -50,3 +50,12 @@ canvas {
 #clock:hover{
     cursor: pointer;
 }
+
+.clockFinished {
+    color: red;
+    animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+    50% { opacity: 0; }
+}

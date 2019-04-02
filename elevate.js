@@ -561,7 +561,6 @@ let clock = {
     audio: null,
     playPromise: null,
     jogTime: 10,
-    end: "Time's up",
     playMusic: false,
     musicFiles: [
         'bensound-beyondtheline',
@@ -645,7 +644,7 @@ let clock = {
                     if (clock.playPromise) {
                         clock.audio.pause();
                     }
-                    $('#clock').html(clock.end);
+                    $('#clock').addClass('clockFinished')
                 }
             }
         }, 1000);
@@ -688,7 +687,7 @@ let clock = {
         }
         clock.timer = clock.duration;
         clock.refreshText();
-        $('#clock').css('opacity', '1');
+        $('#clock').removeClass('clockFinished').css('opacity', '1');
         clock.hasStarted = false;
         clock.isPaused = false;
     },
