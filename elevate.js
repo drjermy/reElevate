@@ -1562,6 +1562,12 @@ function bindKeyboardShortcuts() {
         navigate.orange();
     });
 
+    $(document).bind('keyup', 'j', function () {
+        navigate.jumpTo();
+    });
+
+
+
     $(document).bind('keyup', 'pageup', function () {
         navigate.up(5);
     });
@@ -1594,127 +1600,125 @@ function bindKeyboardShortcuts() {
         presentation.open();
     });
 
-    $(document).bind('keyup', 'j', function () {
-        navigate.jumpTo();
-    });
+    if (!isSlide && hasImages) {
+        $(document).bind('keyup', 'shift+r', function () {
+            init();
+        });
 
+        $(document).bind('keyup', 'shift+s', function () {
+            //canvas.save();
+        });
 
-    $(document).bind('keyup', 'shift+r', function () {
-        init();
-    });
-
-    $(document).bind('keyup', 'shift+s', function () {
-        //canvas.save();
-    });
-
-    $(document).bind('keyup', 'space', function (e) {
-        e.preventDefault();
-        if ($('.vjs-has-started').length > 0) {
-            $('.vjs-play-control').click();
-        } else {
-            if ($('.vjs-big-play-button').length > 0) {
-                $('.vjs-big-play-button').click();
+        $(document).bind('keyup', 'space', function (e) {
+            e.preventDefault();
+            if ($('.vjs-has-started').length > 0) {
+                $('.vjs-play-control').click();
+            } else {
+                if ($('.vjs-big-play-button').length > 0) {
+                    $('.vjs-big-play-button').click();
+                }
             }
-        }
-    });
-
-
-    // ZOOM
-
-    $(document).bind('keydown', '=', function () {
-        canvas.zoom.in();
-    });
-
-    $(document).bind('keydown', '-', function () {
-        canvas.zoom.out();
-    });
-
-
-    // PAN
-
-    $(document).bind('keydown', ',', function () {
-        canvas.move.left();
-    });
-
-    $(document).bind('keydown', '/', function () {
-        canvas.move.right();
-    });
-
-    $(document).bind('keydown', ';', function () {
-        canvas.move.up();
-    });
-
-    $(document).bind('keydown', '.', function () {
-        canvas.move.down();
-    });
-
-
-    // CROP
-
-    $(document).bind('keydown', '[', function () {
-        canvas.crop.in('crop_left');
-    });
-
-    $(document).bind('keydown', 'shift+[', function () {
-        canvas.crop.out('crop_left');
-    });
-
-    $(document).bind('keydown', ']', function () {
-        canvas.crop.in('crop_right');
-    });
-
-    $(document).bind('keydown', 'shift+]', function () {
-        canvas.crop.out('crop_right');
-    });
-
-    $(document).bind('keydown', 'o', function () {
-        canvas.crop.in('crop_top');
-    });
-
-    $(document).bind('keydown', 'shift+o', function () {
-        canvas.crop.out('crop_top');
-    });
-
-    $(document).bind('keydown', 'k', function () {
-        canvas.crop.in('crop_bottom');
-    });
-
-    $(document).bind('keydown', 'shift+k', function () {
-        canvas.crop.out('crop_bottom');
-    });
-
-
-    // ROTATE
-
-    $(document).bind('keydown', '\\', function () {
-        canvas.rotate.clockwise();
-    });
-
-    $(document).bind('keydown', 'shift+\\', function () {
-        canvas.rotate.counter();
-    });
-
-
-    // RESET
-
-    $(document).bind('keydown', 'r', function () {
-        canvas.series.reset();
-    });
-
-
-    $('#offline-workflow-page-links li').each(function (n, value) {
-        let key = n+1;
-        $(document).bind('keyup', 'shift+' + key.toString(), function () {
-            navigate.study(key);
         });
-    });
 
-    $('.thumb').each(function (n, value) {
-        let key = n+1;
-        $(document).bind('keyup', key.toString(), function () {
-            navigate.series(n);
+
+        // ZOOM
+
+        $(document).bind('keydown', '=', function () {
+            canvas.zoom.in();
         });
-    });
+
+        $(document).bind('keydown', '-', function () {
+            canvas.zoom.out();
+        });
+
+
+        // PAN
+
+        $(document).bind('keydown', ',', function () {
+            canvas.move.left();
+        });
+
+        $(document).bind('keydown', '/', function () {
+            canvas.move.right();
+        });
+
+        $(document).bind('keydown', ';', function () {
+            canvas.move.up();
+        });
+
+        $(document).bind('keydown', '.', function () {
+            canvas.move.down();
+        });
+
+
+        // CROP
+
+        $(document).bind('keydown', '[', function () {
+            canvas.crop.in('crop_left');
+        });
+
+        $(document).bind('keydown', 'shift+[', function () {
+            canvas.crop.out('crop_left');
+        });
+
+        $(document).bind('keydown', ']', function () {
+            canvas.crop.in('crop_right');
+        });
+
+        $(document).bind('keydown', 'shift+]', function () {
+            canvas.crop.out('crop_right');
+        });
+
+        $(document).bind('keydown', 'o', function () {
+            canvas.crop.in('crop_top');
+        });
+
+        $(document).bind('keydown', 'shift+o', function () {
+            canvas.crop.out('crop_top');
+        });
+
+        $(document).bind('keydown', 'k', function () {
+            canvas.crop.in('crop_bottom');
+        });
+
+        $(document).bind('keydown', 'shift+k', function () {
+            canvas.crop.out('crop_bottom');
+        });
+
+
+        // ROTATE
+
+        $(document).bind('keydown', '\\', function () {
+            canvas.rotate.clockwise();
+        });
+
+        $(document).bind('keydown', 'shift+\\', function () {
+            canvas.rotate.counter();
+        });
+
+
+        // RESET
+
+        $(document).bind('keydown', 'r', function () {
+            canvas.series.reset();
+        });
+
+
+        $('#offline-workflow-page-links li').each(function (n, value) {
+            let key = n+1;
+            $(document).bind('keyup', 'shift+' + key.toString(), function () {
+                navigate.study(key);
+            });
+        });
+
+        $('.thumb').each(function (n, value) {
+            let key = n+1;
+            $(document).bind('keyup', key.toString(), function () {
+                navigate.series(n);
+            });
+        });
+
+    }
 
 }
 
