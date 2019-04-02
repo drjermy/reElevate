@@ -99,14 +99,6 @@
                     <input type="checkbox" class="custom-control-input toggle popup-toggle" id="engageAutoScrollAutoStart" data-variable="autoScrollAutoStart">
                     <label class="custom-control-label nobr" for="engageAutoScrollAutoStart">Auto-start</label>
                 </div>
-                <div class="form-group mt-2">
-                    <div class="input-group">
-                        <input type="text" class="form-control popup-text" id="engageScrollN" data-variable="scrollN" placeholder="5">
-                        <div class="input-group-append">
-                            <span class="input-group-text">slices</span>
-                        </div>
-                    </div>
-                </div>
                 <div class="form-group mt-1">
                     <div class="input-group">
                         <input type="text" class="form-control popup-text" id="engageScrollSpeed" data-variable="scrollSpeed" placeholder="200">
@@ -230,17 +222,19 @@
     <div id="studyPane" class="container pane py-2">
         <h1>Study</h1>
         <div id="studyInput" class="popper-wrapper" data-scope="study">
-            <div class="custom-control custom-switch">
-                <input type="checkbox" class="custom-control-input toggle popup-toggle" id="studyMaximiseCase" data-variable="maximiseCase">
-                <label class="custom-control-label nobr" for="studyMaximiseCase">Maximise</label>
-            </div>
-            <div class="custom-control custom-switch">
-                <input type="checkbox" class="custom-control-input toggle popup-toggle" id="studyDefaultToTopImage" data-variable="defaultToTopImage">
-                <label class="custom-control-label nobr" for="studyDefaultToTopImage">Start on first slice</label>
-            </div>
-            <div class="custom-control custom-switch toggle-alt">
-                <input type="checkbox" class="custom-control-input toggle popup-toggle" id="studyDefaultSlice" data-variable="defaultSlice" data-relation="defaultToTopImage">
-                <label class="custom-control-label nobr" for="studyDefaultSlice">Start on selected slice</label>
+            <div id="studySelectorWrapper">
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input toggle popup-toggle" id="studyMaximiseCase" data-variable="maximiseCase">
+                    <label class="custom-control-label nobr" for="studyMaximiseCase">Maximise</label>
+                </div>
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input toggle popup-toggle" id="studyDefaultToTopImage" data-variable="defaultToTopImage">
+                    <label class="custom-control-label nobr" for="studyDefaultToTopImage">Start on first slice</label>
+                </div>
+                <div class="custom-control custom-switch toggle-alt">
+                    <input type="checkbox" class="custom-control-input toggle popup-toggle" id="studyDefaultSlice" data-variable="defaultSlice" data-relation="defaultToTopImage">
+                    <label class="custom-control-label nobr" for="studyDefaultSlice">Start on selected slice</label>
+                </div>
             </div>
             <hr/>
             <div id="seriesSelectorWrapper"></div>

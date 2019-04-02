@@ -381,9 +381,9 @@ loadForm = () => {
 
         if (typeof response.series !== "undefined") {
 
-            let numberOfSeries = Object.keys(response.series).length;//if (numberOfSeries > 1) {
-            $('#seriesSelectorWrapper').append(
-                '<div class="mb-4"><button id="saveStudyState" class="ml-2 btn-sm">Save state for <strong>a</strong>ll series</button></div>'
+            let numberOfSeries = Object.keys(response.series).length;
+            $('#studySelectorWrapper').append(
+                '<div class="mt-2"><button id="saveStudyState" class="btn-sm">Save state for <strong>a</strong>ll series</button></div>'
             );
 
             // Create a set of selector buttons for each of the series.
