@@ -585,9 +585,7 @@ let clock = {
     },
     init: (init) => {
         if (init.clockDuration) {
-            clock.set(init.clockDuration);
-        } else {
-            clock.set(60 * 2);
+            clock.set(Number(init.clockDuration));
         }
         clock.timer = clock.duration;
         clock.create();
