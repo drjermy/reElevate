@@ -600,7 +600,7 @@ let clock = {
         $(document).bind('keydown', 'space', function () {
             clock.playPause();
         });
-        $(document).bind('keydown', 'ctrl+r', function () {
+        $(document).bind('keydown', 'r', function () {
             clock.reset();
         });
         $(document).bind('keydown', '-', function () {
