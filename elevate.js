@@ -594,7 +594,7 @@ let clock = {
             clock.playMusic = init.clockMusic;
         }
         if (init.clockFontSize) {
-            $('#clockWrapper').css('font-size', init.clockFontSize + 'rem');
+            $('#clockWrapper').css('font-size', init.clockFontSize + 'rem').css('margin-top', '-' + init.clockFontSize + 'rem');
         }
 
         $(document).bind('keydown', 'space', function () {
