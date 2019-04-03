@@ -290,7 +290,7 @@ loadForm = () => {
                 let settings = result[response.playlist];
                 if (scope !== 'playlist') {
                     if (scope === 'slide') {
-                        settings = settings[response['study']];
+                        settings = settings[response['case']];
                     } else {
                         settings = settings[response[scope]];
                     }
