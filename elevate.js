@@ -513,30 +513,25 @@ function engage()
         if (isSlide) {
             let id = store.case_id();
             let vars = result[id];
-            let showClock = vars.showClock;
 
-            // Should the clock start automatically?
-            let autoClock = result.defaultAutoClock;
-            if (vars.autoClock) {
-                autoClock = vars.autoClock;
+            if (typeof vars !== "undefined") {
+
+                let showClock = vars.showClock;
+                let autoClock = vars.autoClock;
+                let clockDuration = (vars.clockDuration ? vars.clockDuration : 120);
+                let clockMusic = result.defaultClockMusic;
+                let clockFontSize = result.defaultClockFontSize;
+
+                if (typeof showClock !== "undefined" && showClock) {
+                    clock.init({
+                        autoClock: autoClock,
+                        clockMusic: clockMusic,
+                        clockDuration: clockDuration,
+                        clockFontSize: clockFontSize
+                    });
+                }
             }
 
-            let clockMusic = result.defaultClockMusic;
-
-            // What should the clock duration be?
-            let clockDuration = vars.engageClockDuration;
-            if (!clockDuration) clockDuration = 120;
-
-            let clockFontSize = result.defaultClockFontSize;
-
-            if (showClock) {
-                clock.init({
-                    autoClock: autoClock,
-                    clockMusic: clockMusic,
-                    clockDuration: clockDuration,
-                    clockFontSize: clockFontSize
-                });
-            }
         } else {
             let vars = result[store.name()];
             let scrollSpeed = vars.scrollSpeed;

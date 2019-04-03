@@ -158,15 +158,9 @@ let playlist = {
             if (!result[playlist_id]) {
                 result[playlist_id] = {};
             }
-            if (scope === 'engage') {
-                // Slides don't have a study Id.
-                if (playlist.hasStudyId()) {
-                    if (!result[playlist_id][case_id]) result[playlist_id][case_id] = {};
-                    result[playlist_id][case_id][variableName] = variableValue;
-                } else {
-                    if (!result[playlist_id][study_id]) result[playlist_id][study_id] = {};
-                    result[playlist_id][study_id][variableName] = variableValue;
-                }
+            if (scope === 'slide') {
+                if (!result[playlist_id][case_id]) result[playlist_id][case_id] = {};
+                result[playlist_id][case_id][variableName] = variableValue;
             }
             if (scope === 'playlist') {
                 if (!result[playlist_id]) result[playlist_id] = {};
@@ -295,12 +289,8 @@ loadForm = () => {
             if (typeof scope !== "undefined") {
                 let settings = result[response.playlist];
                 if (scope !== 'playlist') {
-                    if (scope === 'engage') {
-                        if (playlist.hasStudyId()) {
-                            settings = settings[response['case']];
-                        } else {
-                            settings = settings[response['study']];
-                        }
+                    if (scope === 'slide') {
+                        settings = settings[response['study']];
                     } else {
                         settings = settings[response[scope]];
                     }
@@ -462,7 +452,6 @@ loadForm = () => {
                             );
                         }
                     }
-
                 }
 
             }
@@ -711,9 +700,9 @@ loadForm = () => {
             }
 
             if (response.isSlide === true) {
-                $('.engageForSlides').show();
                 $('#viewStudy').prop('disabled', true).addClass('disabled');
-                $('#viewCasePane').prop('disabled', true).addClass('disabled');
+                $('#viewCasePane').prop('disabled', true).addClass('disabled').addClass('d-none');
+                $('#viewSlide').removeClass('d-none');
                 $('#viewPlaylist').click().focus();
             } else {
                 if (response.hasImages !== true) {
@@ -722,20 +711,19 @@ loadForm = () => {
                 } else {
                     // Click the viewStudy pane button and give it focus.
                     $('#viewStudy').click().focus();
-                    $('.engageForCases').show();
                 }
             }
 
-            // Show the correct engage elements.
-            if ($('#engageShowClock').prop("checked")) {
-                $('#engageClockSettings').show();
+            // Show the correct slide elements.
+            if ($('#slideShowClock').prop("checked")) {
+                $('#slideClockSettings').show();
             }
 
-            $('#engageShowClock').change(function() {
-                if ($('#engageShowClock').prop("checked")) {
-                    $('#engageClockSettings').show();
+            $('#slideShowClock').change(function() {
+                if ($('#slideShowClock').prop("checked")) {
+                    $('#slideClockSettings').show();
                 } else {
-                    $('#engageClockSettings').hide();
+                    $('#slideClockSettings').hide();
                 }
             });
 

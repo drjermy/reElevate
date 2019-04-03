@@ -60,59 +60,13 @@
     </div>
     <div id="navigation" class="container py-2">
         <nobr>
-            <button id="viewEngagePane" data-open="engagePane" class="openButton btn-sm">Engage</button>
             <button id="viewPlaylist" data-open="playlistPane" class="openButton btn-sm">Playlist</button>
             <button id="viewCasePane" data-open="casePane" class="openButton btn-sm">Case</button>
             <button id="viewStudy" data-open="studyPane" class="openButton btn-sm">Study</button>
+            <button id="viewSlide" data-open="slidePane" class="openButton btn-sm d-none">Slide</button>
             <button id="reloadTab" class="actionButton btn-sm" data-action="reload">&#8635;</button>
             <button id="viewHelp" data-open="helpPane" class="openButton btn-sm">?</button>
         </nobr>
-    </div>
-
-    <div id="engagePane" class="container pane py-2">
-        <h1>Engage</h1>
-        <div id="engageInput" class="popper-wrapper" data-scope="engage">
-            <div class="engageForSlides" style="display: none">
-                <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input toggle popup-toggle" id="engageShowClock" data-variable="showClock">
-                    <label class="custom-control-label nobr" for="engageShowClock">Clock</label>
-                </div>
-                <div id="engageClockSettings" style="display: none">
-                    <div class="custom-control custom-switch">
-                        <input type="checkbox" class="custom-control-input toggle popup-toggle" id="engageAutoClock" data-variable="autoClock">
-                        <label class="custom-control-label nobr" for="engageAutoClock">Auto-start</label>
-                    </div>
-                    <div class="form-group mt-2">
-                        <div class="input-group">
-                            <input type="text" class="form-control popup-text" id="engageClockDuration" data-variable="engageClockDuration" placeholder="120">
-                            <div class="input-group-append">
-                                <span class="input-group-text">secs</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="engageForCases" style="display: none">
-                <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input toggle popup-toggle" id="engageAutoScroll" data-variable="autoScroll">
-                    <label class="custom-control-label nobr" for="engageAutoScroll">Auto-scroll</label>
-                </div>
-                <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input toggle popup-toggle" id="engageAutoScrollAutoStart" data-variable="autoScrollAutoStart">
-                    <label class="custom-control-label nobr" for="engageAutoScrollAutoStart">Auto-start</label>
-                </div>
-                <div class="form-group mt-1">
-                    <div class="input-group">
-                        <input type="text" class="form-control popup-text" id="engageScrollSpeed" data-variable="scrollSpeed" placeholder="200">
-                        <div class="input-group-append">
-                            <span class="input-group-text">milliseconds</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
     </div>
 
     <div id="playlistPane" class="container pane py-2">
@@ -162,10 +116,6 @@
             </div>
             <hr/>
             <div>
-                <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input toggle popup-toggle" id="playlistDefaultAutoClock" data-variable="defaultAutoClock">
-                    <label class="custom-control-label nobr" for="playlistDefaultAutoClock">Auto-start clock</label>
-                </div>
                 <div class="custom-control custom-switch">
                     <input type="checkbox" class="custom-control-input toggle popup-toggle" id="playlistDefaultClockMusic" data-variable="defaultClockMusic">
                     <label class="custom-control-label nobr" for="playlistDefaultClockMusic">Clock Music</label>
@@ -236,10 +186,50 @@
                     <input type="checkbox" class="custom-control-input toggle popup-toggle" id="studyDefaultSlice" data-variable="defaultSlice" data-relation="defaultToTopImage">
                     <label class="custom-control-label nobr" for="studyDefaultSlice">Start on selected slice</label>
                 </div>
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input toggle popup-toggle" id="studyAutoScroll" data-variable="autoScroll">
+                    <label class="custom-control-label nobr" for="studyAutoScroll">Auto-scroll</label>
+                </div>
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input toggle popup-toggle" id="studyAutoScrollAutoStart" data-variable="autoScrollAutoStart">
+                    <label class="custom-control-label nobr" for="studyAutoScrollAutoStart">Auto-start</label>
+                </div>
+                <div class="form-group mt-1">
+                    <div class="input-group">
+                        <input type="text" class="form-control popup-text" id="studyScrollSpeed" data-variable="scrollSpeed" placeholder="200">
+                        <div class="input-group-append">
+                            <span class="input-group-text">milliseconds</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             <hr/>
             <div id="seriesSelectorWrapper"></div>
             <div id="seriesEditorWrapper" class="mt-4"></div>
+        </div>
+    </div>
+
+    <div id="slidePane" class="container pane py-2">
+        <h1>Slide</h1>
+        <div id="slideInput" class="popper-wrapper" data-scope="slide">
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input toggle popup-toggle" id="slideShowClock" data-variable="showClock">
+                <label class="custom-control-label nobr" for="slideShowClock">Clock</label>
+            </div>
+            <div id="slideClockSettings" style="display: none">
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input toggle popup-toggle" id="slideAutoClock" data-variable="autoClock">
+                    <label class="custom-control-label nobr" for="slideAutoClock">Auto-start</label>
+                </div>
+                <div class="form-group mt-2">
+                    <div class="input-group">
+                        <input type="text" class="form-control popup-text" id="slideClockDuration" data-variable="clockDuration" placeholder="120">
+                        <div class="input-group-append">
+                            <span class="input-group-text">secs</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
