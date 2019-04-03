@@ -535,12 +535,10 @@ function engage()
         } else {
             let vars = result[store.name()];
             let scrollSpeed = vars.scrollSpeed;
-            let autoScrollAutoStart = vars.autoScrollAutoStart;
 
             if (vars.autoScroll) {
                 autoScroll.init({
-                    scrollSpeed: scrollSpeed,
-                    autoScrollAutoStart: autoScrollAutoStart
+                    scrollSpeed: scrollSpeed
                 });
             }
         }
@@ -710,7 +708,6 @@ let autoScroll = {
     scrollTimer: null,
     isPaused: false,
     scrollSpeed: 200,
-    autoStart: false,
     hasStarted: false,
     hasStopped: false,
     init: (init) => {
@@ -720,14 +717,9 @@ let autoScroll = {
             autoScroll.autoStart = init.autoScrollAutoStart;
         }
 
-        if (autoScroll.autoStart === true) {
-            autoScroll.start();
-        }
-
         $(document).bind('keydown', 'space', function () {
             autoScroll.playPause();
         });
-
     },
     start: () => {
         autoScroll.hasStarted = true;
