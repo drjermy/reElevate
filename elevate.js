@@ -535,10 +535,12 @@ function engage()
         } else {
             let vars = result[store.name()];
             let scrollSpeed = vars.scrollSpeed;
+            let scrollNumber = vars.scrollNumber;
 
             if (vars.autoScroll) {
                 autoScroll.init({
-                    scrollSpeed: scrollSpeed
+                    scrollSpeed: scrollSpeed,
+                    scrollNumber: scrollNumber
                 });
             }
         }
@@ -705,6 +707,8 @@ let clock = {
 
 let autoScroll = {
     lastImage: null,
+    scrollNumber: undefined,
+    scrollCount: 0,
     scrollTimer: null,
     isPaused: false,
     scrollSpeed: 200,
@@ -714,7 +718,9 @@ let autoScroll = {
         autoScroll.lastImage = lastStudyImage();
         if (init.scrollSpeed) {
             autoScroll.scrollSpeed = init.scrollSpeed;
-            autoScroll.autoStart = init.autoScrollAutoStart;
+        }
+        if (init.scrollNumber) {
+            autoScroll.scrollNumber = init.scrollNumber;
         }
 
         $(document).bind('keydown', 'space', function () {
@@ -725,8 +731,11 @@ let autoScroll = {
         autoScroll.hasStarted = true;
         autoScroll.hasStopped = false;
         autoScroll.scrollTimer = setInterval(function () {
-            if (autoScroll.isPaused === false) {
-                navigate.down();
+            if (autoScroll.isPaused !== true) {
+                if (typeof autoScroll.scrollNumber === "undefined" || autoScroll.scrollCount < autoScroll.scrollNumber) {
+                    navigate.down();
+                    autoScroll.scrollCount++;
+                }
                 if (autoScroll.lastImage === $('#largeImage img').attr('src')) {
                     clearInterval(autoScroll.scrollTimer);
                     autoScroll.hasStopped = true;

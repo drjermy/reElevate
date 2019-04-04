@@ -727,6 +727,18 @@ loadForm = () => {
                 }
             });
 
+            if ($('#studyAutoScroll').prop("checked")) {
+                $('#autoScrollSettings').show();
+            }
+
+            $('#studyAutoScroll').change(function() {
+                if ($('#studyAutoScroll').prop("checked")) {
+                    $('#autoScrollSettings').show();
+                } else {
+                    $('#autoScrollSettings').hide();
+                }
+            });
+
         }
 
     });
