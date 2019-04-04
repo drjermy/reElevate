@@ -521,13 +521,17 @@ function engage()
                 let clockDuration = (vars.clockDuration ? vars.clockDuration : 120);
                 let clockMusic = result.defaultClockMusic;
                 let clockFontSize = result.defaultClockFontSize;
+                let background = result.defaultClockBackground;
+                let border = result.defaultClockBorder;
 
                 if (typeof showClock !== "undefined" && showClock) {
                     clock.init({
                         autoClock: autoClock,
                         clockMusic: clockMusic,
                         clockDuration: clockDuration,
-                        clockFontSize: clockFontSize
+                        clockFontSize: clockFontSize,
+                        background: background,
+                        border: border
                     });
                 }
             }
@@ -559,6 +563,8 @@ let clock = {
     playPromise: null,
     jogTime: 10,
     playMusic: false,
+    border: 'transparent',
+    background: 'transparent',
     musicFiles: [
         'bensound-beyondtheline',
         'bensound-creativeminds',
@@ -576,6 +582,13 @@ let clock = {
             '<span id="clock">' + text + '</span>' +
             '</div>'
         );
+        if (clock.border) {
+            $('#clock').css('border-color', clock.border);
+        }
+        if (clock.background) {
+            $('#clock').css('background-color', clock.background);
+        }
+
         $('#clock').on('click', function () {
             clock.playPause();
         });
@@ -585,7 +598,6 @@ let clock = {
             clock.set(Number(init.clockDuration));
         }
         clock.timer = clock.duration;
-        clock.create();
 
         if (init.autoClock === true) {
             clock.start();
@@ -593,9 +605,18 @@ let clock = {
         if (init.clockMusic) {
             clock.playMusic = init.clockMusic;
         }
+        if (init.border) {
+            clock.border = init.border;
+        }
+        if (init.background) {
+            clock.background = init.background;
+        }
+
         if (init.clockFontSize) {
             $('#clockWrapper').css('font-size', init.clockFontSize + 'rem').css('margin-top', '-' + init.clockFontSize + 'rem');
         }
+
+        clock.create();
 
         $(document).bind('keydown', 'space', function () {
             clock.playPause();

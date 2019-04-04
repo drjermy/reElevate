@@ -115,10 +115,26 @@
                 <label class="custom-control-label nobr" for="playlistMaximiseSlides">Maximise slides</label>
             </div>
             <hr/>
-            <div>
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input toggle popup-toggle" id="playlistHasClock" data-variable="hasClock" data-paired=true>
+                <label class="custom-control-label nobr" for="playlistHasClock">Clock settings</label>
+            </div>
+            <div id="clockSettings" style="display:none">
                 <div class="custom-control custom-switch">
                     <input type="checkbox" class="custom-control-input toggle popup-toggle" id="playlistDefaultClockMusic" data-variable="defaultClockMusic">
                     <label class="custom-control-label nobr" for="playlistDefaultClockMusic">Clock Music</label>
+                </div>
+                <div class="form-group mt-1">
+                    <div class="input-group">
+                        <div class="input-group-prepend"><span class="input-group-text">border</span></div>
+                        <input type="text" class="form-control popup-text" id="playlistDefaultClockBorder" data-variable="defaultClockBorder" placeholder="transparent">
+                    </div>
+                </div>
+                <div class="form-group mt-1">
+                    <div class="input-group">
+                        <div class="input-group-prepend"><span class="input-group-text">background</span></div>
+                        <input type="text" class="form-control popup-text" id="playlistDefaultClockBackground" data-variable="defaultClockBackground" placeholder="transparent">
+                    </div>
                 </div>
                 <div class="form-group mt-1">
                     <div class="input-group">
@@ -127,8 +143,8 @@
                         <div class="input-group-append"><span class="input-group-text">rem</span></div>
                     </div>
                 </div>
-                <hr/>
             </div>
+            <hr/>
             <div class="form-group mt-1">
                 <div class="input-group">
                     <input type="text" class="form-control popup-text" id="playlistJumpURL" data-variable="jumpURL" placeholder="Jump to... " disabled>
@@ -229,7 +245,7 @@
             <div id="slideClockSettings" style="display: none">
                 <div class="custom-control custom-switch">
                     <input type="checkbox" class="custom-control-input toggle popup-toggle" id="slideAutoClock" data-variable="autoClock">
-                    <label class="custom-control-label nobr" for="slideAutoClock">Auto-start</label>
+                    <label class="custom-control-label nobr" for="slideAutoClock">Auto-start (no music)</label>
                 </div>
                 <div class="form-group mt-2">
                     <div class="input-group">

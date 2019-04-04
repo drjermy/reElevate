@@ -42,8 +42,14 @@ canvas {
     vertical-align: middle;
     color: white;
     background-color: transparent;
-    padding: 1rem;
     margin-left: 4%;
+}
+
+#clock {
+    padding: 0.5rem 2rem;
+    border-radius: 1rem;
+    border: 1px solid transparent;
+    background-color: transparent;
 }
 
 #clock:hover{

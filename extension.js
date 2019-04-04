@@ -739,6 +739,19 @@ loadForm = () => {
                 }
             });
 
+
+            if ($('#playlistHasClock').prop("checked")) {
+                $('#clockSettings').show();
+            }
+
+            $('#playlistHasClock').change(function() {
+                if ($('#playlistHasClock').prop("checked")) {
+                    $('#clockSettings').show();
+                } else {
+                    $('#clockSettings').hide();
+                }
+            });
+
         }
 
     });
