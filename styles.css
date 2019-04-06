@@ -65,6 +65,7 @@ canvas {
 .clockFinished {
     color: red !important;
     animation: blinker 1s linear infinite;
+    animation-iteration-count: 10;
 }
 
 @keyframes blinker {
