@@ -565,6 +565,7 @@ let clock = {
     playMusic: false,
     border: 'transparent',
     background: 'transparent',
+    clockFontSize: 5,
     musicFiles: [
         'bensound-beyondtheline',
         'bensound-creativeminds',
@@ -577,17 +578,24 @@ let clock = {
     },
     create: () => {
         let text = clock.text();
-        $('#largeImage').append(
+        $('#main-content').append(
             '<div id="clockWrapper">' +
-            '<span id="clock">' + text + '</span>' +
+            '<span id="clock" style="display:none">' + text + '</span>' +
             '</div>'
         );
+
         if (clock.border) {
             $('#clock').css('border-color', clock.border);
         }
         if (clock.background) {
             $('#clock').css('background-color', clock.background);
         }
+        if (clock.clockFontSize) {
+            $('#clock').css('font-size', clock.clockFontSize + 'rem');
+            $('#clock').css('border-width', Number(clock.clockFontSize)/2 + 'px');
+        }
+
+        clock.reposition();
 
         $('#clock').on('click', function () {
             clock.playPause();
@@ -611,9 +619,8 @@ let clock = {
         if (init.background) {
             clock.background = init.background;
         }
-
         if (init.clockFontSize) {
-            $('#clockWrapper').css('font-size', init.clockFontSize + 'rem').css('margin-top', '-' + init.clockFontSize + 'rem');
+            clock.clockFontSize = init.clockFontSize;
         }
 
         clock.create();
@@ -630,7 +637,9 @@ let clock = {
         $(document).bind('keydown', '=', function () {
             clock.addMinute();
         });
-
+        $(window).resize(function () {
+            clock.reposition();
+        });
     },
     text: (timer = clock.duration) => {
         let minutes, seconds;
@@ -648,6 +657,12 @@ let clock = {
         text = clock.text(clock.timer);
         $('#clock').html(text);
     },
+    reposition: () => {
+        $('#clock').css({
+            top: ($('#clockWrapper').height() - $('#clock').outerHeight())/2,
+            left: ($('#clockWrapper').width() - $('#clock').outerWidth())/2
+        }).show();
+    },
     start: () => {
         clock.timer -= 1;
         clock.hasStarted = true;
@@ -658,9 +673,9 @@ let clock = {
                     clock.isEnded = true;
                     clearInterval(clock.runningClock);
                     if (clock.playPromise) {
-                        clock.audio.pause();
+                        clock.fadeAudio();
                     }
-                    $('#clock').addClass('clockFinished')
+                    $('#clock').addClass('clockFinished');
                 }
             }
         }, 1000);
@@ -670,7 +685,7 @@ let clock = {
     },
     pause: () => {
         if (clock.runningClock && !clock.isEnded) {
-            $('#clock').css('opacity', '0.6');
+            $('#clock').addClass('paused');
             clock.isPaused = true;
             if (clock.playPromise) {
                 clock.audio.pause();
@@ -679,7 +694,7 @@ let clock = {
     },
     restart: () => {
         if (clock.runningClock && !clock.isEnded) {
-            $('#clock').css('opacity', '1');
+            $('#clock').removeClass('paused');
             clock.isPaused = false;
             if (clock.playPromise) {
                 clock.audio.play();
@@ -687,13 +702,15 @@ let clock = {
         }
     },
     playPause: () => {
-        if (clock.hasStarted === false) {
-            clock.start();
-        } else {
-            if (clock.isPaused === false) {
-                clock.pause();
+        if (!clock.hasStopped) {
+            if (clock.hasStarted === false) {
+                clock.start();
             } else {
-                clock.restart();
+                if (clock.isPaused === false) {
+                    clock.pause();
+                } else {
+                    clock.restart();
+                }
             }
         }
     },
@@ -722,7 +739,16 @@ let clock = {
         clock.audio = new Audio(chrome.runtime.getURL('/music/' + filename + '.mp3'));
         clock.audio.type = 'audio/wav';
         clock.playPromise = clock.audio.play();
-    }
+    },
+    fadeAudio: () => {
+        let audioFade = setInterval(function () {
+            clock.audio.volume -= 0.01;
+            if (clock.audio.volume < 0.01) {
+                clock.audio.pause();
+                clearInterval(audioFade);
+            }
+        }, 50);
+    },
 };
 
 
