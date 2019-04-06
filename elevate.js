@@ -580,7 +580,9 @@ let clock = {
         let text = clock.text();
         $('#main-content').append(
             '<div id="clockWrapper">' +
-            '<span id="clock" style="display:none">' + text + '</span>' +
+            '<span id="clock" style="display:none">' +
+            '<span id="clockText">' + text + '</span>' +
+            '</span>' +
             '</div>'
         );
 
@@ -655,7 +657,7 @@ let clock = {
     refreshText: () => {
         let text;
         text = clock.text(clock.timer);
-        $('#clock').html(text);
+        $('#clockText').html(text);
     },
     reposition: () => {
         $('#clock').css({
@@ -675,7 +677,7 @@ let clock = {
                     if (clock.playPromise) {
                         clock.fadeAudio();
                     }
-                    $('#clock').addClass('clockFinished');
+                    $('#clockText').addClass('clockFinished');
                 }
             }
         }, 1000);
@@ -720,7 +722,7 @@ let clock = {
         }
         clock.timer = clock.duration;
         clock.refreshText();
-        $('#clock').removeClass('clockFinished').css('opacity', '1');
+        $('#clockText').removeClass('clockFinished').css('opacity', '1');
         clock.hasStarted = false;
         clock.isPaused = false;
     },
