@@ -240,6 +240,11 @@ function elementVisibility() {
 
     if (isSlide === true) {
         maximise.slideHide();
+
+		global.all(function (global) {
+			jumpURL = global.jumpURL;
+		});
+
     } else {
 
         elements.presentingDefaults();
