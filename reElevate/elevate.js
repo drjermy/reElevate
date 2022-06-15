@@ -73,27 +73,27 @@ function getPageVariables()
 function retrieveWindowVariables(variables) {
     let ret = {};
 
-    let scriptContent = "";
-    for (let i = 0; i < variables.length; i++) {
-        let currVariable = variables[i];
-        scriptContent += "if (typeof " + currVariable + " !== 'undefined') $('body').attr('tmp_" + currVariable + "', JSON.stringify(" + currVariable + "));\n"
-    }
+    // let scriptContent = "";
+    // for (let i = 0; i < variables.length; i++) {
+    //     let currVariable = variables[i];
+    //     scriptContent += "if (typeof " + currVariable + " !== 'undefined') $('body').attr('tmp_" + currVariable + "', JSON.stringify(" + currVariable + "));\n"
+    // }
 
-    let script = document.createElement('script');
-    script.id = 'tmpScript';
-    script.appendChild(document.createTextNode(scriptContent));
-    (document.body || document.head || document.documentElement).appendChild(script);
+    // let script = document.createElement('script');
+    // script.id = 'tmpScript';
+    // script.appendChild(document.createTextNode(scriptContent));
+    // (document.body || document.head || document.documentElement).appendChild(script);
 
-    for (let i = 0; i < variables.length; i++) {
-        let currVariable = variables[i];
-        let current = $("body").attr("tmp_" + currVariable);
-        if (current) {
-            ret[currVariable] = $.parseJSON(current);
-        }
-        $("body").removeAttr("tmp_" + currVariable);
-    }
+    // for (let i = 0; i < variables.length; i++) {
+    //     let currVariable = variables[i];
+    //     let current = $("body").attr("tmp_" + currVariable);
+    //     if (current) {
+    //         ret[currVariable] = $.parseJSON(current);
+    //     }
+    //     $("body").removeAttr("tmp_" + currVariable);
+    // }
 
-    $("#tmpScript").remove();
+    // $("#tmpScript").remove();
 
     return ret;
 }

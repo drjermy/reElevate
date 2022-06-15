@@ -806,7 +806,14 @@ $(document).on('click', '.openSubButton', function () {
  * Wait until the document is ready and initialse the playlist and load.
  */
 $(document).ready(function() {
-    chrome.tabs.getSelected(null, function(tab) {
+    // Get the current active tab in the lastly focused window
+    chrome.tabs.query({
+        active: true,
+        lastFocusedWindow: true
+    }, function(tabs) {
+        // and use that tab to fill in out title and url
+        var tab = tabs[0];
+        
         playlist.init(tab);
         popup.load();
     });
