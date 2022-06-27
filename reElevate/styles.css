@@ -6,6 +6,10 @@ div.modality {
     display:none;
 }
 
+.offline-workflow-outer-wrapper {
+    overflow: hidden;
+}
+
 .footer-courtesy a {
     color: #777 !important;
 }
