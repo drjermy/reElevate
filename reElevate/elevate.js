@@ -108,24 +108,16 @@ function getPlaylistVarsFromURL()
 {
     let playlistIds = {};
 
-    let pathArray = window.location.pathname.split('/');
-    if (offlineMode === true) {
-        let lastPart = pathArray.pop();
-        let partsArray = lastPart.split('.html')[0].split('_');
-        playlistIds = {
-            playlistId: partsArray[1],
-            entryId: partsArray[3],
-            caseId: partsArray[5],
-            studyId: partsArray[7]
-        };
-    } else {
-        playlistIds = {
-            playlistId: pathArray[2],
-            entryId: pathArray[4],
-            caseId: pathArray[6],
-            studyId: pathArray[8]
-        };
-    }
+    let regex = /play_([0-9]*)_entry_([0-9]*)_case_([0-9]*)_studies_([0-9]*).html/
+
+    let pathParts = window.location.pathname.match(regex)
+
+    playlistIds = {
+        playlistId: pathParts[1],
+        entryId: pathParts[2],
+        caseId: pathParts[3],
+        studyId: pathParts[4]
+    };
 
     playlistVars = playlistIds;
 }
