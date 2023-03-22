@@ -543,10 +543,10 @@ function engage()
 
         } else {
             let vars = result[store.name()];
-            let scrollSpeed = vars.scrollSpeed;
-            let scrollNumber = vars.scrollNumber;
+            let scrollSpeed = vars?.scrollSpeed;
+            let scrollNumber = vars?.scrollNumber;
 
-            if (vars.autoScroll) {
+            if (vars?.autoScroll) {
                 autoScroll.init({
                     scrollSpeed: scrollSpeed,
                     scrollNumber: scrollNumber
