@@ -90,48 +90,37 @@ let extensionReload = () => {
  * The init method is called immediately after page-load.
  */
 let playlist = {
-    offlineMode: null, // (bool) for whether we are online or offline.
     tab: null, // the tab object from the current chrome tab (used to get URL).
     vars: {}, // extracted variables.
     init: (tab) => {
         playlist.tab = tab;
-        playlist.isOffline();
         playlist.varsFromUrl();
-    },
-    isOffline: () => { // Determine whether we are online or offline.
-        playlist.offlineMode = (playlist.tab.url.split('://')[0] === 'file');
     },
     hasStudyId: () => {
         return typeof playlist.vars.studyId === 'undefined';
     },
-    varsFromUrl: () => { // Gather all the vars from the URL (different format for online and offline).
-        let trimmedURL = playlist.tab.url.split('?')[0];
-        let pathArray = trimmedURL.split('/');
-        if (playlist.offlineMode === true) {
-            let lastPart = pathArray.pop();
-            let partsArray = lastPart.split('.html')[0].split('_');
-            playlist.vars = {
-                playlistId: partsArray[1],
-                entryId: partsArray[3],
-                caseId: partsArray[5],
-                studyId: partsArray[7]
-            };
-        } else {
-            let studyId;
-            if (typeof pathArray[10] === "undefined") {
-                studyId = pathArray[9];
-            } else {
-                studyId = pathArray[10];
-            }
-            playlist.vars = {
-                playlistId: pathArray[4],
-                entryId: pathArray[6],
-                caseId: pathArray[8]
-            };
-            if (typeof studyId !== 'undefined') {
-                playlist.vars.studyId = studyId.split('#')[0];
-            }
-        }
+    varsFromUrl: () => {
+        let regex = /play_([0-9]*)_entry_([0-9]*)_case_([0-9]*)_studies_([0-9]*).html/
+        let pathParts = playlist.tab.url.match(regex)
+
+        playlist.vars = {
+            playlistId: pathParts[1],
+            entryId: pathParts[2],
+            caseId: pathParts[3],
+            studyId: pathParts[4]
+        };
+
+
+//        let trimmedURL = playlist.tab.url.split('?')[0];
+//        let pathArray = trimmedURL.split('/');
+//        let lastPart = pathArray.pop();
+//        let partsArray = lastPart.split('.html')[0].split('_');
+//        playlist.vars = {
+//            playlistId: partsArray[1],
+//            entryId: partsArray[3],
+//            caseId: partsArray[5],
+//            studyId: partsArray[7]
+//        };
     },
     playlist_id: () => { // Create the playlist id that is used as the location for playlist config.
         return 'radiopaedia' + '-' + playlist.vars.playlistId;
@@ -143,11 +132,7 @@ let playlist = {
         return 'radiopaedia' + '-' + playlist.vars.playlistId + '-' + playlist.vars.entryId + '-' + playlist.vars.caseId + '-' + playlist.vars.studyId;
     },
     jumpTo_url: () => {
-        if (playlist.offlineMode === true) {
-            return '/' + playlist.tab.url.split('pages/')[1].split('.html')[0].split('_').join('/');
-        } else {
-            return '/play/' + playlist.tab.url.split('/play/')[1].split('#')[0];
-        }
+        return '/' + playlist.tab.url.split('pages/')[1].split('.html')[0].split('_').join('/');
     },
     store: (variableName, variableValue, scope = 'study') => { // Store a name => value pair to a scope.
         let playlist_id = playlist.playlist_id();

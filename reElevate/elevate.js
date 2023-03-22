@@ -1,40 +1,4 @@
-let wrapper, wrapperPaddingTop, wrapperPaddingBottom, largeImageMarginLeft, hasImages, hasVideo, isSlide, stackedImages, offlineMode, playlistVars, jumpURL, context, globalSettings;
-
-/**
- * This is really just for the online version.
- * In a case, we don't refresh the page, and therefore we need another way to trigger init(), e.g. not document.ready
- * So, we are going to look for an attribute change to 'type' which seems to happen when we change study.
- * This could break with any changes to the local codebase.
- */
-function observe() {
-    if (offlineMode === true) return;
-
-    // Select the node that will be observed for mutations
-    let targetNode = document.getElementById('content');
-
-    // Options for the observer (which mutations to observe)
-    let config = { attributes: true, childList: true, subtree: true };
-
-    // Callback function to execute when mutations are observed
-    let callback = function(mutationsList, observer) {
-        for(let mutation of mutationsList) {
-            if (mutation.type === 'attributes') {
-                if (mutation.attributeName !== "id" && mutation.attributeName !== "style"  && mutation.attributeName !== "src") {
-                    console.log('The ' + mutation.attributeName + ' attribute was modified.');
-                }
-                if (mutation.attributeName === 'type') {
-                    init();
-                }
-            }
-        }
-    };
-
-    // Create an observer instance linked to the callback function
-    let observer = new MutationObserver(callback);
-
-    // Start observing the target node for configured mutations
-    observer.observe(targetNode, config);
-}
+let wrapper, wrapperPaddingTop, wrapperPaddingBottom, largeImageMarginLeft, hasImages, hasVideo, isSlide, stackedImages, playlistVars, jumpURL, context, globalSettings;
 
 function init() {
     wrapper = $('#wrapper');
@@ -75,9 +39,7 @@ function getPageVariables()
         const cdata = scripts[i].valueOf().innerHTML.match(regex);
 
         if (cdata) {
-            if (cdata[1] === 'offlineMode') {
-                pageVariables['offlineMode'] = cdata[2]
-            } else if (cdata[1] === 'currentCaseID') {
+            if (cdata[1] === 'currentCaseID') {
                 let match = cdata[2].match(/'(.*)'/)
                 pageVariables['currentCaseID'] = match[1]
             } else if (cdata[1] === 'studies') {
@@ -99,7 +61,6 @@ function getPageVariables()
     }
 
     stackedImages = pageVariables['stackedImages'];
-    offlineMode = pageVariables['offlineMode'];
 
 }
 
@@ -1236,12 +1197,8 @@ presentation = {
         presentation.createTab();
     },
     url: () => {
-        if (offlineMode) {
-            let urlSansFilename = location.href.replace(/[^/]*$/, '');
-            return urlSansFilename + 'play_' + playlistVars.playlistId + '_entry_' + playlistVars.entryId + '_case_' + playlistVars.caseId + '_presentation.html';
-        } else {
-            return 'https://radiopaedia.org/play/' + playlistVars.playlistId + '/entry/' + playlistVars.entryId + '/case/' + playlistVars.caseId + '/presentation';
-        }
+        let urlSansFilename = location.href.replace(/[^/]*$/, '');
+        return urlSansFilename + 'play_' + playlistVars.playlistId + '_entry_' + playlistVars.entryId + '_case_' + playlistVars.caseId + '_presentation.html';
     },
     loadFromStorage: () => {
         let storage = presentation.storage;
@@ -1569,11 +1526,7 @@ let navigate = {
     },
     jumpTo: function () {
         if (typeof jumpURL !== "undefined") {
-            if (offlineMode === true) {
-                jumpURL = jumpURL.replace('/play', 'play').split('/').join('_') + '.html';
-            } else {
-                jumpURL = 'https://radiopaedia.org' + jumpURL;
-            }
+            jumpURL = jumpURL.replace('/play', 'play').split('/').join('_') + '.html';
             window.location.replace(jumpURL);
         }
     },
@@ -1794,7 +1747,6 @@ function bindKeyboardShortcuts() {
 $(document).ready(function() {
 
     init();
-    observe();
 
     $( window ).resize(function() {
         setImageWrapperSize();
