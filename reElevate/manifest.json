@@ -26,8 +26,6 @@
       "elevate.js"
     ],
     "matches": [
-      "https://radiopaedia.org/play/*",
-      "https://staging.radiopaedia.org/play/*",
       "file://*pages/*"
     ]
   }]
