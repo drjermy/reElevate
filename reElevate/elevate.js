@@ -62,40 +62,45 @@ function init() {
 
 function getPageVariables()
 {
-    let pageVariables = retrieveWindowVariables(["stackedImages", "caseIDs", "currentCaseID", "studies", "components", "offlineMode"]);
+
+    // We have to do all this extraction from CDATA manually and set variables.
+    // If there is ever a better way to scrape the variables from the page, then we MUST do it!
+    let pageVariables = [];
+
+    let scripts = document.body.getElementsByTagName('script')
+
+    for (let i = 0; i < scripts.length; i++) {
+
+        let regex = /CDATA[\s\S]*var ([\s\S]*) = ([\s\S]*);/;
+        const cdata = scripts[i].valueOf().innerHTML.match(regex);
+
+        if (cdata) {
+            if (cdata[1] === 'offlineMode') {
+                pageVariables['offlineMode'] = cdata[2]
+            } else if (cdata[1] === 'currentCaseID') {
+                let match = cdata[2].match(/'(.*)'/)
+                pageVariables['currentCaseID'] = match[1]
+            } else if (cdata[1] === 'studies') {
+                pageVariables['studies'] = JSON.parse(cdata[2])
+            } else if (cdata[1] === 'caseIDs') {
+                pageVariables['caseIDs'] = JSON.parse(cdata[2])
+            } else if (cdata[1] === 'components') {
+                pageVariables['components'] = JSON.parse(cdata[2])
+            }
+        }
+
+        let regex2 = /var stackedImages = ([\s\S]*);/;
+        const result2 = scripts[i].valueOf().innerHTML.match(regex2);
+
+        if (result2) {
+            pageVariables['stackedImages'] = JSON.parse(result2[1])
+        }
+
+    }
 
     stackedImages = pageVariables['stackedImages'];
     offlineMode = pageVariables['offlineMode'];
-}
 
-
-// https://stackoverflow.com/questions/3955803/page-variables-in-content-script
-function retrieveWindowVariables(variables) {
-    let ret = {};
-
-    // let scriptContent = "";
-    // for (let i = 0; i < variables.length; i++) {
-    //     let currVariable = variables[i];
-    //     scriptContent += "if (typeof " + currVariable + " !== 'undefined') $('body').attr('tmp_" + currVariable + "', JSON.stringify(" + currVariable + "));\n"
-    // }
-
-    // let script = document.createElement('script');
-    // script.id = 'tmpScript';
-    // script.appendChild(document.createTextNode(scriptContent));
-    // (document.body || document.head || document.documentElement).appendChild(script);
-
-    // for (let i = 0; i < variables.length; i++) {
-    //     let currVariable = variables[i];
-    //     let current = $("body").attr("tmp_" + currVariable);
-    //     if (current) {
-    //         ret[currVariable] = $.parseJSON(current);
-    //     }
-    //     $("body").removeAttr("tmp_" + currVariable);
-    // }
-
-    // $("#tmpScript").remove();
-
-    return ret;
 }
 
 
