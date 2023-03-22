@@ -1193,7 +1193,9 @@ presentation = {
     data: {},
     init: (storage) => {
         presentation.storage = storage;
-        presentation.getData();
+        presentation.parse.all();
+        presentation.loadFromStorage();
+        presentation.injectionIntoQuestions();
         presentation.createTab();
     },
     url: () => {
@@ -1205,18 +1207,6 @@ presentation = {
         if (storage.presentationAge) presentation.data.age = storage.presentationAge;
         if (storage.presentationGender) presentation.data.gender = storage.presentationGender;
         if (storage.presentationPresentation) presentation.data.presentation = storage.presentationPresentation;
-    },
-    getData: () => {
-        $.ajax({
-            url: presentation.url(),
-            cache: false,
-            success: function (response) {
-                presentation.response = response;
-                presentation.parse.all();
-                presentation.loadFromStorage();
-                presentation.injectionIntoQuestions();
-            }
-        });
     },
     parse: {
         all: () => {
@@ -1253,14 +1243,15 @@ presentation = {
         navigate.imagesTab();
     },
     tabHTML: () => {
-        return '\n' +
-            '<p><strong>Age: </strong>\n' +
-            '<span id="presentation-tab-age">' + presentation.data.age + '</span></p>\n' +
-            '<p><strong>Gender: </strong>\n' +
-            '<span id="presentation-tab-gender">' + presentation.data.gender + '</span></p>\n' +
-            '<p><strong>Presentation: </strong>\n' +
-            '<span id="presentation-tab-presentation">' + presentation.data.presentation + '</span></p>\n' +
-            '</div>';
+        let age = presentation.data.age
+        let gender = presentation.data.gender
+        let pres = presentation.data.presentation
+
+        let ageHTML = age ? '<p><strong>Age: </strong>\n<span id="presentation-tab-age">' + age + '</span></p>\n' : ''
+        let genderHTML = gender ? '<p><strong>Gender: </strong>\n<span id="presentation-tab-gender">' + gender + '</span></p>\n' : ''
+        let presentationHTML = pres ? '<p><strong>Presentation: </strong>\n<span id="presentation-tab-presentation">' + pres + '</span></p>\n' : ''
+
+        return '\n<div>' + ageHTML + genderHTML + presentationHTML + '</div>';
     },
     injectionIntoQuestions: () => {
         $('#offline-workflow-questions-pane').html(presentation.tabHTML());
