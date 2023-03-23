@@ -69,18 +69,36 @@ function getPlaylistVarsFromURL()
 {
     let playlistIds = {};
 
-    let regex = /play_([0-9]*)_entry_([0-9]*)_case_([0-9]*)_studies_([0-9]*).html/
+    let pathname = window.location.pathname
 
-    let pathParts = window.location.pathname.match(regex)
+    let regex = /play_([0-9]*).*\.html/
+    let pathParts = pathname.match(regex)
+    playlistIds.playlistId = pathParts[1]
 
-    playlistIds = {
-        playlistId: pathParts[1],
-        entryId: pathParts[2],
-        caseId: pathParts[3],
-        studyId: pathParts[4]
-    };
+    let regex1 = /play_.*_entry_([0-9]*).*\.html/
+    let pathParts1 = pathname.match(regex1)
+    playlistIds.playlistId = pathParts[1]
 
-    playlistVars = playlistIds;
+    if (pathParts1) {
+        playlistIds.entryId = pathParts[1]
+    }
+
+    let regex2 = /play_.*_case_([0-9]*)_studies_([0-9]*)\.html/
+    let pathParts2 = pathname.match(regex2)
+
+    if (pathParts2) {
+        playlistIds.caseId = pathParts2[1]
+        playlistIds.studyId = pathParts2[2]
+    }
+
+    let regex3 = /play_.*_slide_([0-9]*)\.html/
+    let pathParts3 = pathname.match(regex3)
+
+    if (pathParts3) {
+        playlistIds.slideId = pathParts3[1]
+    }
+
+    playlistVars = playlistIds
 }
 
 

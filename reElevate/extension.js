@@ -100,27 +100,42 @@ let playlist = {
         return typeof playlist.vars.studyId === 'undefined';
     },
     varsFromUrl: () => {
-        let regex = /play_([0-9]*)_entry_([0-9]*)_case_([0-9]*)_studies_([0-9]*).html/
-        let pathParts = playlist.tab.url.match(regex)
 
-        playlist.vars = {
-            playlistId: pathParts[1],
-            entryId: pathParts[2],
-            caseId: pathParts[3],
-            studyId: pathParts[4]
-        };
+        let pathname = playlist.tab.url
 
+        let playlistIds = {}
 
-//        let trimmedURL = playlist.tab.url.split('?')[0];
-//        let pathArray = trimmedURL.split('/');
-//        let lastPart = pathArray.pop();
-//        let partsArray = lastPart.split('.html')[0].split('_');
-//        playlist.vars = {
-//            playlistId: partsArray[1],
-//            entryId: partsArray[3],
-//            caseId: partsArray[5],
-//            studyId: partsArray[7]
-//        };
+        let regex = /play_([0-9]*).*\.html/
+        let pathParts = pathname.match(regex)
+        playlistIds.playlistId = pathParts[1]
+
+        let regex1 = /play_.*_entry_([0-9]*).*\.html/
+        let pathParts1 = pathname.match(regex1)
+        playlistIds.playlistId = pathParts[1]
+
+        if (pathParts1) {
+            playlistIds.entryId = pathParts[1]
+        }
+
+        let regex2 = /play_.*_case_([0-9]*)_studies_([0-9]*)\.html/
+        let pathParts2 = pathname.match(regex2)
+
+        if (pathParts2) {
+            playlistIds.caseId = pathParts2[1]
+            playlistIds.studyId = pathParts2[2]
+        }
+
+        let regex3 = /play_.*_slide_([0-9]*)\.html/
+        let pathParts3 = pathname.match(regex3)
+
+        if (pathParts3) {
+            playlistIds.slideId = pathParts3[1]
+        }
+
+        playlist.vars = playlistIds
+
+        console.log(playlist.vars)
+
     },
     playlist_id: () => { // Create the playlist id that is used as the location for playlist config.
         return 'radiopaedia' + '-' + playlist.vars.playlistId;
