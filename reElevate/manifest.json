@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "reElevate",
-  "version": "1.3",
+  "version": "1.3.1",
   "description": "Elevate Radiopaedia playlists",
   "permissions": [
     "storage",
@@ -12,12 +12,6 @@
     "default_popup": "popup.html",
     "default_title": "reElevate"
   },
-  "web_accessible_resources": [{
-    "resources": [
-      "/music/*"
-    ],
-    "matches": ["<all_urls>"]
-  }],
   "content_scripts": [{
     "css": ["styles.css"],
     "js": [
