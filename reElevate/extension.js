@@ -3,17 +3,6 @@
  *********************/
 
 /**
- * Capitalise the first letter of a string.
- *
- * @param string
- * @returns {string}
- */
-function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-
-/**
  * Create a downloadable file with text.
  *
  * @param filename
@@ -133,9 +122,6 @@ let playlist = {
         }
 
         playlist.vars = playlistIds
-
-        console.log(playlist.vars)
-
     },
     playlist_id: () => { // Create the playlist id that is used as the location for playlist config.
         return 'radiopaedia' + '-' + playlist.vars.playlistId;
