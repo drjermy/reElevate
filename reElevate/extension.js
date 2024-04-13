@@ -92,6 +92,13 @@ let playlist = {
 
         let pathname = playlist.tab.url
 
+        let regexUrl = /^file:\/\/\//
+        let matchUrl = pathname.match(regexUrl)
+
+        if (! matchUrl) {
+            return
+        }
+
         let playlistIds = {}
 
         let regex = /play_([0-9]*).*\.html/
@@ -801,6 +808,9 @@ $(document).ready(function() {
         var tab = tabs[0];
         
         playlist.init(tab);
-        popup.load();
+
+        if (playlist.vars) {
+            popup.load();
+        }
     });
 });
